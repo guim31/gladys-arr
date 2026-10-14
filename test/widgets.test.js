@@ -1,77 +1,116 @@
+// -----------------------------------------------------------------------------
+// The "Upcoming releases" widget: valid content within the core budget, the
+// posters served from the instances, the buttons.
+// -----------------------------------------------------------------------------
+
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateWidgetContent } from '@gladysassistant/integration-sdk';
-import { createFakeGladys } from '@gladysassistant/integration-sdk/testing';
-import { buildDiscoveredDevices } from '../src/devices/index.js';
-import { simulateLanSession } from '../src/devices/plug.js';
-import { DEMO_STATUS_WIDGET, WIDGETS, refreshWidgets } from '../src/widgets.js';
-import { normalizeConfig } from '../src/config.js';
+import { validateWidgetContent, validateWidgetImage } from '@gladysassistant/integration-sdk';
+import { ACTIONS } from '../src/widgets.js';
+import { createClock, createWorld, deviceId } from './helpers/world.js';
 
-const gladys = createFakeGladys();
-const config = normalizeConfig();
-const demoStatus = WIDGETS[DEMO_STATUS_WIDGET];
+async function world(t, options) {
+  const w = await createWorld(options);
+  t.after(() => w.app.stop());
+  return w;
+}
 
-// What the SDK passes to onWidgetGet, plus the config index.js adds.
-const getContent = (cfg = config) =>
-  demoStatus.get(gladys, { settings: {}, language: 'en', units: 'metric', config: cfg });
+const components = (ack) => ack.data.content.components;
+const ofType = (ack, type) => components(ack).filter((c) => c.type === type);
 
-test('the demo_status content is rendered exactly as sent', async () => {
-  // [] = nothing the core would drop, truncate or trim to the content budget.
-  assert.deepEqual(validateWidgetContent(await getContent()), []);
-});
+function assertBudget(content) {
+  assert.deepEqual(validateWidgetContent(content), []);
+  const list = content.components;
+  assert.ok(list.length <= 8);
+  assert.ok(list.filter((c) => c.type === 'text').length <= 2);
+  assert.ok(list.filter((c) => ['value', 'gauge'].includes(c.type)).length <= 6);
+  assert.ok(list.filter((c) => c.type === 'button').length <= 4);
+  const keys = list.filter((c) => c.type === 'button').map((c) => c.action.key);
+  assert.equal(new Set(keys).size, keys.length, 'unique button keys');
+}
 
-test('the degraded plug connection content is valid too', async () => {
-  simulateLanSession(false);
-  try {
-    const content = await getContent();
-    assert.deepEqual(validateWidgetContent(content), []);
-    const status = content.components.find((component) => component.type === 'status');
-    assert.ok(
-      status.items.some((item) => item.color === 'warning'),
-      'degraded shows a warning',
-    );
-  } finally {
-    simulateLanSession(true);
+test('the week of the captures: the episode, its poster, the queues', async (t) => {
+  const w = await world(t);
+  for (const language of ['en', 'fr', 'de', 'es']) {
+    const ack = await w.fake.widgetGet('upcoming', { language });
+    assert.equal(ack.success, true, ack.error);
+    assertBudget(ack.data.content);
   }
-});
-
-test('the live tiles reference features the integration publishes', async () => {
-  const featureIds = new Set(
-    buildDiscoveredDevices(gladys, config).flatMap((device) =>
-      device.features.map((feature) => feature.external_id),
-    ),
+  const ack = await w.fake.widgetGet('upcoming', { language: 'en' });
+  const [grid] = ofType(ack, 'card-list');
+  assert.deepEqual(grid.items[0], {
+    title: 'The Simpsons · S38E03',
+    date: '2026-10-19T00:00:00.000Z',
+    image: 'poster-sonarr-1-1',
+    badge: { text: 'Downloaded', color: 'success' },
+    description:
+      'S38E03 · Treehouse of Horror Presents: The Revengening\n\nAll hell breaks loose on Halloween when a killer comes to Springfield and hacks their way through town. No Simpson is safe from... THE REVENGENING!',
+  });
+  assert.deepEqual(
+    ofType(ack, 'value').map((c) => c.value),
+    [3, 1263],
   );
-  const liveTiles = (await getContent()).components.filter((c) => c.device_feature);
-  assert.ok(liveTiles.length > 0, 'the template demonstrates a device-bound tile');
-  for (const tile of liveTiles) {
-    assert.ok(featureIds.has(tile.device_feature), `unknown feature ${tile.device_feature}`);
+  const [status] = ofType(ack, 'status');
+  assert.equal(status.items[0].value, '3 in queue · 2 in error · 3 alert(s)');
+});
+
+test('a movie released this week shows how it comes out', async (t) => {
+  const w = await world(t, { clock: createClock(Date.parse('2026-10-30T10:00:00Z')) });
+  const ack = await w.fake.widgetGet('upcoming', {
+    language: 'fr',
+    settings: { device: deviceId(w.gladys, 'radarr_1') },
+  });
+  const [grid] = ofType(ack, 'card-list');
+  assert.equal(grid.items.length, 1);
+  assert.equal(grid.items[0].title, 'Avatar Aang: The Last Airbender');
+  assert.equal(grid.items[0].date, '2026-11-03');
+  assert.deepEqual(grid.items[0].badge, { text: 'Blu-ray / DVD', color: 'neutral' });
+});
+
+test('an empty week says so', async (t) => {
+  const w = await world(t, { clock: createClock(Date.parse('2026-12-01T10:00:00Z')) });
+  const ack = await w.fake.widgetGet('upcoming', { language: 'fr' });
+  assert.deepEqual(ofType(ack, 'card-list'), []);
+  assert.equal(ofType(ack, 'text')[0].text, 'Aucune sortie cette semaine.');
+  assertBudget(ack.data.content);
+});
+
+test('the posters come from the instance, other keys are refused', async (t) => {
+  const w = await world(t);
+  const ack = await w.fake.widgetGetImage('poster-sonarr-1-1');
+  assert.equal(ack.success, true, ack.error);
+  assert.deepEqual(validateWidgetImage(ack.data.image), []);
+  assert.equal(w.sonarr.requests.at(-1).path, '/api/v3/mediacover/1/poster-250.jpg');
+  for (const key of ['poster-sonarr-2-1', 'poster-lidarr-1-1', '../etc/passwd']) {
+    assert.equal((await w.fake.widgetGetImage(key)).success, false, key);
   }
 });
 
-test('every button action of the content is handled and answers a short toast', async () => {
-  const buttons = (await getContent()).components.filter((c) => c.type === 'button' && c.action);
-  assert.ok(buttons.length > 0, 'the template demonstrates a widget action');
-  for (const { action } of buttons) {
-    const message = await demoStatus.action(gladys, {
-      actionKey: action.key,
-      params: action.params ?? {},
-      settings: {},
-      config,
-    });
-    assert.ok(message.en, 'the toast carries at least the mandatory `en` text');
-    assert.ok(message.en.length <= 200, 'toasts are capped at 200 characters');
-  }
-});
-
-test('an unknown widget action fails, so the user sees the error', async () => {
-  await assert.rejects(
-    demoStatus.action(gladys, { actionKey: 'unknown', params: {}, settings: {}, config }),
-    /Unknown widget action/,
+test('the buttons search the missing items and refresh', async (t) => {
+  const w = await world(t, { config: { ...(await import('./helpers/world.js')).BOTH } });
+  const search = await w.fake.widgetAction('upcoming', ACTIONS.SEARCH_MISSING);
+  assert.equal(search.success, true, search.error);
+  assert.match(search.data.message.en, /started on 2 instance/);
+  const refresh = await w.fake.widgetAction(
+    'upcoming',
+    ACTIONS.REFRESH,
+    {},
+    {
+      settings: { device: deviceId(w.gladys, 'sonarr_1') },
+    },
   );
+  assert.equal(refresh.success, true, refresh.error);
+  assert.deepEqual(w.sonarr.commands, ['MissingEpisodeSearch', 'RefreshSeries']);
 });
 
-test('refreshWidgets nudges every widget', () => {
-  const fresh = createFakeGladys();
-  refreshWidgets(fresh);
-  assert.deepEqual(fresh.fake.widgetRefreshes, Object.keys(WIDGETS));
+test('without configuration, or for a removed instance, a message', async (t) => {
+  const empty = await world(t, { config: {} });
+  const ack = await empty.fake.widgetGet('upcoming', { language: 'en' });
+  assert.match(ofType(ack, 'text')[0].text, /address and API key/);
+  const w = await world(t);
+  const gone = await w.fake.widgetGet('upcoming', {
+    language: 'en',
+    settings: { device: deviceId(w.gladys, 'radarr_2') },
+  });
+  assert.match(ofType(gone, 'text')[0].text, /no longer in the configuration/);
 });

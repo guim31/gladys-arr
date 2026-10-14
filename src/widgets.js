@@ -1,169 +1,285 @@
 // -----------------------------------------------------------------------------
-// Dashboard widgets (SDK v0.14+, Gladys 5.1+).
+// Dashboard widget (manifest `widgets`, Gladys 5.1+): `upcoming`.
 //
-// A widget puts the integration's own data on the Gladys dashboard without a
-// dedicated core widget. The manifest `widgets` field declares its identity
-// (key, label, icon, optional per-instance `settings`); at runtime the
-// integration returns a DECLARATIVE content — `text`, `value`, `gauge`,
-// `status`, `chart`, `card-list`, `image`, `button` — that the core renders
-// with its own theme, dark mode and translations. No HTML, no CSS.
+// The use case: what comes out this week, at a glance on the wall tablet,
+// and whether the downloads are stuck. So the widget shows a poster grid of
+// the episodes and movies released from today to the next 6 days (a check
+// mark badge once downloaded), two tiles (queue, missing), one status row per
+// instance, and two direct buttons: search the missing ones, refresh.
 //
-// Each entry of WIDGETS is keyed by the widget `key` and exposes:
-//   - get(gladys, { settings, language, units, config }): the content,
-//     registered by index.js with `gladys.onWidgetGet(key, ...)`;
-//   - action(gladys, { actionKey, params, settings, config }) (optional): a
-//     tapped `button` carrying an `action`, registered with
-//     `gladys.onWidgetAction`.
+// Every instance by default, or the one chosen in the widget settings. The
+// figures are sent as values, not bound to device features, so the widget
+// works before the devices are added to Gladys and sums several instances.
 //
-// Check your contents in the tests with `validateWidgetContent` (exported by
-// the SDK, see test/widgets.test.js), or run with DEBUG=gladys-integration-sdk
-// to have the SDK log every violation of the vocabulary and the budget.
+// Posters: Sonarr and Radarr keep a small copy of each poster (MediaCover,
+// ~250 px wide JPEG). The content declares a key per poster, Gladys asks for
+// its bytes through onWidgetGetImage, and the hub reads them from the
+// instance: the browser never loads a third-party URL.
 // -----------------------------------------------------------------------------
 
-import {
-  createLogger,
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_TRANSPORTS,
-  WIDGET_COLORS,
-} from '@gladysassistant/integration-sdk';
-import { identifyDevice } from './devices/index.js';
-import { weatherStation } from './devices/weatherStation.js';
-import { plug } from './devices/plug.js';
-import { light } from './devices/light.js';
+import { WIDGET_COLORS, validateWidgetImage } from '@gladysassistant/integration-sdk';
+import { KINDS } from './config.js';
+import { ERROR_KINDS } from './arr/client.js';
+import { instanceName } from './devices.js';
+import { WIDGET_KEY } from './hub.js';
+import { pick } from './texts.js';
 
-const logger = createLogger({ name: 'widgets' });
+// Action keys of the buttons: permanent once published.
+export const ACTIONS = Object.freeze({
+  SEARCH_MISSING: 'search_missing',
+  REFRESH: 'refresh',
+});
 
-// Widget key, as declared in the manifest `widgets` field.
-export const DEMO_STATUS_WIDGET = 'demo_status';
+const MAX_CARDS = 12;
+const MAX_IMAGE_BYTES = 300 * 1024;
+const POSTER_KEY = /^poster-(sonarr|radarr)-(\d)-(\d{1,12})$/;
 
-// Keys of the `button` actions the demo_status content declares.
-const DEMO_STATUS_ACTIONS = { IDENTIFY_LIGHT: 'identify_light' };
+export const TEXT = {
+  pick: {
+    en: 'Enter the address and API key of your Sonarr or Radarr in the configuration of the integration.',
+    fr: "Saisissez l'adresse et la clé d'API de votre Sonarr ou Radarr dans la configuration de l'intégration.",
+    de: 'Gib die Adresse und den API-Schlüssel deines Sonarr oder Radarr in der Konfiguration der Integration ein.',
+    es: 'Introduzca la dirección y la clave de API de su Sonarr o Radarr en la configuración de la integración.',
+  },
+  unknown: {
+    en: 'This instance is no longer in the configuration: choose another one in the widget settings.',
+    fr: "Cette instance n'est plus dans la configuration : choisissez-en une autre dans les réglages du widget.",
+    de: 'Diese Instanz ist nicht mehr in der Konfiguration: Wähle eine andere in den Widget-Einstellungen.',
+    es: 'Esta instancia ya no está en la configuración: elija otra en la configuración del widget.',
+  },
+  nothing: {
+    en: 'Nothing comes out this week.',
+    fr: 'Aucune sortie cette semaine.',
+    de: 'Diese Woche erscheint nichts.',
+    es: 'No hay estrenos esta semana.',
+  },
+  queue: { en: 'In queue', fr: 'En file', de: 'In Warteschlange', es: 'En cola' },
+  missing: { en: 'Missing', fr: 'Manquants', de: 'Fehlend', es: 'Pendientes' },
+  inQueue: { en: 'in queue', fr: 'en file', de: 'wartend', es: 'en cola' },
+  inError: { en: 'in error', fr: 'en erreur', de: 'mit Fehler', es: 'con error' },
+  healthy: { en: 'OK', fr: 'OK', de: 'OK', es: 'OK' },
+  issues: { en: 'alert(s)', fr: 'alerte(s)', de: 'Meldung(en)', es: 'aviso(s)' },
+  unreachable: {
+    en: 'Unreachable',
+    fr: 'Injoignable',
+    de: 'Nicht erreichbar',
+    es: 'Inaccesible',
+  },
+  error: { en: 'Error', fr: 'Erreur', de: 'Fehler', es: 'Error' },
+  waiting: { en: 'Waiting…', fr: 'En attente…', de: 'Warte…', es: 'Esperando…' },
+  downloaded: { en: 'Downloaded', fr: 'Téléchargé', de: 'Geladen', es: 'Descargado' },
+  cinema: { en: 'In cinemas', fr: 'Au cinéma', de: 'Im Kino', es: 'En cines' },
+  digital: { en: 'Digital', fr: 'Numérique', de: 'Digital', es: 'Digital' },
+  physical: { en: 'Blu-ray / DVD', fr: 'Blu-ray / DVD', de: 'Blu-ray / DVD', es: 'Blu-ray / DVD' },
+  searchMissing: {
+    en: 'Search missing',
+    fr: 'Chercher les manquants',
+    de: 'Fehlende suchen',
+    es: 'Buscar pendientes',
+  },
+  refresh: { en: 'Refresh', fr: 'Rafraîchir', de: 'Aktualisieren', es: 'Actualizar' },
+};
 
-// How the plug transport reads in the status list.
-const TRANSPORT_STATUS = {
-  [DEVICE_TRANSPORTS.LOCAL]: { value: { en: 'Local', fr: 'Locale' }, color: WIDGET_COLORS.SUCCESS },
-  [DEVICE_TRANSPORTS.CLOUD]: { value: { en: 'Cloud', fr: 'Cloud' }, color: WIDGET_COLORS.INFO },
-  [DEVICE_TRANSPORTS.UNREACHABLE]: {
-    value: { en: 'Unreachable', fr: 'Injoignable' },
-    color: WIDGET_COLORS.DANGER,
+// Toasts after a tap (≤ 200 characters).
+export const DONE_TEXT = {
+  en: {
+    searchMissing: (count) => `Search for the missing items started on ${count} instance(s).`,
+    refresh: (count) => `Refresh started on ${count} instance(s).`,
+  },
+  fr: {
+    searchMissing: (count) => `Recherche des manquants lancée sur ${count} instance(s).`,
+    refresh: (count) => `Rafraîchissement lancé sur ${count} instance(s).`,
+  },
+  de: {
+    searchMissing: (count) => `Suche nach fehlenden Elementen auf ${count} Instanz(en) gestartet.`,
+    refresh: (count) => `Aktualisierung auf ${count} Instanz(en) gestartet.`,
+  },
+  es: {
+    searchMissing: (count) => `Búsqueda de pendientes iniciada en ${count} instancia(s).`,
+    refresh: (count) => `Actualización iniciada en ${count} instancia(s).`,
   },
 };
 
-// A live tile references a feature by its external_id: read it from the
-// discovery payload itself, so the widget and the device never disagree.
-function featureExternalId(gladys, config, blueprint, category) {
-  const device = blueprint.buildDevice(gladys, config);
-  return device.features.find((feature) => feature.category === category).external_id;
+const t = (text, language) => pick(text, language);
+const fit = (text, max) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
+
+function message(text, language) {
+  return {
+    ttl_seconds: 300,
+    components: [{ type: 'text', variant: 'body', text: t(text, language) }],
+  };
 }
 
-function plugConnectionStatus(gladys, config) {
-  const { transport, degraded } = plug.transport(gladys, config);
-  const { value, color } = TRANSPORT_STATUS[transport];
-  if (degraded) {
+/** Image key of the poster of a series or movie of an instance. */
+export const posterKey = (slot, mediaId) => `poster-${slot.replace('_', '-')}-${mediaId}`;
+
+/** One card of the grid. */
+function card(record, item, language) {
+  const isEpisode = item.kind === KINDS.SONARR;
+  const code = isEpisode ? item.subtitle.split(' · ')[0] : '';
+  const title = fit(code ? `${item.title} · ${code}` : item.title, 60);
+  const overview = item.overview
+    .replace(/\r\n?/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  const description = [isEpisode ? item.subtitle : item.title, overview]
+    .filter(Boolean)
+    .join('\n\n');
+  const badge = item.hasFile
+    ? { text: t(TEXT.downloaded, language), color: WIDGET_COLORS.SUCCESS }
+    : item.release
+      ? { text: t(TEXT[item.release], language), color: WIDGET_COLORS.NEUTRAL }
+      : null;
+  return {
+    title,
+    date: item.day ?? item.date.toISOString(),
+    ...(Number.isSafeInteger(item.mediaId) && item.mediaId > 0
+      ? { image: posterKey(record.instance.slot, item.mediaId) }
+      : {}),
+    ...(badge ? { badge } : {}),
+    ...(description ? { description: fit(description, 2000) } : {}),
+  };
+}
+
+/** The status row of one instance. */
+function instanceRow(record, language) {
+  const label = fit(instanceName(record.instance), 40);
+  if (record.error) {
+    const unreachable = record.error.kind === ERROR_KINDS.UNREACHABLE;
     return {
-      value: { en: `${value.en} (degraded mode)`, fr: `${value.fr} (mode dégradé)` },
-      color: WIDGET_COLORS.WARNING,
+      label,
+      icon: 'alert-triangle',
+      value: t(unreachable ? TEXT.unreachable : TEXT.error, language),
+      color: WIDGET_COLORS.DANGER,
     };
   }
-  return { value, color };
+  const { queue, health } = record.snapshot;
+  if (!queue || !health) {
+    return { label, icon: 'clock', value: t(TEXT.waiting, language), color: WIDGET_COLORS.NEUTRAL };
+  }
+  const parts = [`${queue.count} ${t(TEXT.inQueue, language)}`];
+  if (queue.errors) {
+    parts.push(`${queue.errors} ${t(TEXT.inError, language)}`);
+  }
+  const issues = health.warnings + health.errors;
+  if (issues) {
+    parts.push(`${issues} ${t(TEXT.issues, language)}`);
+  }
+  const color =
+    health.errors || queue.errors
+      ? WIDGET_COLORS.DANGER
+      : health.warnings
+        ? WIDGET_COLORS.WARNING
+        : WIDGET_COLORS.SUCCESS;
+  return {
+    label,
+    icon: record.instance.kind === KINDS.SONARR ? 'tv' : 'film',
+    value: fit(parts.join(' · '), 40),
+    color,
+  };
+}
+
+export function buttons(language) {
+  return [
+    {
+      type: 'button',
+      label: t(TEXT.searchMissing, language),
+      icon: 'search',
+      style: 'secondary',
+      action: { key: ACTIONS.SEARCH_MISSING },
+    },
+    {
+      type: 'button',
+      label: t(TEXT.refresh, language),
+      icon: 'refresh-cw',
+      style: 'secondary',
+      action: { key: ACTIONS.REFRESH },
+    },
+  ];
+}
+
+async function get(hub, { settings, language = 'en' }) {
+  if (hub.records.size === 0) {
+    return message(TEXT.pick, language);
+  }
+  const records = hub.view(settings?.device);
+  if (records.length === 0) {
+    return message(TEXT.unknown, language);
+  }
+  const totals = hub.totals(records);
+  const components = [];
+  if (totals.answering > 0) {
+    components.push(
+      { type: 'value', value: totals.queue, label: t(TEXT.queue, language), icon: 'download' },
+      {
+        type: 'value',
+        value: totals.missing,
+        label: t(TEXT.missing, language),
+        icon: 'search',
+        color: totals.missing ? WIDGET_COLORS.WARNING : WIDGET_COLORS.NEUTRAL,
+      },
+    );
+  }
+  const cards = records
+    .filter((record) => !record.error && record.snapshot.upcoming)
+    .flatMap((record) => record.snapshot.upcoming.map((item) => ({ record, item })))
+    .sort((a, b) => a.item.date - b.item.date || a.item.title.localeCompare(b.item.title))
+    .slice(0, MAX_CARDS)
+    .map(({ record, item }) => card(record, item, language));
+  if (cards.length > 0) {
+    components.push({ type: 'card-list', display: 'grid', items: cards });
+  } else if (totals.answering > 0) {
+    components.push({ type: 'text', variant: 'body', text: t(TEXT.nothing, language) });
+  }
+  components.push({
+    type: 'status',
+    items: records.slice(0, 10).map((record) => instanceRow(record, language)),
+  });
+  components.push(...buttons(language));
+  return { ttl_seconds: 300, components };
+}
+
+async function action(hub, { actionKey, settings }) {
+  const device = settings?.device || null;
+  const done = (render) =>
+    Object.fromEntries(Object.entries(DONE_TEXT).map(([lang, text]) => [lang, render(text)]));
+  if (actionKey === ACTIONS.SEARCH_MISSING) {
+    const count = await hub.searchMissing(device);
+    return { message: done((text) => text.searchMissing(count)) };
+  }
+  if (actionKey === ACTIONS.REFRESH) {
+    const count = await hub.refresh(device);
+    return { message: done((text) => text.refresh(count)) };
+  }
+  throw new Error(`Unknown action ${actionKey}`);
+}
+
+/**
+ * Bytes of a poster, as raw base64 (onWidgetGetImage). Only the keys this
+ * widget declares, only from a configured instance.
+ */
+export async function getImage(hub, imageKey) {
+  const match = POSTER_KEY.exec(String(imageKey));
+  if (!match) {
+    throw new Error(`Unknown image ${imageKey}`);
+  }
+  const record = hub.records.get(`${match[1]}_${match[2]}`);
+  if (!record) {
+    throw new Error(`No instance for image ${imageKey}`);
+  }
+  const { body } = await record.client.poster(Number(match[3]));
+  if (!Buffer.isBuffer(body) || body.length === 0 || body.length > MAX_IMAGE_BYTES) {
+    throw new Error(`Poster ${imageKey} is empty or too large`);
+  }
+  const image = body.toString('base64');
+  // The checks of the core (format, header, size): refused here, explained in the logs.
+  const problems = validateWidgetImage(image);
+  if (problems.length > 0) {
+    throw new Error(`Poster ${imageKey} refused: ${problems.join('; ')}`);
+  }
+  return image;
 }
 
 export const WIDGETS = {
-  [DEMO_STATUS_WIDGET]: {
-    // `settings` holds the per-instance values of the declared `settings`
-    // (none here); `language` and `units` are those of the user viewing the
-    // dashboard, for the values you format yourself. Multi-language objects
-    // (`{ en, fr }`) are picked by the core, like everywhere else.
-    async get(gladys, { config }) {
-      logger.debug(`onWidgetGet <- ${DEMO_STATUS_WIDGET}`);
-      return {
-        // Reload policy: the computed parts below only change with the
-        // config, and index.js nudges the widget on every (re)connection and
-        // config update (see refreshWidgets) — the TTL is just a safety net.
-        ttl_seconds: 300,
-        components: [
-          // Device-bound tiles: LIVE, they follow the published states over
-          // the core's real-time path. No TTL, no nudge involved.
-          {
-            type: 'value',
-            label: { en: 'Temperature', fr: 'Température' },
-            icon: 'thermometer',
-            device_feature: featureExternalId(
-              gladys,
-              config,
-              weatherStation,
-              DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-            ),
-          },
-          {
-            type: 'value',
-            label: { en: 'Office plug', fr: 'Prise du bureau' },
-            icon: 'zap',
-            device_feature: featureExternalId(
-              gladys,
-              config,
-              plug,
-              DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            ),
-          },
-          // Computed rows: what the integration knows that no device feature
-          // carries. Served from the core cache until the TTL or a nudge.
-          {
-            type: 'status',
-            items: [
-              {
-                label: { en: 'Plug connection', fr: 'Connexion de la prise' },
-                icon: 'wifi',
-                ...plugConnectionStatus(gladys, config),
-              },
-              {
-                label: { en: 'Observed location', fr: 'Position observée' },
-                icon: 'map-pin',
-                value: `${config.latitude.toFixed(2)}, ${config.longitude.toFixed(2)}`,
-                color: WIDGET_COLORS.NEUTRAL,
-              },
-            ],
-          },
-          // `params` are declared HERE and sent back as-is: the handler never
-          // receives user input (a dashboard can hang on a public wall).
-          {
-            type: 'button',
-            label: { en: 'Identify the light', fr: 'Identifier la lampe' },
-            icon: 'eye',
-            style: 'secondary',
-            action: {
-              key: DEMO_STATUS_ACTIONS.IDENTIFY_LIGHT,
-              params: { device: light.deviceExternalId(gladys) },
-            },
-          },
-        ],
-      };
-    },
-
-    // Resolve an optional toast (string or multi-language object, ≤ 200
-    // characters). After a successful action the core drops the cached
-    // content and every open dashboard refetches it: no nudge needed.
-    async action(gladys, { actionKey, params, config }) {
-      logger.info(`onWidgetAction <- ${DEMO_STATUS_WIDGET}.${actionKey}`);
-      if (actionKey === DEMO_STATUS_ACTIONS.IDENTIFY_LIGHT) {
-        return identifyDevice(gladys, params.device, config);
-      }
-      // Throwing acks the action as failed: the message reaches the user.
-      throw new Error(`Unknown widget action: ${actionKey}`);
-    },
-  },
+  [WIDGET_KEY]: { get, action },
 };
-
-/**
- * Freshness nudge: ask the core to re-pull every widget NOW instead of
- * waiting for the content TTL. Call it when you KNOW a computed content
- * changed (here: the config, which drives the plug transport and the observed
- * location) — and after every (re)connection, since the nudges are
- * fire-and-forget: rate-limited core-side to 1 per 10 s per widget, dropped
- * silently while disconnected.
- */
-export function refreshWidgets(gladys) {
-  for (const key of Object.keys(WIDGETS)) {
-    gladys.requestWidgetRefresh(key);
-  }
-}

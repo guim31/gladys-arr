@@ -1,0 +1,66 @@
+{
+  "page": 1,
+  "pageSize": 1,
+  "sortKey": "movieMetadata.sortTitle",
+  "sortDirection": "descending",
+  "totalRecords": 3,
+  "records": [
+    {
+      "title": "Avatar: Fire and Ash",
+      "originalTitle": "Avatar: Fire and Ash",
+      "originalLanguage": {
+        "id": 1,
+        "name": "English"
+      },
+      "secondaryYearSourceId": 0,
+      "sortTitle": "avatar fire and ash",
+      "sizeOnDisk": 0,
+      "status": "released",
+      "overview": "In the wake of the devastating war against the RDA and the loss of their eldest son, Jake Sully and Neytiri face a new threat on Pandora: the Ash People, a violent and power-hungry Na'vi tribe led by the ruthless Varang. Jake's family must fight for their survival and the future of Pandora in a conflict that pushes them to their emotional and physical limits.",
+      "inCinemas": "2025-12-17T00:00:00Z",
+      "physicalRelease": "2026-05-19T00:00:00Z",
+      "digitalRelease": "2026-03-31T00:00:00Z",
+      "releaseDate": "2026-03-31T00:00:00Z",
+      "images": [
+        {
+          "coverType": "poster",
+          "url": "/MediaCover/2/poster.jpg?h=102d2f78d85adfd79af1",
+          "remoteUrl": "https://image.tmdb.org/t/p/original/bRBeSHfGHwkEpImlhxPmOcUsaeg.jpg"
+        },
+        {
+          "coverType": "fanart",
+          "url": "/MediaCover/2/fanart.jpg?h=f5e75177d28e600a090b",
+          "remoteUrl": "https://image.tmdb.org/t/p/original/u8DU5fkLoM5tTRukzPC31oGPxaQ.jpg"
+        }
+      ],
+      "website": "https://www.avatar.com/movies/avatar-fire-and-ash",
+      "year": 2025,
+      "youTubeTrailerId": "Ma1x7ikpid8",
+      "studio": "20th Century Studios",
+      "path": "/config/movies/Avatar - Fire and Ash (2025)",
+      "qualityProfileId": 1,
+      "hasFile": false,
+      "movieFileId": 0,
+      "monitored": true,
+      "minimumAvailability": "released",
+      "isAvailable": true,
+      "folderName": "/config/movies/Avatar - Fire and Ash (2025)",
+      "runtime": 198,
+      "cleanTitle": "avatarfireash",
+      "imdbId": "tt1757678",
+      "tmdbId": 83533,
+      "titleSlug": "83533",
+      "certification": "PG-13",
+      "tags": [],
+      "added": "2026-10-14T16:06:12Z",
+      "popularity": 78.0294,
+      "statistics": {
+        "movieFileCount": 0,
+        "sizeOnDisk": 0,
+        "releaseGroups": [],
+        "movieFileQualities": []
+      },
+      "id": 2
+    }
+  ]
+}

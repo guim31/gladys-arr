@@ -32,15 +32,20 @@ pushing.
 
 ```
 index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
+src/app.js                        registers every SDK handler on the hub (shared with the tests)
+src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults), slots, URL parsing
+src/hub.js                        one record per instance: timer, states, history and health events, commands
+src/devices.js                    one device per instance: features, names (4 languages), external ids
+src/arr/client.js                 Sonarr/Radarr API v3 client (X-Api-Key), error kinds, commands
+src/arr/model.js                  pure parsers: queue, health, free space, calendar, history
+src/arr/http.js                   the only network function (node:http/https), the test seam
+src/widgets.js                    "Upcoming releases" widget (poster grid, posters via onWidgetGetImage)
 src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
-src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
-gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+src/texts.js                      messages in en/fr/de/es
+src/store.js                      /data/arr-state.json: history cursor, health issues announced
+gladys-assistant-integration.json manifest: name, config_schema, actions, triggers, widget...
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys, same sections
+test/                             node --test, fake Sonarr/Radarr (test/helpers) + the SDK's fake Gladys
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -70,8 +75,9 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** exists in English, French, German and Spanish: action
+  messages, widget texts, feature names, manifest texts, and `docs/*.md`, kept
+  in sync (`test/i18n.test.js`).
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -233,3 +239,41 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## Sonarr & Radarr : propre à cette intégration
+
+- **API v3** (`/api/v3/…`, en-tête `X-Api-Key`), commune à Sonarr 3/4 et Radarr 3 à 6. Vérifié le 14/10/2026 sur
+  les images `lscr.io/linuxserver/sonarr` (4.0.20) et `radarr` (6.4.4) : clé dans `/config/config.xml`
+  (`<ApiKey>`), sans authentification de l'interface par défaut (`authentication: none`), l'API exige quand même la
+  clé (401 sans).
+- **Emplacements fixes** `sonarr_1`, `sonarr_2`, `radarr_1`, `radarr_2` : l'application est connue avant la
+  première lecture (noms « épisodes »/« films » figés à la création), et `/system/status` (`appName`) détecte une
+  adresse de Radarr dans un emplacement Sonarr (`wrong_app`). Identifiant d'appareil = emplacement.
+- **Pas de type `calendar`** : un manifeste n'a qu'un `type`, et un `calendar` n'a ni appareils ni onglet
+  Découverte. Le widget à affiches tient le rôle du calendrier.
+- **Historique** (`/history/since?date=…`, `includeSeries`/`includeEpisode` ou `includeMovie`) : événements
+  `downloadFolderImported` et `downloadFailed` ; curseur = dernier `id` par emplacement (avec l'adresse) dans
+  `/data`, fenêtre d'une heure, 10 événements par lecture au plus. Première lecture d'une instance = point de
+  départ, rien d'annoncé.
+- **Santé** : identité d'une alerte = `type:source` (le message varie), mémorisée avec l'adresse (autre serveur =
+  nouveau point de départ) ; les alertes présentes à la première
+  lecture ne sont pas annoncées.
+- **Dates Radarr** (`inCinemas`…) : des jours envoyés à minuit UTC ; lus comme ce jour à minuit local et envoyés
+  au widget en `YYYY-MM-DD`, sinon une sortie du jour disparaît à l'ouest d'UTC (relevé en relecture).
+- **Calendrier Radarr** : un film y figure si l'une de ses dates (`inCinemas`, `digitalRelease`,
+  `physicalRelease`) tombe dans la fenêtre ; Sonarr filtre sur `airDateUtc`. Fenêtre : 7 jours depuis minuit local (TZ
+  de Gladys).
+- **Affiches** : `/api/v3/mediacover/{seriesId|movieId}/poster-250.jpg` (≈ 37 Ko, JPEG ~250 px), clé d'image
+  `poster-<kind>-<n>-<id>`, contrôlées par `validateWidgetImage` du SDK avant envoi. Une JPEG de test doit être
+  une vraie image : `validateWidgetImage` lit l'en-tête (taille en pixels), quelques octets magiques ne suffisent
+  pas.
+- **Provoquer un vrai import en test** : déposer un fichier `.strm` (Sonarr/Radarr ne lancent pas ffprobe dessus,
+  alors qu'une vidéo factice est rejetée par `DetectSample`) dans un dossier au nom de release
+  (`The.Simpsons.S38E03.1080p.WEB.h264-GRP/`), puis commande `DownloadedEpisodesScan` /
+  `DownloadedMoviesScan` avec `path` : l'historique reçoit un vrai `downloadFolderImported`.
+- La file de test (`sonarr-queue.json`) est construite à la main faute de client de téléchargement : les valeurs
+  `trackedDownloadStatus` (`ok`/`warning`/`error`) et `status` sont celles de l'API, à revérifier sur une vraie
+  file.
+- Une commande refusée (HTTP 4xx/5xx sur `/command`) ne met pas l'instance hors ligne : seule une erreur de
+  connexion le fait. `Refresh*` s'exécute en arrière-plan côté Sonarr/Radarr : la relecture qui suit ne voit pas
+  encore son résultat.
