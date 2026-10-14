@@ -1,61 +1,153 @@
-# Demo Devices Template
+# Sonarr & Radarr
 
-This is the user documentation of the integration. Gladys re-hosts this file
-and shows a permanent **Documentation** link to it in the Configuration screen
-(in the user's language, with English as the fallback) — it is when
-configuring that the user needs it most. Keep the short onboarding hints in
-the `section` blocks of the manifest `config_schema`; put the long
-step-by-step (screenshots, troubleshooting…) here.
+Bring your [Sonarr](https://sonarr.tv) (series) and [Radarr](https://radarr.video)
+(movies) into Gladys, over your local network: the episodes and movies coming
+out this week on the dashboard, with their posters, the state of the download
+queues, the missing items, the health alerts, and scenes that react when an
+episode or a movie is downloaded.
 
-## What you get
+The integration was tested against real Sonarr 4 and Radarr 6 instances (the
+official Docker images), not yet in a real Gladys installation: feedback is
+welcome on the [Gladys forum](https://community.gladysassistant.com) or in the
+[issues](https://github.com/guim31/gladys-arr/issues).
 
-Six demo devices show up after installation: a weather station (real data
-from Open-Meteo), a switch, a dimmable light, a smart plug with power
-metering, a motion sensor and a camera.
+## What you need
 
-## Configuration
+- Gladys Assistant 5.1.0 or later.
+- **Sonarr** v3 or v4, and/or **Radarr** v3 or later, reachable from Gladys
+  (same network). Up to two of each.
+- The **API key** of each instance: in Sonarr or Radarr, **Settings** →
+  **General** → **Security** → **API Key**.
 
-1. Open the **Configuration** tab of the integration.
-2. Set the **latitude** and **longitude** the demo weather station should
-   observe (they default to Paris), and pick your temperature unit.
-   The **refresh interval** sets how often the weather station and the
-   plug's power are read: every 5 minutes by default, every minute at most.
-3. Save: the devices appear in the **Discovery** tab, ready to be added.
+## Set up
 
-The **Prefer the local connection** toggle drives the demo plug: it reports
-the channel it actually uses as a badge (local or cloud), with an orange dot
-when it runs degraded (local refused, cloud fallback).
+1. Install the integration from the Gladys catalog.
+2. In **Configuration**, in the _Sonarr_ section, enter the **Address** of your
+   Sonarr with its port (for example `192.168.1.2:8989`), its **API key**, and
+   optionally a **Name**. Same thing in the _Radarr_ section (port `7878` by
+   default). A Sonarr behind a reverse proxy with a URL base? Enter it too:
+   `https://example.org/sonarr`. Leave a section empty if you do not use that
+   application. A second Sonarr (4K, anime…) or Radarr? Fill in the _Second
+   Sonarr_ or _Second Radarr_ section.
+3. Save, then click **Test the connection**: the message under the button says,
+   for each instance, whether it answers, its version, its queue, its missing
+   items and its health alerts.
+4. Open the **Discover** tab: one device per instance. Click **Add**, pick a
+   room and save.
 
-## Actions
+Options:
 
-- **Test the weather provider** — performs a live request to Open-Meteo and
-  shows the current temperature and humidity under the button.
-- **Identify a device** — pick one of your devices in the list and it will
-  signal itself (the demo light "blinks" in the logs).
+- **Refresh interval**: how often the instances are read (queue, calendar,
+  history, health), from 1 to 10 minutes (2 minutes by default). Each reading
+  makes 6 small requests to each instance, 7 once an hour.
+- **Language of the feature names**: English, French, German or Spanish. The
+  names are given when a device is added (French by default); the language also
+  sets the sentence of the summary action.
 
-## Scenes
+## The device of each instance
 
-The integration adds its own cards to the scene editor (Gladys 5.1 or
-later), under the **Integrations** category:
+All the features are read-only. The names say "episodes" on a Sonarr and
+"movies" on a Radarr.
 
-- **Motion detected** (trigger) — starts the scene when a demo motion sensor
-  sees something move. Optionally pick the sensor and what moved (person,
-  animal); left empty, any detection matches. The following actions can
-  read what moved with `{{triggerEvent.data.target}}`.
-- **Identify a device** (action) — makes the chosen device signal itself.
-  It returns whether the device could signal itself, so the following
-  actions can depend on it.
+| Feature                                                 | What it is                                                                           |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Online                                                  | 1 while the instance answers, 0 when it does not                                     |
+| Download queue                                          | Items in the queue of Sonarr or Radarr (Activity → Queue)                            |
+| Downloads in error                                      | Items of the queue in warning or error: blocked import, failed download…             |
+| Missing episodes / Missing movies                       | Monitored episodes or movies without a file (Wanted → Missing)                       |
+| Episodes in the next 7 days / Movies in the next 7 days | Episodes airing, or movies released (cinema, digital, disc), from today to 6 days on |
+| Free space                                              | Free space of the root folders, in GB; the smallest when there are several           |
+| Health warnings                                         | Warnings of System → Status (indexer, download client…)                              |
+| Health errors                                           | Errors of System → Status                                                            |
+| Version                                                 | Version of Sonarr or Radarr                                                          |
 
 ## Dashboard
 
-Add the **Demo status** widget to a dashboard: it shows the live
-temperature of the weather station and the power of the office plug, the
-connection the plug currently uses (orange when degraded) and the observed
-location. Its **Identify the light** button makes the demo light signal
-itself.
+Add the **Upcoming releases** widget (the integration's widgets in the
+dashboard editor). By default it covers every instance; its **Instance**
+setting limits it to one.
+
+It shows:
+
+- two tiles: the items **In queue** and the **Missing** ones, for all the
+  instances shown;
+- a grid of the episodes and movies coming out from today to the next 6 days,
+  with their poster, their date, and a _Downloaded_ badge once the file is
+  there (for a movie: _In cinemas_, _Digital_ or _Blu-ray / DVD_ before that).
+  Tap a card for the episode title and the overview;
+- one line per instance: queue, downloads in error, health alerts, or
+  _Unreachable_;
+- two buttons: **Search missing** (the same as the action below) and
+  **Refresh**.
+
+The posters come from Sonarr and Radarr themselves (the small copy they keep),
+through Gladys: your browser never loads an outside address.
+
+## Scenes
+
+### Triggers
+
+| Trigger                     | When                                                                     | Filters                      | Variables                                                 |
+| --------------------------- | ------------------------------------------------------------------------ | ---------------------------- | --------------------------------------------------------- |
+| Episode or movie downloaded | Sonarr or Radarr imported a finished download into the library           | instance, application        | instance name, title, title with episode or year, quality |
+| Download failed             | A download was marked as failed                                          | instance, application        | instance name, title, title with episode or year, reason  |
+| New health issue            | A warning or error appears in System → Status (once, until it goes away) | instance, application, level | instance name, level, check, message                      |
+
+The integration reads the history of each instance at every refresh: a
+download is announced at most one interval after the import, once, even across
+a restart. Events older than one hour are not announced (Gladys stopped for a
+night does not replay the night). The health alerts present when an instance is
+added are the starting point: only the new ones are announced.
+
+### Actions
+
+| Action                               | What it does                                                                                  | Outputs                                     |
+| ------------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Search missing episodes or movies    | Starts the search of every monitored missing episode or movie, on one instance or all of them | instances that started the search           |
+| Refresh the Sonarr or Radarr library | Refreshes the information and files of every series or movie, then reads the instance again   | instances refreshed                         |
+| Read the Sonarr/Radarr summary       | Builds a sentence: releases this week, queue, missing items, health alerts                    | sentence, releases, items in queue, missing |
+
+Nothing is ever deleted: the integration only reads, and starts searches and
+refreshes.
+
+### Scene ideas
+
+- **Movie night**: trigger _Episode or movie downloaded_ with the application
+  _Radarr_, then a notification that uses the variable _Title with episode
+  (S01E02) or year_: "Avatar (2009) is ready to watch".
+- **Morning summary**: every day at 8:00, _Read the Sonarr/Radarr summary_,
+  then send its sentence on Telegram or have it said by the speaker.
+- **Stuck downloads**: trigger _Download failed_, then a message with the
+  reason; or a scene on the _Downloads in error_ feature above 0.
+- **Weekly catch-up**: every Sunday night, _Search missing episodes or movies_.
 
 ## Troubleshooting
 
-The integration logs everything it does: check the integration logs from the
-Gladys UI (or `docker logs` on the host) with `LOG_LEVEL=debug` for the full
-detail.
+- **"does not answer"**: check the address and the port from the Gladys
+  machine (`http://<address>:8989` for Sonarr, `:7878` for Radarr). Gladys runs
+  the integration in a container: `localhost` is the container itself, use the
+  IP address of the machine.
+- **"API key refused"**: copy the key again from Settings → General → Security.
+  A new key in Sonarr or Radarr needs the new key here.
+- **"this address is the other application"**: a Radarr address in a Sonarr
+  section, or the reverse.
+- **"no Sonarr or Radarr API at this address"** or **"the address redirects"**:
+  an instance behind a reverse proxy needs its URL base
+  (`https://example.org/sonarr`), and a login page of the proxy blocks the API:
+  use the local address.
+- **"certificate refused"**: HTTPS with a self-signed certificate is not
+  supported; use the `http://` address on your network.
+- No poster: Sonarr or Radarr has not downloaded it yet (MediaCover); it comes
+  with the next refresh of the series or movie.
+
+## Limits
+
+- No webhook: the sandbox of Gladys has no inbound port, so the imports are
+  read from the history at each refresh, not pushed instantly.
+- The _Downloads in error_ count reads the first 100 items of the queue.
+- The widget shows 12 releases at most, the first ones in time.
+- No calendar in the Gladys calendar view: an integration is either a device
+  or a calendar provider, and the devices, triggers and actions matter more
+  here. The widget plays the calendar part.
+- Lidarr, Readarr, Prowlarr and the download clients are not covered.
+- Not affiliated with the Sonarr or Radarr projects.

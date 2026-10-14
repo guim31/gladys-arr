@@ -1,67 +1,162 @@
-# Template de démonstration
+# Sonarr & Radarr
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+Amenez votre [Sonarr](https://sonarr.tv) (séries) et votre
+[Radarr](https://radarr.video) (films) dans Gladys, sur votre réseau local : les
+épisodes et films qui sortent cette semaine sur le tableau de bord, avec leurs
+affiches, l'état des files de téléchargement, les manquants, les alertes de
+santé, et des scènes qui réagissent quand un épisode ou un film est téléchargé.
 
-## Ce que vous obtenez
+L'intégration a été testée contre de vrais Sonarr 4 et Radarr 6 (les images
+Docker officielles), pas encore dans une vraie installation de Gladys : vos
+retours sont les bienvenus sur le [forum Gladys](https://community.gladysassistant.com)
+ou dans les [issues](https://github.com/guim31/gladys-arr/issues).
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+## Ce qu'il faut
 
-## Configuration
+- Gladys Assistant 5.1.0 ou plus récent.
+- **Sonarr** v3 ou v4, et/ou **Radarr** v3 ou plus récent, joignables depuis
+  Gladys (même réseau). Jusqu'à deux de chaque.
+- La **clé d'API** de chaque instance : dans Sonarr ou Radarr, **Settings** →
+  **General** → **Security** → **API Key**.
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+## Mise en route
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+1. Installez l'intégration depuis le catalogue de Gladys.
+2. Dans **Configuration**, section _Sonarr_, saisissez l'**Adresse** de votre
+   Sonarr avec son port (par exemple `192.168.1.2:8989`), sa **Clé d'API**, et
+   si vous le souhaitez un **Nom**. De même dans la section _Radarr_ (port
+   `7878` par défaut). Un Sonarr derrière un proxy inverse avec une base d'URL ?
+   Saisissez-la aussi : `https://example.org/sonarr`. Laissez vide la section
+   d'une application que vous n'utilisez pas. Un deuxième Sonarr (4K, animés…)
+   ou Radarr ? Remplissez la section _Deuxième Sonarr_ ou _Deuxième Radarr_.
+3. Enregistrez, puis cliquez sur **Tester la connexion** : le message sous le
+   bouton indique, pour chaque instance, si elle répond, sa version, sa file,
+   ses manquants et ses alertes de santé.
+4. Ouvrez l'onglet **Découverte** : un appareil par instance. Cliquez sur
+   **Ajouter**, choisissez une pièce, enregistrez.
 
-## Actions
+Options :
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+- **Intervalle de rafraîchissement** : fréquence de lecture des instances
+  (file, calendrier, historique, santé), de 1 à 10 minutes (2 minutes par
+  défaut). Chaque lecture fait 6 petites requêtes à chaque instance, 7 une fois
+  par heure.
+- **Langue des noms de fonctionnalités** : anglais, français, allemand ou
+  espagnol. Les noms sont donnés à l'ajout d'un appareil (français par défaut) ;
+  la langue règle aussi la phrase de l'action de résumé.
 
-## Scènes
+## L'appareil de chaque instance
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+Toutes les fonctionnalités sont en lecture seule. Les noms parlent
+d'« épisodes » sur un Sonarr et de « films » sur un Radarr.
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
+| Fonctionnalité                                               | Ce que c'est                                                                                |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| En ligne                                                     | 1 tant que l'instance répond, 0 sinon                                                       |
+| File de téléchargement                                       | Éléments de la file de Sonarr ou Radarr (Activity → Queue)                                  |
+| Téléchargements en erreur                                    | Éléments de la file en avertissement ou en erreur : import bloqué, téléchargement en échec… |
+| Épisodes manquants / Films manquants                         | Épisodes ou films surveillés sans fichier (Wanted → Missing)                                |
+| Épisodes des 7 prochains jours / Films des 7 prochains jours | Épisodes diffusés, ou films qui sortent (cinéma, numérique, disque), d'aujourd'hui à J+6    |
+| Espace libre                                                 | Espace libre des dossiers racine, en Go ; le plus petit s'il y en a plusieurs               |
+| Avertissements de santé                                      | Avertissements de System → Status (indexeur, client de téléchargement…)                     |
+| Erreurs de santé                                             | Erreurs de System → Status                                                                  |
+| Version                                                      | Version de Sonarr ou Radarr                                                                 |
 
 ## Tableau de bord
 
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+Ajoutez le widget **Sorties à venir** (les widgets de l'intégration, dans
+l'éditeur du tableau de bord). Par défaut il couvre toutes les instances ; son
+réglage **Instance** le limite à une seule.
+
+Il affiche :
+
+- deux tuiles : les éléments **En file** et les **Manquants**, pour toutes les
+  instances affichées ;
+- une grille des épisodes et films qui sortent d'aujourd'hui aux 6 jours
+  suivants, avec leur affiche, leur date, et un badge _Téléchargé_ une fois le
+  fichier là (pour un film, avant cela : _Au cinéma_, _Numérique_ ou
+  _Blu-ray / DVD_). Touchez une carte pour le titre de l'épisode et le résumé ;
+- une ligne par instance : file, téléchargements en erreur, alertes de santé,
+  ou _Injoignable_ ;
+- deux boutons : **Chercher les manquants** (comme l'action ci-dessous) et
+  **Rafraîchir**.
+
+Les affiches viennent de Sonarr et Radarr eux-mêmes (la petite copie qu'ils
+gardent), à travers Gladys : votre navigateur ne charge jamais d'adresse
+extérieure.
+
+## Scènes
+
+### Déclencheurs
+
+| Déclencheur                | Quand                                                                                           | Filtres                       | Variables                                                      |
+| -------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------- |
+| Épisode ou film téléchargé | Sonarr ou Radarr a importé un téléchargement terminé dans la bibliothèque                       | instance, application         | nom de l'instance, titre, titre avec épisode ou année, qualité |
+| Téléchargement en échec    | Un téléchargement a été marqué en échec                                                         | instance, application         | nom de l'instance, titre, titre avec épisode ou année, raison  |
+| Nouvelle alerte de santé   | Un avertissement ou une erreur apparaît dans System → Status (une fois, jusqu'à sa disparition) | instance, application, niveau | nom de l'instance, niveau, vérification, message               |
+
+L'intégration lit l'historique de chaque instance à chaque rafraîchissement :
+un téléchargement est annoncé au plus un intervalle après l'import, une seule
+fois, même après un redémarrage. Les événements de plus d'une heure ne sont pas
+annoncés (Gladys arrêté une nuit ne rejoue pas la nuit). Les alertes de santé
+présentes à l'ajout d'une instance servent de point de départ : seules les
+nouvelles sont annoncées.
+
+### Actions
+
+| Action                                      | Ce qu'elle fait                                                                                   | Sorties                                      |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Chercher les épisodes ou films manquants    | Lance la recherche de tous les épisodes ou films surveillés manquants, sur une instance ou toutes | instances ayant lancé la recherche           |
+| Rafraîchir la bibliothèque Sonarr ou Radarr | Rafraîchit les informations et fichiers de chaque série ou film, puis relit l'instance            | instances rafraîchies                        |
+| Lire le résumé Sonarr/Radarr                | Construit une phrase : sorties de la semaine, file, manquants, alertes de santé                   | phrase, sorties, éléments en file, manquants |
+
+Rien n'est jamais supprimé : l'intégration lit, et lance des recherches et des
+rafraîchissements.
+
+### Idées de scènes
+
+- **Soirée film** : déclencheur _Épisode ou film téléchargé_ avec
+  l'application _Radarr_, puis une notification qui reprend la variable
+  _Titre avec épisode (S01E02) ou année_ : « Avatar (2009) est prêt ».
+- **Résumé du matin** : chaque jour à 8 h, _Lire le résumé Sonarr/Radarr_, puis
+  envoyer sa phrase sur Telegram ou la faire dire par l'enceinte.
+- **Téléchargements bloqués** : déclencheur _Téléchargement en échec_, puis un
+  message avec la raison ; ou une scène sur la fonctionnalité _Téléchargements
+  en erreur_ au-dessus de 0.
+- **Rattrapage hebdomadaire** : chaque dimanche soir, _Chercher les épisodes ou
+  films manquants_.
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- **« ne répond pas »** : vérifiez l'adresse et le port depuis la machine de
+  Gladys (`http://<adresse>:8989` pour Sonarr, `:7878` pour Radarr). Gladys fait
+  tourner l'intégration dans un conteneur : `localhost` est le conteneur
+  lui-même, utilisez l'adresse IP de la machine.
+- **« clé d'API refusée »** : recopiez la clé depuis Settings → General →
+  Security. Une nouvelle clé dans Sonarr ou Radarr doit être reportée ici.
+- **« cette adresse est l'autre application »** : une adresse de Radarr dans
+  une section Sonarr, ou l'inverse.
+- **« aucune API Sonarr ou Radarr à cette adresse »** ou **« l'adresse
+  redirige »** : une instance derrière un proxy inverse demande sa base d'URL
+  (`https://example.org/sonarr`), et une page de connexion du proxy bloque
+  l'API : utilisez l'adresse locale.
+- **« certificat refusé »** : le HTTPS avec un certificat auto-signé n'est pas
+  pris en charge ; utilisez l'adresse en `http://` de votre réseau.
+- Pas d'affiche : Sonarr ou Radarr ne l'a pas encore téléchargée (MediaCover) ;
+  elle arrive au prochain rafraîchissement de la série ou du film.
+
+## Limites
+
+- Pas de webhook : le bac à sable de Gladys n'a pas de port entrant, les
+  imports sont donc lus dans l'historique à chaque rafraîchissement, pas
+  poussés à l'instant.
+- Le nombre de _Téléchargements en erreur_ lit les 100 premiers éléments de la
+  file.
+- Le widget montre 12 sorties au plus, les premières dans le temps.
+- Pas de calendrier dans la vue calendrier de Gladys : une intégration est soit
+  un appareil, soit un fournisseur de calendrier, et les appareils,
+  déclencheurs et actions comptent davantage ici. Le widget joue le rôle du
+  calendrier.
+- Lidarr, Readarr, Prowlarr et les clients de téléchargement ne sont pas
+  couverts.
+- Sans lien avec les projets Sonarr ou Radarr.
