@@ -945,10 +945,10 @@
         "es": "Actualizar la biblioteca de Sonarr o Radarr"
       },
       "description": {
-        "en": "Refreshes the information and files of every series or movie, then reads the instance again.",
-        "fr": "Rafraîchit les informations et fichiers de chaque série ou film, puis relit l'instance.",
-        "de": "Aktualisiert Infos und Dateien aller Serien oder Filme und liest die Instanz dann neu.",
-        "es": "Actualiza la información y los archivos de cada serie o película y vuelve a leer la instancia."
+        "en": "Asks Sonarr or Radarr to refresh the information and files of every series or movie.",
+        "fr": "Demande à Sonarr ou Radarr de rafraîchir les informations et fichiers de chaque série ou film.",
+        "de": "Bittet Sonarr oder Radarr, Infos und Dateien aller Serien oder Filme zu aktualisieren.",
+        "es": "Pide a Sonarr o Radarr que actualice la información y los archivos de cada serie o película."
       },
       "timeout_seconds": 30,
       "fields": [

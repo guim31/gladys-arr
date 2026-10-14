@@ -17,6 +17,7 @@ export class Store {
   constructor(directory = process.env.ARR_DATA_DIR || '/data') {
     this.directory = directory;
     this.path = join(directory, FILE_NAME);
+    this.latest = null;
     this.pending = null;
     this.writing = null;
   }

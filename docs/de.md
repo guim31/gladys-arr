@@ -104,11 +104,11 @@ neue werden gemeldet.
 
 ### Aktionen
 
-| Aktion                                       | Was sie tut                                                                                     | Ausgaben                                        |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Fehlende Episoden oder Filme suchen          | Startet die Suche aller überwachten fehlenden Episoden oder Filme, auf einer Instanz oder allen | Instanzen, die die Suche gestartet haben        |
-| Sonarr- oder Radarr-Bibliothek aktualisieren | Aktualisiert Infos und Dateien aller Serien oder Filme und liest die Instanz dann neu           | aktualisierte Instanzen                         |
-| Sonarr/Radarr-Zusammenfassung lesen          | Baut einen Satz: Neuerscheinungen der Woche, Warteschlange, Fehlende, Zustandsmeldungen         | Satz, Neuerscheinungen, Warteschlange, Fehlende |
+| Aktion                                       | Was sie tut                                                                                                                  | Ausgaben                                        |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Fehlende Episoden oder Filme suchen          | Startet die Suche aller überwachten fehlenden Episoden oder Filme, auf einer Instanz oder allen                              | Instanzen, die die Suche gestartet haben        |
+| Sonarr- oder Radarr-Bibliothek aktualisieren | Fordert die Aktualisierung von Infos und Dateien aller Serien oder Filme an (Sonarr oder Radarr erledigt sie im Hintergrund) | aktualisierte Instanzen                         |
+| Sonarr/Radarr-Zusammenfassung lesen          | Baut einen Satz: Neuerscheinungen der Woche, Warteschlange, Fehlende, Zustandsmeldungen                                      | Satz, Neuerscheinungen, Warteschlange, Fehlende |
 
 Nichts wird je gelöscht: Die Integration liest nur und startet Suchen und
 Aktualisierungen.
@@ -137,7 +137,9 @@ Aktualisierungen.
   General → Security. Ein neuer Schlüssel in Sonarr oder Radarr muss hier
   nachgetragen werden.
 - **„diese Adresse ist die andere Anwendung“**: eine Radarr-Adresse in einem
-  Sonarr-Abschnitt oder umgekehrt.
+  Sonarr-Abschnitt oder umgekehrt (mit dem Schlüssel dieser anderen Anwendung;
+  mit dem richtigen Schlüssel antwortet eine falsche Adresse „API-Schlüssel
+  abgelehnt“).
 - **„keine Sonarr- oder Radarr-API unter dieser Adresse“** oder **„die Adresse
   leitet um“**: Eine Instanz hinter einem Reverse-Proxy braucht ihre URL-Basis
   (`https://example.org/sonarr`), und eine Anmeldeseite des Proxys blockiert die

@@ -59,6 +59,18 @@ const validDate = (value) => {
   return Number.isFinite(time) ? new Date(time) : null;
 };
 
+/**
+ * A Radarr release date: a calendar day sent as midnight UTC. Read as that
+ * day at local midnight, so a release of today stays today west of UTC.
+ */
+const releaseDay = (value) => {
+  const match = typeof value === 'string' ? /^(\d{4})-(\d{2})-(\d{2})/.exec(value) : null;
+  return match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : null;
+};
+
+const dayString = (date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
 // Release kinds of a movie, in the order Radarr lists them.
 export const RELEASES = Object.freeze(['cinema', 'digital', 'physical']);
 const RELEASE_FIELDS = {
@@ -70,7 +82,7 @@ const RELEASE_FIELDS = {
 /**
  * Calendar entries released in [start, end): one per episode, one per movie
  * (its first release inside the window). Sorted by date.
- * @returns {Array<{ key, kind, mediaId, title, subtitle, date: Date, hasFile, release?, overview }>}
+ * @returns {Array<{ key, kind, mediaId, title, subtitle, date: Date, day?, hasFile, release?, overview }>}
  */
 export function parseCalendar(kind, list, start, end) {
   const items = [];
@@ -97,7 +109,7 @@ export function parseCalendar(kind, list, start, end) {
     } else {
       const release = RELEASES.map((name) => ({
         name,
-        date: validDate(entry[RELEASE_FIELDS[name]]),
+        date: releaseDay(entry[RELEASE_FIELDS[name]]),
       })).find(({ date }) => date && date >= start && date < end);
       if (!release) {
         continue;
@@ -109,6 +121,8 @@ export function parseCalendar(kind, list, start, end) {
         title: String(entry.title ?? '?'),
         subtitle: entry.year ? String(entry.year) : '',
         date: release.date,
+        // A day, not an instant: the widget shows it without a time.
+        day: dayString(release.date),
         release: release.name,
         hasFile: entry.hasFile === true,
         overview: typeof entry.overview === 'string' ? entry.overview : '',

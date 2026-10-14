@@ -101,11 +101,11 @@ added are the starting point: only the new ones are announced.
 
 ### Actions
 
-| Action                               | What it does                                                                                  | Outputs                                     |
-| ------------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Search missing episodes or movies    | Starts the search of every monitored missing episode or movie, on one instance or all of them | instances that started the search           |
-| Refresh the Sonarr or Radarr library | Refreshes the information and files of every series or movie, then reads the instance again   | instances refreshed                         |
-| Read the Sonarr/Radarr summary       | Builds a sentence: releases this week, queue, missing items, health alerts                    | sentence, releases, items in queue, missing |
+| Action                               | What it does                                                                                                         | Outputs                                     |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Search missing episodes or movies    | Starts the search of every monitored missing episode or movie, on one instance or all of them                        | instances that started the search           |
+| Refresh the Sonarr or Radarr library | Asks for a refresh of the information and files of every series or movie (run in the background by Sonarr or Radarr) | instances refreshed                         |
+| Read the Sonarr/Radarr summary       | Builds a sentence: releases this week, queue, missing items, health alerts                                           | sentence, releases, items in queue, missing |
 
 Nothing is ever deleted: the integration only reads, and starts searches and
 refreshes.
@@ -130,7 +130,8 @@ refreshes.
 - **"API key refused"**: copy the key again from Settings → General → Security.
   A new key in Sonarr or Radarr needs the new key here.
 - **"this address is the other application"**: a Radarr address in a Sonarr
-  section, or the reverse.
+  section, or the reverse (with the key of that other application; with the
+  right key, a wrong address answers "API key refused").
 - **"no Sonarr or Radarr API at this address"** or **"the address redirects"**:
   an instance behind a reverse proxy needs its URL base
   (`https://example.org/sonarr`), and a login page of the proxy blocks the API:

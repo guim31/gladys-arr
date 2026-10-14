@@ -104,11 +104,11 @@ nouvelles sont annoncées.
 
 ### Actions
 
-| Action                                      | Ce qu'elle fait                                                                                   | Sorties                                      |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Chercher les épisodes ou films manquants    | Lance la recherche de tous les épisodes ou films surveillés manquants, sur une instance ou toutes | instances ayant lancé la recherche           |
-| Rafraîchir la bibliothèque Sonarr ou Radarr | Rafraîchit les informations et fichiers de chaque série ou film, puis relit l'instance            | instances rafraîchies                        |
-| Lire le résumé Sonarr/Radarr                | Construit une phrase : sorties de la semaine, file, manquants, alertes de santé                   | phrase, sorties, éléments en file, manquants |
+| Action                                      | Ce qu'elle fait                                                                                                                 | Sorties                                      |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Chercher les épisodes ou films manquants    | Lance la recherche de tous les épisodes ou films surveillés manquants, sur une instance ou toutes                               | instances ayant lancé la recherche           |
+| Rafraîchir la bibliothèque Sonarr ou Radarr | Demande le rafraîchissement des informations et fichiers de chaque série ou film (exécuté en arrière-plan par Sonarr ou Radarr) | instances rafraîchies                        |
+| Lire le résumé Sonarr/Radarr                | Construit une phrase : sorties de la semaine, file, manquants, alertes de santé                                                 | phrase, sorties, éléments en file, manquants |
 
 Rien n'est jamais supprimé : l'intégration lit, et lance des recherches et des
 rafraîchissements.
@@ -135,7 +135,8 @@ rafraîchissements.
 - **« clé d'API refusée »** : recopiez la clé depuis Settings → General →
   Security. Une nouvelle clé dans Sonarr ou Radarr doit être reportée ici.
 - **« cette adresse est l'autre application »** : une adresse de Radarr dans
-  une section Sonarr, ou l'inverse.
+  une section Sonarr, ou l'inverse (avec la clé de cette autre application ;
+  avec la bonne clé, une mauvaise adresse répond « clé d'API refusée »).
 - **« aucune API Sonarr ou Radarr à cette adresse »** ou **« l'adresse
   redirige »** : une instance derrière un proxy inverse demande sa base d'URL
   (`https://example.org/sonarr`), et une page de connexion du proxy bloque

@@ -63,7 +63,7 @@ test('a movie released this week shows how it comes out', async (t) => {
   const [grid] = ofType(ack, 'card-list');
   assert.equal(grid.items.length, 1);
   assert.equal(grid.items[0].title, 'Avatar Aang: The Last Airbender');
-  assert.equal(grid.items[0].date, '2026-11-03T00:00:00.000Z');
+  assert.equal(grid.items[0].date, '2026-11-03');
   assert.deepEqual(grid.items[0].badge, { text: 'Blu-ray / DVD', color: 'neutral' });
 });
 

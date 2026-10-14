@@ -27,6 +27,7 @@ import {
 } from './arr/model.js';
 import {
   APP_NAMES,
+  FEATURE_KEYS,
   buildDevice,
   deviceIds,
   featureValues,
@@ -68,7 +69,6 @@ export const HUB_TIMINGS = {
 };
 
 const MAX_STATES_PER_REQUEST = 100;
-const DAY_MS = 24 * 60 * 60_000;
 
 /** Midnight (container time zone: the TZ of Gladys) of the day of `now`. */
 export function startOfDay(now) {
@@ -284,7 +284,9 @@ export class ArrHub {
 
   calendarWindow() {
     const start = startOfDay(this.now());
-    return { start, end: new Date(start.getTime() + this.timings.calendarDays * DAY_MS) };
+    const end = new Date(start);
+    end.setDate(end.getDate() + this.timings.calendarDays); // local days, across a DST change
+    return { start, end };
   }
 
   async read(record) {
@@ -370,14 +372,16 @@ export class ArrHub {
    * starting point, not news.
    */
   async healthTransition(record, health) {
-    const slot = record.instance.slot;
+    const { slot, url } = record.instance;
     const keys = health.issues.map((issue) => `${issue.level}:${issue.source}`);
-    const known = this.saved.health[slot];
-    this.saved.health[slot] = keys;
+    const saved = this.saved.health[slot];
+    // Another server in the slot is a first reading too.
+    const known = saved?.url === url && Array.isArray(saved.keys) ? saved.keys : null;
+    this.saved.health[slot] = { url, keys };
     if (JSON.stringify(known) !== JSON.stringify(keys)) {
       this.store.save(this.saved);
     }
-    if (!Array.isArray(known)) {
+    if (!known) {
       return;
     }
     for (const issue of health.issues) {
@@ -407,6 +411,9 @@ export class ArrHub {
           record.instance.kind,
           await record.client.historySince(new Date(now - this.timings.historyMaxAgeMs)),
         );
+        if (record.dropped) {
+          return false;
+        }
         const lastId = events.reduce((max, event) => Math.max(max, event.id), 0);
         this.saved.history[slot] = { url, lastId };
         this.store.save(this.saved);
@@ -425,6 +432,11 @@ export class ArrHub {
       this.resolved(`history:${slot}`);
     } catch (err) {
       this.historyProblem(record, err);
+      return false;
+    }
+    // Checked after the request: the record that replaced this one (a new API
+    // key) may have moved the cursor meanwhile.
+    if (record.dropped || this.saved.history[slot] !== cursor) {
       return false;
     }
     const fresh = events.filter((event) => event.id > cursor.lastId);
@@ -480,7 +492,7 @@ export class ArrHub {
   async publishStates(record, { force = false } = {}) {
     const now = this.now();
     const states = [];
-    for (const { externalId, value, text } of featureValues(
+    for (const { key, externalId, value, text } of featureValues(
       this.gladys,
       record.instance.slot,
       record.snapshot,
@@ -489,7 +501,10 @@ export class ArrHub {
         continue;
       }
       const last = this.published.get(externalId);
-      const fresh = last && last.value === value && now - last.at < this.timings.heartbeatMs;
+      // While the instance is down, its last counts are not republished as fresh.
+      const stale = record.snapshot.reachable === false && key !== FEATURE_KEYS.ONLINE;
+      const fresh =
+        last && last.value === value && (stale || now - last.at < this.timings.heartbeatMs);
       if (!force && fresh) {
         continue;
       }
@@ -635,7 +650,11 @@ export class ArrHub {
             throw err;
           }
           logger.warn(`${this.label(record)}: ${name} refused: ${err.message}`);
-          await this.applyFailure(record, err);
+          // A command refused by an instance that answers says nothing of its
+          // connection: only a connection problem marks it offline.
+          if (err.kind !== ERROR_KINDS.HTTP) {
+            await this.applyFailure(record, err);
+          }
           return false;
         }
       }),

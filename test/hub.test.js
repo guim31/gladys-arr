@@ -216,6 +216,37 @@ test('searching the missing items runs the command of each application', async (
   assert.deepEqual(w.sonarr.commands, ['MissingEpisodeSearch']);
 });
 
+test('a command refused by an instance that answers does not mark it offline', async (t) => {
+  const w = await world(t);
+  w.sonarr.failNext = 500;
+  const ack = await w.fake.sceneAction('search_missing', { device: deviceId(w.gladys) });
+  assert.equal(ack.success, false);
+  assert.equal(w.hub.records.get('sonarr_1').error, null);
+  assert.equal(w.fake.lastState(featureId(w.gladys, 'online')), 1);
+});
+
+test('refreshing reads the instance again after the command', async (t) => {
+  const w = await world(t);
+  await w.fake.sceneAction('refresh_library', { device: deviceId(w.gladys) });
+  const paths = w.sonarr.requests.map((request) => request.path);
+  const command = paths.lastIndexOf('/api/v3/command');
+  assert.ok(paths.slice(command + 1).includes('/api/v3/queue'));
+});
+
+test('another server in a slot: its existing health issues are a starting point', async (t) => {
+  const w = await createWorld();
+  await w.app.stop();
+  const other = new FakeArr({ kind: 'sonarr', apiKey: 'key-1' });
+  other.healthChecks.push({ source: 'RootFolderCheck', type: 'error', message: 'Missing' });
+  const again = await world(t, {
+    dataDir: w.dataDir,
+    instances: { 'http://198.51.100.40:8989': other },
+    config: { sonarr_1_url: 'http://198.51.100.40:8989', sonarr_1_api_key: 'key-1' },
+  });
+  await again.hub.pollAll();
+  assert.deepEqual(keys(again), []);
+});
+
 test('a command no instance accepts fails with an explanation', async (t) => {
   const w = await world(t, { config: { ...BOTH, language: 'fr' } });
   w.sonarr.online = false;

@@ -255,8 +255,11 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
   `downloadFolderImported` et `downloadFailed` ; curseur = dernier `id` par emplacement (avec l'adresse) dans
   `/data`, fenêtre d'une heure, 10 événements par lecture au plus. Première lecture d'une instance = point de
   départ, rien d'annoncé.
-- **Santé** : identité d'une alerte = `type:source` (le message varie) ; les alertes présentes à la première
+- **Santé** : identité d'une alerte = `type:source` (le message varie), mémorisée avec l'adresse (autre serveur =
+  nouveau point de départ) ; les alertes présentes à la première
   lecture ne sont pas annoncées.
+- **Dates Radarr** (`inCinemas`…) : des jours envoyés à minuit UTC ; lus comme ce jour à minuit local et envoyés
+  au widget en `YYYY-MM-DD`, sinon une sortie du jour disparaît à l'ouest d'UTC (relevé en relecture).
 - **Calendrier Radarr** : un film y figure si l'une de ses dates (`inCinemas`, `digitalRelease`,
   `physicalRelease`) tombe dans la fenêtre ; Sonarr filtre sur `airDateUtc`. Fenêtre : 7 jours depuis minuit local (TZ
   de Gladys).
@@ -271,3 +274,6 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - La file de test (`sonarr-queue.json`) est construite à la main faute de client de téléchargement : les valeurs
   `trackedDownloadStatus` (`ok`/`warning`/`error`) et `status` sont celles de l'API, à revérifier sur une vraie
   file.
+- Une commande refusée (HTTP 4xx/5xx sur `/command`) ne met pas l'instance hors ligne : seule une erreur de
+  connexion le fait. `Refresh*` s'exécute en arrière-plan côté Sonarr/Radarr : la relecture qui suit ne voit pas
+  encore son résultat.

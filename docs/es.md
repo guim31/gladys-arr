@@ -104,11 +104,11 @@ nuevos.
 
 ### Acciones
 
-| Acción                                      | Qué hace                                                                                                | Salidas                                        |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Buscar episodios o películas pendientes     | Inicia la búsqueda de todos los episodios o películas vigilados pendientes, en una instancia o en todas | instancias que iniciaron la búsqueda           |
-| Actualizar la biblioteca de Sonarr o Radarr | Actualiza la información y los archivos de cada serie o película y vuelve a leer la instancia           | instancias actualizadas                        |
-| Leer el resumen de Sonarr/Radarr            | Construye una frase: estrenos de la semana, cola, pendientes, avisos de estado                          | frase, estrenos, elementos en cola, pendientes |
+| Acción                                      | Qué hace                                                                                                                       | Salidas                                        |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| Buscar episodios o películas pendientes     | Inicia la búsqueda de todos los episodios o películas vigilados pendientes, en una instancia o en todas                        | instancias que iniciaron la búsqueda           |
+| Actualizar la biblioteca de Sonarr o Radarr | Pide la actualización de la información y los archivos de cada serie o película (Sonarr o Radarr la ejecutan en segundo plano) | instancias actualizadas                        |
+| Leer el resumen de Sonarr/Radarr            | Construye una frase: estrenos de la semana, cola, pendientes, avisos de estado                                                 | frase, estrenos, elementos en cola, pendientes |
 
 Nunca se borra nada: la integración solo lee, e inicia búsquedas y
 actualizaciones.
@@ -135,7 +135,8 @@ actualizaciones.
 - **«clave de API rechazada»**: vuelva a copiar la clave desde Settings →
   General → Security. Una clave nueva en Sonarr o Radarr debe copiarse aquí.
 - **«esta dirección es la otra aplicación»**: una dirección de Radarr en una
-  sección de Sonarr, o al revés.
+  sección de Sonarr, o al revés (con la clave de esa otra aplicación; con la
+  clave correcta, una dirección equivocada responde «clave de API rechazada»).
 - **«no hay ninguna API de Sonarr o Radarr en esta dirección»** o **«la
   dirección redirige»**: una instancia detrás de un proxy inverso necesita su
   base de URL (`https://example.org/sonarr`), y una página de inicio de sesión

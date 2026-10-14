@@ -22,9 +22,7 @@ export const SCENE_ACTIONS = {
   async read_summary(hub, { fields = {} }) {
     const device = fields.device || null;
     // Read now: the sentence says what is true at the time of the scene.
-    for (const record of hub.targets(device)) {
-      await hub.poll(record);
-    }
+    await Promise.all(hub.targets(device).map((record) => hub.poll(record)));
     await hub.afterChanges(false);
     const { sentence, totals } = hub.summary(device);
     return {

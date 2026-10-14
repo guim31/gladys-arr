@@ -32,7 +32,7 @@ export const ACTIONS = Object.freeze({
 
 const MAX_CARDS = 12;
 const MAX_IMAGE_BYTES = 300 * 1024;
-const POSTER_KEY = /^poster-(sonarr|radarr)-(\d)-(\d{1,9})$/;
+const POSTER_KEY = /^poster-(sonarr|radarr)-(\d)-(\d{1,12})$/;
 
 export const TEXT = {
   pick: {
@@ -118,7 +118,11 @@ function card(record, item, language) {
   const isEpisode = item.kind === KINDS.SONARR;
   const code = isEpisode ? item.subtitle.split(' · ')[0] : '';
   const title = fit(code ? `${item.title} · ${code}` : item.title, 60);
-  const description = [isEpisode ? item.subtitle : item.title, item.overview]
+  const overview = item.overview
+    .replace(/\r\n?/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  const description = [isEpisode ? item.subtitle : item.title, overview]
     .filter(Boolean)
     .join('\n\n');
   const badge = item.hasFile
@@ -128,8 +132,8 @@ function card(record, item, language) {
       : null;
   return {
     title,
-    date: item.date.toISOString(),
-    ...(Number.isInteger(item.mediaId)
+    date: item.day ?? item.date.toISOString(),
+    ...(Number.isSafeInteger(item.mediaId) && item.mediaId > 0
       ? { image: posterKey(record.instance.slot, item.mediaId) }
       : {}),
     ...(badge ? { badge } : {}),
