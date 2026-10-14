@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-14
+
 ### Added
 
 - Sonarr and Radarr in Gladys, over the local network (API v3): up to two of
@@ -23,3 +25,6 @@ the notes of the version's GitHub Release.
 - "Upcoming releases" dashboard widget: the episodes and movies of the week
   with their posters, the queues, and Search missing / Refresh buttons.
 - Documentation in English, French, German and Spanish.
+
+[Unreleased]: https://github.com/guim31/gladys-arr/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-arr/releases/tag/v1.0.0
