@@ -1,0 +1,25 @@
+{
+  "page": 1,
+  "pageSize": 1,
+  "sortKey": "episodes.airDateUtc",
+  "sortDirection": "descending",
+  "totalRecords": 1260,
+  "records": [
+    {
+      "seriesId": 1,
+      "tvdbId": 11972265,
+      "episodeFileId": 0,
+      "seasonNumber": 38,
+      "episodeNumber": 2,
+      "title": "Diary of a Chimpy Kid",
+      "airDate": "2026-10-04",
+      "airDateUtc": "2026-10-05T00:00:00Z",
+      "runtime": 0,
+      "overview": "Bart and Lisa adopt an abandoned baby chimp and clash over their surprisingly different parenting styles. When the chimp is abducted by a private wild animal zoo, the family goes on a mission to rescue him. Homer is conflicted about saving the ape, because he's convinced the chimp will tear off his face and groin.",
+      "hasFile": false,
+      "monitored": true,
+      "unverifiedSceneNumbering": false,
+      "id": 877
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "title": "Avatar Aang: The Last Airbender",
+    "originalTitle": "Avatar Aang: The Last Airbender",
+    "originalLanguage": {
+      "id": 1,
+      "name": "English"
+    },
+    "secondaryYearSourceId": 0,
+    "sortTitle": "avatar aang the last airbender",
+    "sizeOnDisk": 0,
+    "status": "released",
+    "overview": "Avatar Aang, the world's last Airbender, learns of an ancient power that could save his culture from extinction. With the help of his friends, he embarks on a global quest to find it before it falls into the wrong hands and threatens to upend the peace they sacrificed everything to achieve.",
+    "inCinemas": "2026-07-24T00:00:00Z",
+    "physicalRelease": "2026-11-03T00:00:00Z",
+    "digitalRelease": "2026-07-25T00:00:00Z",
+    "releaseDate": "2026-07-25T00:00:00Z",
+    "images": [
+      {
+        "coverType": "poster",
+        "remoteUrl": "https://image.tmdb.org/t/p/original/3sgnSfNT27Bx5O5ukr7B26mhEQq.jpg"
+      },
+      {
+        "coverType": "fanart",
+        "remoteUrl": "https://image.tmdb.org/t/p/original/ezbrL1dMymKQZw7mDEWa2ZTzN7d.jpg"
+      }
+    ],
+    "website": "https://www.paramountplus.com/movies/video/ALVE01KRF3YJMCEJB92T78193MJ4HP",
+    "year": 2026,
+    "youTubeTrailerId": "7b20GRFZBFE",
+    "studio": "Nickelodeon Movies",
+    "path": "/config/movies/Avatar Aang - The Last Airbender (2026)",
+    "qualityProfileId": 1,
+    "hasFile": false,
+    "movieFileId": 0,
+    "monitored": true,
+    "minimumAvailability": "released",
+    "isAvailable": true,
+    "folderName": "/config/movies/Avatar Aang - The Last Airbender (2026)",
+    "runtime": 99,
+    "cleanTitle": "avataraanglastairbender",
+    "imdbId": "tt18259538",
+    "tmdbId": 980431,
+    "titleSlug": "980431",
+    "certification": "PG",
+    "tags": [],
+    "added": "2026-10-14T16:06:13Z",
+    "popularity": 90.3732,
+    "statistics": {
+      "movieFileCount": 0,
+      "sizeOnDisk": 0,
+      "releaseGroups": [],
+      "movieFileQualities": []
+    },
+    "id": 4
+  }
+]

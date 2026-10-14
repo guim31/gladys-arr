@@ -1,0 +1,90 @@
+[
+  {
+    "movieId": 1,
+    "sourceTitle": "Avatar.2009.1080p.BluRay.x264-GRP",
+    "languages": [
+      {
+        "id": 1,
+        "name": "English"
+      }
+    ],
+    "quality": {
+      "quality": {
+        "id": 7,
+        "name": "Bluray-1080p",
+        "source": "bluray",
+        "resolution": 1080,
+        "modifier": "none"
+      },
+      "revision": {
+        "version": 1,
+        "real": 0,
+        "isRepack": false
+      }
+    },
+    "customFormats": [],
+    "customFormatScore": 0,
+    "qualityCutoffNotMet": false,
+    "date": "2026-10-14T16:20:05Z",
+    "eventType": "downloadFolderImported",
+    "data": {
+      "fileId": "1",
+      "droppedPath": "/config/dl/Avatar.2009.1080p.BluRay.x264-GRP/Avatar.2009.1080p.BluRay.x264-GRP.strm",
+      "importedPath": "/config/movies/Avatar (2009)/Avatar.2009.1080p.BluRay.x264-GRP.strm",
+      "downloadClient": null,
+      "downloadClientName": null,
+      "releaseGroup": "GRP",
+      "customFormatScore": "0",
+      "size": "25",
+      "indexerFlags": "0"
+    },
+    "movie": {
+      "title": "Avatar",
+      "originalTitle": "Avatar",
+      "originalLanguage": {
+        "id": 1,
+        "name": "English"
+      },
+      "secondaryYearSourceId": 0,
+      "sortTitle": "avatar",
+      "status": "released",
+      "overview": "In the 22nd century, a paraplegic Marine is dispatched to the moon Pandora on a unique mission, but becomes torn between following orders and protecting an alien civilization.",
+      "inCinemas": "2009-12-16T00:00:00Z",
+      "physicalRelease": "2010-04-22T00:00:00Z",
+      "digitalRelease": "2011-01-21T00:00:00Z",
+      "releaseDate": "2010-04-22T00:00:00Z",
+      "images": [
+        {
+          "coverType": "poster",
+          "remoteUrl": "https://image.tmdb.org/t/p/original/gKY6q7SjCkAU6FqvqWybDYgUKIF.jpg"
+        },
+        {
+          "coverType": "fanart",
+          "remoteUrl": "https://image.tmdb.org/t/p/original/vL5LR6WdxWPjLPFRLe133jXWsh5.jpg"
+        }
+      ],
+      "website": "https://www.avatar.com/movies/avatar",
+      "year": 2009,
+      "youTubeTrailerId": "jm2sNLIPPvA",
+      "studio": "Dune Entertainment",
+      "path": "/config/movies/Avatar (2009)",
+      "qualityProfileId": 1,
+      "movieFileId": 1,
+      "monitored": true,
+      "minimumAvailability": "released",
+      "isAvailable": true,
+      "folderName": "/config/movies/Avatar (2009)",
+      "runtime": 162,
+      "cleanTitle": "avatar",
+      "imdbId": "tt0499549",
+      "tmdbId": 19995,
+      "titleSlug": "19995",
+      "certification": "PG-13",
+      "tags": [],
+      "added": "2026-10-14T16:06:12Z",
+      "popularity": 47.0545,
+      "id": 1
+    },
+    "id": 1
+  }
+]

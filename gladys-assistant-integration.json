@@ -1,177 +1,1085 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "Sonarr & Radarr",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "Sonarr and Radarr: releases of the week, queue, missing items, health alerts, searches.",
+    "fr": "Sonarr et Radarr : sorties de la semaine, file, manquants, alertes de santé, recherches.",
+    "de": "Sonarr und Radarr: Neuerscheinungen, Warteschlange, Fehlende, Zustandsmeldungen, Suche.",
+    "es": "Sonarr y Radarr: estrenos de la semana, cola, pendientes, avisos de estado, búsquedas."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
+  "docker_image": "ghcr.io/guim31/gladys-arr:1.0.0",
   "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-arr/main/cover.png",
+  "categories": ["multimedia"],
+  "transports": ["local"],
   "config_schema": [
     {
-      "key": "intro",
+      "key": "sonarr_1",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Sonarr",
+        "fr": "Sonarr",
+        "de": "Sonarr",
+        "es": "Sonarr"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "Address and API key of your Sonarr (Settings → General → Security). Leave empty if you do not use Sonarr.",
+        "fr": "Adresse et clé d'API de votre Sonarr (Settings → General → Security). Laissez vide si vous n'utilisez pas Sonarr.",
+        "de": "Adresse und API-Schlüssel deines Sonarr (Settings → General → Security). Leer lassen, wenn du Sonarr nicht nutzt.",
+        "es": "Dirección y clave de API de su Sonarr (Settings → General → Security). Déjelo vacío si no usa Sonarr."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://wiki.servarr.com/sonarr/settings#security",
+          "label": {
+            "en": "Where to find the Sonarr API key",
+            "fr": "Où trouver la clé d'API Sonarr",
+            "de": "Wo du den Sonarr-API-Schlüssel findest",
+            "es": "Dónde encontrar la clave de API de Sonarr"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
+      "key": "sonarr_1_url",
+      "type": "string",
+      "label": {
+        "en": "Address",
+        "fr": "Adresse",
+        "de": "Adresse",
+        "es": "Dirección"
       },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
-    },
-    {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
       "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
+        "en": "IP address or name with the port, and the URL base if any (e.g. http://192.168.1.2:8989/sonarr).",
+        "fr": "Adresse IP ou nom avec le port, et la base d'URL s'il y en a une (ex. http://192.168.1.2:8989/sonarr).",
+        "de": "IP-Adresse oder Name mit Port und gegebenenfalls URL-Basis (z. B. http://192.168.1.2:8989/sonarr).",
+        "es": "Dirección IP o nombre con el puerto, y la base de URL si la hay (p. ej. http://192.168.1.2:8989/sonarr)."
       },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
-    },
-    {
-      "key": "unit",
-      "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
+      "placeholder": {
+        "en": "e.g. 192.168.1.2:8989",
+        "fr": "ex. 192.168.1.2:8989",
+        "de": "z. B. 192.168.1.2:8989",
+        "es": "p. ej. 192.168.1.2:8989"
+      },
       "required": false,
-      "default": "celsius",
-      "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+      "default": ""
+    },
+    {
+      "key": "sonarr_1_api_key",
+      "type": "secret",
+      "label": {
+        "en": "API key",
+        "fr": "Clé d'API",
+        "de": "API-Schlüssel",
+        "es": "Clave de API"
+      },
+      "description": {
+        "en": "Sonarr: Settings → General → Security → API Key.",
+        "fr": "Sonarr : Settings → General → Security → API Key.",
+        "de": "Sonarr: Settings → General → Security → API Key.",
+        "es": "Sonarr: Settings → General → Security → API Key."
+      },
+      "required": false
+    },
+    {
+      "key": "sonarr_1_name",
+      "type": "string",
+      "label": {
+        "en": "Name",
+        "fr": "Nom",
+        "de": "Name",
+        "es": "Nombre"
+      },
+      "description": {
+        "en": "Name of the device in Gladys. Empty: \"Sonarr\" followed by the address.",
+        "fr": "Nom de l'appareil dans Gladys. Vide : « Sonarr » suivi de l'adresse.",
+        "de": "Name des Geräts in Gladys. Leer: „Sonarr“ gefolgt von der Adresse.",
+        "es": "Nombre del dispositivo en Gladys. Vacío: «Sonarr» seguido de la dirección."
+      },
+      "placeholder": {
+        "en": "e.g. Sonarr",
+        "fr": "ex. Sonarr",
+        "de": "z. B. Sonarr",
+        "es": "p. ej. Sonarr"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "sonarr_2",
+      "type": "section",
+      "label": {
+        "en": "Second Sonarr (optional)",
+        "fr": "Deuxième Sonarr (facultatif)",
+        "de": "Zweites Sonarr (optional)",
+        "es": "Segundo Sonarr (opcional)"
+      },
+      "description": {
+        "en": "Same fields, for another Sonarr.",
+        "fr": "Les mêmes champs, pour un autre Sonarr.",
+        "de": "Dieselben Felder, für ein weiteres Sonarr.",
+        "es": "Los mismos campos, para otro Sonarr."
+      }
+    },
+    {
+      "key": "sonarr_2_url",
+      "type": "string",
+      "label": {
+        "en": "Address",
+        "fr": "Adresse",
+        "de": "Adresse",
+        "es": "Dirección"
+      },
+      "description": {
+        "en": "IP address or name with the port, and the URL base if any (e.g. http://192.168.1.2:8989/sonarr).",
+        "fr": "Adresse IP ou nom avec le port, et la base d'URL s'il y en a une (ex. http://192.168.1.2:8989/sonarr).",
+        "de": "IP-Adresse oder Name mit Port und gegebenenfalls URL-Basis (z. B. http://192.168.1.2:8989/sonarr).",
+        "es": "Dirección IP o nombre con el puerto, y la base de URL si la hay (p. ej. http://192.168.1.2:8989/sonarr)."
+      },
+      "placeholder": {
+        "en": "e.g. 192.168.1.2:8989",
+        "fr": "ex. 192.168.1.2:8989",
+        "de": "z. B. 192.168.1.2:8989",
+        "es": "p. ej. 192.168.1.2:8989"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "sonarr_2_api_key",
+      "type": "secret",
+      "label": {
+        "en": "API key",
+        "fr": "Clé d'API",
+        "de": "API-Schlüssel",
+        "es": "Clave de API"
+      },
+      "description": {
+        "en": "Sonarr: Settings → General → Security → API Key.",
+        "fr": "Sonarr : Settings → General → Security → API Key.",
+        "de": "Sonarr: Settings → General → Security → API Key.",
+        "es": "Sonarr: Settings → General → Security → API Key."
+      },
+      "required": false
+    },
+    {
+      "key": "sonarr_2_name",
+      "type": "string",
+      "label": {
+        "en": "Name",
+        "fr": "Nom",
+        "de": "Name",
+        "es": "Nombre"
+      },
+      "description": {
+        "en": "Name of the device in Gladys. Empty: \"Sonarr\" followed by the address.",
+        "fr": "Nom de l'appareil dans Gladys. Vide : « Sonarr » suivi de l'adresse.",
+        "de": "Name des Geräts in Gladys. Leer: „Sonarr“ gefolgt von der Adresse.",
+        "es": "Nombre del dispositivo en Gladys. Vacío: «Sonarr» seguido de la dirección."
+      },
+      "placeholder": {
+        "en": "e.g. Sonarr",
+        "fr": "ex. Sonarr",
+        "de": "z. B. Sonarr",
+        "es": "p. ej. Sonarr"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "radarr_1",
+      "type": "section",
+      "label": {
+        "en": "Radarr",
+        "fr": "Radarr",
+        "de": "Radarr",
+        "es": "Radarr"
+      },
+      "description": {
+        "en": "Address and API key of your Radarr (Settings → General → Security). Leave empty if you do not use Radarr.",
+        "fr": "Adresse et clé d'API de votre Radarr (Settings → General → Security). Laissez vide si vous n'utilisez pas Radarr.",
+        "de": "Adresse und API-Schlüssel deines Radarr (Settings → General → Security). Leer lassen, wenn du Radarr nicht nutzt.",
+        "es": "Dirección y clave de API de su Radarr (Settings → General → Security). Déjelo vacío si no usa Radarr."
+      },
+      "links": [
+        {
+          "url": "https://wiki.servarr.com/radarr/settings#security",
+          "label": {
+            "en": "Where to find the Radarr API key",
+            "fr": "Où trouver la clé d'API Radarr",
+            "de": "Wo du den Radarr-API-Schlüssel findest",
+            "es": "Dónde encontrar la clave de API de Radarr"
+          }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "radarr_1_url",
+      "type": "string",
+      "label": {
+        "en": "Address",
+        "fr": "Adresse",
+        "de": "Adresse",
+        "es": "Dirección"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "IP address or name with the port, and the URL base if any (e.g. http://192.168.1.2:7878/radarr).",
+        "fr": "Adresse IP ou nom avec le port, et la base d'URL s'il y en a une (ex. http://192.168.1.2:7878/radarr).",
+        "de": "IP-Adresse oder Name mit Port und gegebenenfalls URL-Basis (z. B. http://192.168.1.2:7878/radarr).",
+        "es": "Dirección IP o nombre con el puerto, y la base de URL si la hay (p. ej. http://192.168.1.2:7878/radarr)."
+      },
+      "placeholder": {
+        "en": "e.g. 192.168.1.2:7878",
+        "fr": "ex. 192.168.1.2:7878",
+        "de": "z. B. 192.168.1.2:7878",
+        "es": "p. ej. 192.168.1.2:7878"
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": ""
+    },
+    {
+      "key": "radarr_1_api_key",
+      "type": "secret",
+      "label": {
+        "en": "API key",
+        "fr": "Clé d'API",
+        "de": "API-Schlüssel",
+        "es": "Clave de API"
+      },
+      "description": {
+        "en": "Radarr: Settings → General → Security → API Key.",
+        "fr": "Radarr : Settings → General → Security → API Key.",
+        "de": "Radarr: Settings → General → Security → API Key.",
+        "es": "Radarr: Settings → General → Security → API Key."
+      },
+      "required": false
+    },
+    {
+      "key": "radarr_1_name",
+      "type": "string",
+      "label": {
+        "en": "Name",
+        "fr": "Nom",
+        "de": "Name",
+        "es": "Nombre"
+      },
+      "description": {
+        "en": "Name of the device in Gladys. Empty: \"Radarr\" followed by the address.",
+        "fr": "Nom de l'appareil dans Gladys. Vide : « Radarr » suivi de l'adresse.",
+        "de": "Name des Geräts in Gladys. Leer: „Radarr“ gefolgt von der Adresse.",
+        "es": "Nombre del dispositivo en Gladys. Vacío: «Radarr» seguido de la dirección."
+      },
+      "placeholder": {
+        "en": "e.g. Radarr",
+        "fr": "ex. Radarr",
+        "de": "z. B. Radarr",
+        "es": "p. ej. Radarr"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "radarr_2",
+      "type": "section",
+      "label": {
+        "en": "Second Radarr (optional)",
+        "fr": "Deuxième Radarr (facultatif)",
+        "de": "Zweites Radarr (optional)",
+        "es": "Segundo Radarr (opcional)"
+      },
+      "description": {
+        "en": "Same fields, for another Radarr.",
+        "fr": "Les mêmes champs, pour un autre Radarr.",
+        "de": "Dieselben Felder, für ein weiteres Radarr.",
+        "es": "Los mismos campos, para otro Radarr."
+      }
+    },
+    {
+      "key": "radarr_2_url",
+      "type": "string",
+      "label": {
+        "en": "Address",
+        "fr": "Adresse",
+        "de": "Adresse",
+        "es": "Dirección"
+      },
+      "description": {
+        "en": "IP address or name with the port, and the URL base if any (e.g. http://192.168.1.2:7878/radarr).",
+        "fr": "Adresse IP ou nom avec le port, et la base d'URL s'il y en a une (ex. http://192.168.1.2:7878/radarr).",
+        "de": "IP-Adresse oder Name mit Port und gegebenenfalls URL-Basis (z. B. http://192.168.1.2:7878/radarr).",
+        "es": "Dirección IP o nombre con el puerto, y la base de URL si la hay (p. ej. http://192.168.1.2:7878/radarr)."
+      },
+      "placeholder": {
+        "en": "e.g. 192.168.1.2:7878",
+        "fr": "ex. 192.168.1.2:7878",
+        "de": "z. B. 192.168.1.2:7878",
+        "es": "p. ej. 192.168.1.2:7878"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "radarr_2_api_key",
+      "type": "secret",
+      "label": {
+        "en": "API key",
+        "fr": "Clé d'API",
+        "de": "API-Schlüssel",
+        "es": "Clave de API"
+      },
+      "description": {
+        "en": "Radarr: Settings → General → Security → API Key.",
+        "fr": "Radarr : Settings → General → Security → API Key.",
+        "de": "Radarr: Settings → General → Security → API Key.",
+        "es": "Radarr: Settings → General → Security → API Key."
+      },
+      "required": false
+    },
+    {
+      "key": "radarr_2_name",
+      "type": "string",
+      "label": {
+        "en": "Name",
+        "fr": "Nom",
+        "de": "Name",
+        "es": "Nombre"
+      },
+      "description": {
+        "en": "Name of the device in Gladys. Empty: \"Radarr\" followed by the address.",
+        "fr": "Nom de l'appareil dans Gladys. Vide : « Radarr » suivi de l'adresse.",
+        "de": "Name des Geräts in Gladys. Leer: „Radarr“ gefolgt von der Adresse.",
+        "es": "Nombre del dispositivo en Gladys. Vacío: «Radarr» seguido de la dirección."
+      },
+      "placeholder": {
+        "en": "e.g. Radarr",
+        "fr": "ex. Radarr",
+        "de": "z. B. Radarr",
+        "es": "p. ej. Radarr"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "options",
+      "type": "section",
+      "label": {
+        "en": "Options",
+        "fr": "Options",
+        "de": "Optionen",
+        "es": "Opciones"
+      }
+    },
+    {
+      "key": "poll_interval",
+      "type": "select",
+      "label": {
+        "en": "Refresh interval",
+        "fr": "Intervalle de rafraîchissement",
+        "de": "Aktualisierungsintervall",
+        "es": "Intervalo de actualización"
+      },
+      "description": {
+        "en": "How often the instances are read: queue, calendar, history, health.",
+        "fr": "Fréquence de lecture des instances : file, calendrier, historique, santé.",
+        "de": "Wie oft die Instanzen gelesen werden: Warteschlange, Kalender, Verlauf, Zustand.",
+        "es": "Con qué frecuencia se leen las instancias: cola, calendario, historial, estado."
+      },
+      "required": false,
+      "default": "120",
+      "options": [
+        {
+          "value": "60",
+          "label": {
+            "en": "1 minute",
+            "fr": "1 minute",
+            "de": "1 Minute",
+            "es": "1 minuto"
+          }
+        },
+        {
+          "value": "120",
+          "label": {
+            "en": "2 minutes",
+            "fr": "2 minutes",
+            "de": "2 Minuten",
+            "es": "2 minutos"
+          }
+        },
+        {
+          "value": "300",
+          "label": {
+            "en": "5 minutes",
+            "fr": "5 minutes",
+            "de": "5 Minuten",
+            "es": "5 minutos"
+          }
+        },
+        {
+          "value": "600",
+          "label": {
+            "en": "10 minutes",
+            "fr": "10 minutes",
+            "de": "10 Minuten",
+            "es": "10 minutos"
+          }
+        }
+      ]
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the feature names",
+        "fr": "Langue des noms de fonctionnalités",
+        "de": "Sprache der Funktionsnamen",
+        "es": "Idioma de los nombres de funciones"
+      },
+      "description": {
+        "en": "Names given to the features when a device is added, and the sentence of the summary action.",
+        "fr": "Noms donnés aux fonctionnalités à l'ajout d'un appareil, et phrase de l'action de résumé.",
+        "de": "Namen der Funktionen beim Hinzufügen eines Geräts und Satz der Zusammenfassungsaktion.",
+        "es": "Nombres de las funciones al añadir un dispositivo y frase de la acción de resumen."
+      },
+      "required": false,
+      "default": "fr",
+      "options": [
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "Anglais",
+            "de": "Englisch",
+            "es": "Inglés"
+          }
+        },
+        {
+          "value": "fr",
+          "label": {
+            "en": "French",
+            "fr": "Français",
+            "de": "Französisch",
+            "es": "Francés"
+          }
+        },
+        {
+          "value": "de",
+          "label": {
+            "en": "German",
+            "fr": "Allemand",
+            "de": "Deutsch",
+            "es": "Alemán"
+          }
+        },
+        {
+          "value": "es",
+          "label": {
+            "en": "Spanish",
+            "fr": "Espagnol",
+            "de": "Spanisch",
+            "es": "Español"
+          }
+        }
+      ]
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "description": {
+        "en": "Reads every instance now and reports what it finds.",
+        "fr": "Lit chaque instance maintenant et indique ce qu'elle trouve.",
+        "de": "Liest jede Instanz sofort und meldet, was sie findet.",
+        "es": "Lee cada instancia ahora e indica lo que encuentra."
+      },
       "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ]
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "key": "download_imported",
+      "label": {
+        "en": "Episode or movie downloaded",
+        "fr": "Épisode ou film téléchargé",
+        "de": "Episode oder Film heruntergeladen",
+        "es": "Episodio o película descargados"
+      },
       "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+        "en": "Sonarr or Radarr imported a finished download into the library.",
+        "fr": "Sonarr ou Radarr a importé un téléchargement terminé dans la bibliothèque.",
+        "de": "Sonarr oder Radarr hat einen fertigen Download in die Bibliothek importiert.",
+        "es": "Sonarr o Radarr ha importado una descarga terminada a la biblioteca."
       },
       "fields": [
         {
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
+          "label": {
+            "en": "Instance (empty: any)",
+            "fr": "Instance (vide : n'importe laquelle)",
+            "de": "Instanz (leer: beliebig)",
+            "es": "Instancia (vacío: cualquiera)"
+          }
         },
         {
-          "key": "target",
-          "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
+          "key": "app",
+          "type": "select",
+          "label": {
+            "en": "Application (empty: both)",
+            "fr": "Application (vide : les deux)",
+            "de": "Anwendung (leer: beide)",
+            "es": "Aplicación (vacío: ambas)"
+          },
           "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
+            {
+              "value": "sonarr",
+              "label": {
+                "en": "Sonarr (series)",
+                "fr": "Sonarr (séries)",
+                "de": "Sonarr (Serien)",
+                "es": "Sonarr (series)"
+              }
+            },
+            {
+              "value": "radarr",
+              "label": {
+                "en": "Radarr (movies)",
+                "fr": "Radarr (films)",
+                "de": "Radarr (Filme)",
+                "es": "Radarr (películas)"
+              }
+            }
           ]
         }
       ],
       "variables": [
         {
-          "key": "target",
+          "key": "instance",
           "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
+          "label": {
+            "en": "Instance name",
+            "fr": "Nom de l'instance",
+            "de": "Name der Instanz",
+            "es": "Nombre de la instancia"
+          }
+        },
+        {
+          "key": "device",
+          "type": "string",
+          "label": {
+            "en": "Instance device",
+            "fr": "Appareil de l'instance",
+            "de": "Gerät der Instanz",
+            "es": "Dispositivo de la instancia"
+          }
+        },
+        {
+          "key": "app",
+          "type": "string",
+          "label": {
+            "en": "Application (sonarr, radarr)",
+            "fr": "Application (sonarr, radarr)",
+            "de": "Anwendung (sonarr, radarr)",
+            "es": "Aplicación (sonarr, radarr)"
+          }
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Series or movie title",
+            "fr": "Titre de la série ou du film",
+            "de": "Titel der Serie oder des Films",
+            "es": "Título de la serie o película"
+          }
+        },
+        {
+          "key": "label",
+          "type": "string",
+          "label": {
+            "en": "Title with episode (S01E02) or year",
+            "fr": "Titre avec épisode (S01E02) ou année",
+            "de": "Titel mit Episode (S01E02) oder Jahr",
+            "es": "Título con episodio (S01E02) o año"
+          }
+        },
+        {
+          "key": "quality",
+          "type": "string",
+          "label": {
+            "en": "Quality (e.g. WEBDL-1080p)",
+            "fr": "Qualité (ex. WEBDL-1080p)",
+            "de": "Qualität (z. B. WEBDL-1080p)",
+            "es": "Calidad (p. ej. WEBDL-1080p)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "download_failed",
+      "label": {
+        "en": "Download failed",
+        "fr": "Téléchargement en échec",
+        "de": "Download fehlgeschlagen",
+        "es": "Descarga fallida"
+      },
+      "description": {
+        "en": "A download was marked as failed by Sonarr or Radarr, with the reason.",
+        "fr": "Un téléchargement a été marqué en échec par Sonarr ou Radarr, avec la raison.",
+        "de": "Ein Download wurde von Sonarr oder Radarr als fehlgeschlagen markiert, mit dem Grund.",
+        "es": "Sonarr o Radarr ha marcado una descarga como fallida, con el motivo."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Instance (empty: any)",
+            "fr": "Instance (vide : n'importe laquelle)",
+            "de": "Instanz (leer: beliebig)",
+            "es": "Instancia (vacío: cualquiera)"
+          }
+        },
+        {
+          "key": "app",
+          "type": "select",
+          "label": {
+            "en": "Application (empty: both)",
+            "fr": "Application (vide : les deux)",
+            "de": "Anwendung (leer: beide)",
+            "es": "Aplicación (vacío: ambas)"
+          },
+          "options": [
+            {
+              "value": "sonarr",
+              "label": {
+                "en": "Sonarr (series)",
+                "fr": "Sonarr (séries)",
+                "de": "Sonarr (Serien)",
+                "es": "Sonarr (series)"
+              }
+            },
+            {
+              "value": "radarr",
+              "label": {
+                "en": "Radarr (movies)",
+                "fr": "Radarr (films)",
+                "de": "Radarr (Filme)",
+                "es": "Radarr (películas)"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "instance",
+          "type": "string",
+          "label": {
+            "en": "Instance name",
+            "fr": "Nom de l'instance",
+            "de": "Name der Instanz",
+            "es": "Nombre de la instancia"
+          }
+        },
+        {
+          "key": "device",
+          "type": "string",
+          "label": {
+            "en": "Instance device",
+            "fr": "Appareil de l'instance",
+            "de": "Gerät der Instanz",
+            "es": "Dispositivo de la instancia"
+          }
+        },
+        {
+          "key": "app",
+          "type": "string",
+          "label": {
+            "en": "Application (sonarr, radarr)",
+            "fr": "Application (sonarr, radarr)",
+            "de": "Anwendung (sonarr, radarr)",
+            "es": "Aplicación (sonarr, radarr)"
+          }
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Series or movie title",
+            "fr": "Titre de la série ou du film",
+            "de": "Titel der Serie oder des Films",
+            "es": "Título de la serie o película"
+          }
+        },
+        {
+          "key": "label",
+          "type": "string",
+          "label": {
+            "en": "Title with episode (S01E02) or year",
+            "fr": "Titre avec épisode (S01E02) ou année",
+            "de": "Titel mit Episode (S01E02) oder Jahr",
+            "es": "Título con episodio (S01E02) o año"
+          }
+        },
+        {
+          "key": "reason",
+          "type": "string",
+          "label": {
+            "en": "Reason given by the download client",
+            "fr": "Raison donnée par le client de téléchargement",
+            "de": "Grund des Download-Clients",
+            "es": "Motivo indicado por el cliente de descarga"
+          }
+        }
+      ]
+    },
+    {
+      "key": "health_issue",
+      "label": {
+        "en": "New health issue",
+        "fr": "Nouvelle alerte de santé",
+        "de": "Neue Zustandsmeldung",
+        "es": "Nuevo aviso de estado"
+      },
+      "description": {
+        "en": "A new warning or error appeared in System → Status (indexer, download client, disk…).",
+        "fr": "Un nouvel avertissement ou une nouvelle erreur est apparu dans System → Status (indexeur, client, disque…).",
+        "de": "Eine neue Warnung oder ein neuer Fehler erscheint unter System → Status (Indexer, Client, Festplatte…).",
+        "es": "Ha aparecido un nuevo aviso o error en System → Status (indexador, cliente, disco…)."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Instance (empty: any)",
+            "fr": "Instance (vide : n'importe laquelle)",
+            "de": "Instanz (leer: beliebig)",
+            "es": "Instancia (vacío: cualquiera)"
+          }
+        },
+        {
+          "key": "app",
+          "type": "select",
+          "label": {
+            "en": "Application (empty: both)",
+            "fr": "Application (vide : les deux)",
+            "de": "Anwendung (leer: beide)",
+            "es": "Aplicación (vacío: ambas)"
+          },
+          "options": [
+            {
+              "value": "sonarr",
+              "label": {
+                "en": "Sonarr (series)",
+                "fr": "Sonarr (séries)",
+                "de": "Sonarr (Serien)",
+                "es": "Sonarr (series)"
+              }
+            },
+            {
+              "value": "radarr",
+              "label": {
+                "en": "Radarr (movies)",
+                "fr": "Radarr (films)",
+                "de": "Radarr (Filme)",
+                "es": "Radarr (películas)"
+              }
+            }
+          ]
+        },
+        {
+          "key": "level",
+          "type": "select",
+          "label": {
+            "en": "Level (empty: any)",
+            "fr": "Niveau (vide : tous)",
+            "de": "Stufe (leer: beliebig)",
+            "es": "Nivel (vacío: cualquiera)"
+          },
+          "options": [
+            {
+              "value": "warning",
+              "label": {
+                "en": "Warning",
+                "fr": "Avertissement",
+                "de": "Warnung",
+                "es": "Aviso"
+              }
+            },
+            {
+              "value": "error",
+              "label": {
+                "en": "Error",
+                "fr": "Erreur",
+                "de": "Fehler",
+                "es": "Error"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "instance",
+          "type": "string",
+          "label": {
+            "en": "Instance name",
+            "fr": "Nom de l'instance",
+            "de": "Name der Instanz",
+            "es": "Nombre de la instancia"
+          }
+        },
+        {
+          "key": "device",
+          "type": "string",
+          "label": {
+            "en": "Instance device",
+            "fr": "Appareil de l'instance",
+            "de": "Gerät der Instanz",
+            "es": "Dispositivo de la instancia"
+          }
+        },
+        {
+          "key": "app",
+          "type": "string",
+          "label": {
+            "en": "Application (sonarr, radarr)",
+            "fr": "Application (sonarr, radarr)",
+            "de": "Anwendung (sonarr, radarr)",
+            "es": "Aplicación (sonarr, radarr)"
+          }
+        },
+        {
+          "key": "level",
+          "type": "string",
+          "label": {
+            "en": "Level (warning, error)",
+            "fr": "Niveau (warning, error)",
+            "de": "Stufe (warning, error)",
+            "es": "Nivel (warning, error)"
+          }
+        },
+        {
+          "key": "source",
+          "type": "string",
+          "label": {
+            "en": "Check (e.g. IndexerStatusCheck)",
+            "fr": "Vérification (ex. IndexerStatusCheck)",
+            "de": "Prüfung (z. B. IndexerStatusCheck)",
+            "es": "Comprobación (p. ej. IndexerStatusCheck)"
+          }
+        },
+        {
+          "key": "message",
+          "type": "string",
+          "label": {
+            "en": "Message of Sonarr or Radarr",
+            "fr": "Message de Sonarr ou Radarr",
+            "de": "Meldung von Sonarr oder Radarr",
+            "es": "Mensaje de Sonarr o Radarr"
+          }
         }
       ]
     }
   ],
   "scene_actions": [
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+      "key": "search_missing",
+      "label": {
+        "en": "Search missing episodes or movies",
+        "fr": "Chercher les épisodes ou films manquants",
+        "de": "Fehlende Episoden oder Filme suchen",
+        "es": "Buscar episodios o películas pendientes"
       },
-      "timeout_seconds": 15,
+      "description": {
+        "en": "Starts the search of every monitored missing episode or movie (Wanted → Missing).",
+        "fr": "Lance la recherche de tous les épisodes ou films surveillés manquants (Wanted → Missing).",
+        "de": "Startet die Suche aller überwachten fehlenden Episoden oder Filme (Wanted → Missing).",
+        "es": "Inicia la búsqueda de todos los episodios o películas vigilados pendientes (Wanted → Missing)."
+      },
+      "timeout_seconds": 20,
       "fields": [
         {
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
+          "label": {
+            "en": "Instance (empty: all)",
+            "fr": "Instance (vide : toutes)",
+            "de": "Instanz (leer: alle)",
+            "es": "Instancia (vacío: todas)"
+          }
         }
       ],
       "outputs": [
         {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "key": "instances",
+          "type": "number",
+          "label": {
+            "en": "Instances that started the search",
+            "fr": "Instances ayant lancé la recherche",
+            "de": "Instanzen, die die Suche gestartet haben",
+            "es": "Instancias que iniciaron la búsqueda"
+          }
+        }
+      ]
+    },
+    {
+      "key": "refresh_library",
+      "label": {
+        "en": "Refresh the Sonarr or Radarr library",
+        "fr": "Rafraîchir la bibliothèque Sonarr ou Radarr",
+        "de": "Sonarr- oder Radarr-Bibliothek aktualisieren",
+        "es": "Actualizar la biblioteca de Sonarr o Radarr"
+      },
+      "description": {
+        "en": "Refreshes the information and files of every series or movie, then reads the instance again.",
+        "fr": "Rafraîchit les informations et fichiers de chaque série ou film, puis relit l'instance.",
+        "de": "Aktualisiert Infos und Dateien aller Serien oder Filme und liest die Instanz dann neu.",
+        "es": "Actualiza la información y los archivos de cada serie o película y vuelve a leer la instancia."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Instance (empty: all)",
+            "fr": "Instance (vide : toutes)",
+            "de": "Instanz (leer: alle)",
+            "es": "Instancia (vacío: todas)"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "key": "instances",
+          "type": "number",
+          "label": {
+            "en": "Instances refreshed",
+            "fr": "Instances rafraîchies",
+            "de": "Aktualisierte Instanzen",
+            "es": "Instancias actualizadas"
+          }
+        }
+      ]
+    },
+    {
+      "key": "read_summary",
+      "label": {
+        "en": "Read the Sonarr/Radarr summary",
+        "fr": "Lire le résumé Sonarr/Radarr",
+        "de": "Sonarr/Radarr-Zusammenfassung lesen",
+        "es": "Leer el resumen de Sonarr/Radarr"
+      },
+      "description": {
+        "en": "A sentence for a message: releases this week, queue, missing items, health issues.",
+        "fr": "Une phrase pour un message : sorties de la semaine, file, manquants, alertes de santé.",
+        "de": "Ein Satz für eine Nachricht: Neuerscheinungen der Woche, Warteschlange, Fehlende, Meldungen.",
+        "es": "Una frase para un mensaje: estrenos de la semana, cola, pendientes, avisos de estado."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Instance (empty: all)",
+            "fr": "Instance (vide : toutes)",
+            "de": "Instanz (leer: alle)",
+            "es": "Instancia (vacío: todas)"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "key": "summary",
+          "type": "string",
+          "label": {
+            "en": "Summary sentence",
+            "fr": "Phrase de résumé",
+            "de": "Zusammenfassungssatz",
+            "es": "Frase de resumen"
+          }
+        },
+        {
+          "key": "upcoming",
+          "type": "number",
+          "label": {
+            "en": "Releases in the next 7 days",
+            "fr": "Sorties des 7 prochains jours",
+            "de": "Neuerscheinungen der nächsten 7 Tage",
+            "es": "Estrenos de los próximos 7 días"
+          }
+        },
+        {
+          "key": "queue",
+          "type": "number",
+          "label": {
+            "en": "Items in queue",
+            "fr": "Éléments en file",
+            "de": "Elemente in der Warteschlange",
+            "es": "Elementos en cola"
+          }
+        },
+        {
+          "key": "missing",
+          "type": "number",
+          "label": {
+            "en": "Missing items",
+            "fr": "Éléments manquants",
+            "de": "Fehlende Elemente",
+            "es": "Elementos pendientes"
+          }
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      "key": "upcoming",
+      "label": {
+        "en": "Upcoming releases",
+        "fr": "Sorties à venir",
+        "de": "Neuerscheinungen",
+        "es": "Próximos estrenos"
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+      "description": {
+        "en": "Episodes and movies of the week with their posters, and the state of the queues.",
+        "fr": "Épisodes et films de la semaine avec leurs affiches, et l'état des files.",
+        "de": "Episoden und Filme der Woche mit Postern und der Zustand der Warteschlangen.",
+        "es": "Episodios y películas de la semana con sus carteles, y el estado de las colas."
+      },
+      "icon": "film",
+      "action_timeout_seconds": 30,
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Instance (empty: all)",
+            "fr": "Instance (vide : toutes)",
+            "de": "Instanz (leer: alle)",
+            "es": "Instancia (vacío: todas)"
+          },
+          "required": false
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,77 @@
+[
+  {
+    "seriesId": 1,
+    "tvdbId": 12004754,
+    "episodeFileId": 1,
+    "seasonNumber": 38,
+    "episodeNumber": 3,
+    "title": "Treehouse of Horror Presents: The Revengening",
+    "airDate": "2026-10-18",
+    "airDateUtc": "2026-10-19T00:00:00Z",
+    "runtime": 0,
+    "overview": "All hell breaks loose on Halloween when a killer comes to Springfield and hacks their way through town. No Simpson is safe from... THE REVENGENING!",
+    "hasFile": true,
+    "monitored": true,
+    "unverifiedSceneNumbering": false,
+    "series": {
+      "title": "The Simpsons",
+      "sortTitle": "simpsons",
+      "status": "continuing",
+      "ended": false,
+      "overview": "Set in Springfield, the average American town, the show focuses on the antics and everyday adventures of the Simpson family; Homer, Marge, Bart, Lisa and Maggie, as well as a virtual cast of thousands. Since the beginning, the series has been a pop culture icon, attracting hundreds of celebrities to guest star. The show has also made name for itself in its fearless satirical take on politics, media and American life in general.",
+      "network": "FOX",
+      "airTime": "20:00",
+      "images": [
+        {
+          "coverType": "banner",
+          "remoteUrl": "https://artworks.thetvdb.com/banners/graphical/71663-g13.jpg"
+        },
+        {
+          "coverType": "poster",
+          "remoteUrl": "https://artworks.thetvdb.com/banners/posters/71663-15.jpg"
+        },
+        {
+          "coverType": "fanart",
+          "remoteUrl": "https://artworks.thetvdb.com/banners/fanart/original/71663-10.jpg"
+        },
+        {
+          "coverType": "clearlogo",
+          "remoteUrl": "https://artworks.thetvdb.com/banners/v4/series/71663/clearlogo/611b473e14b3f.png"
+        }
+      ],
+      "originalLanguage": {
+        "id": 1,
+        "name": "English"
+      },
+      "year": 1989,
+      "path": "/config/tv/The Simpsons",
+      "qualityProfileId": 1,
+      "seasonFolder": true,
+      "monitored": true,
+      "monitorNewItems": "all",
+      "useSceneNumbering": false,
+      "runtime": 24,
+      "tvdbId": 71663,
+      "tvRageId": 6190,
+      "tvMazeId": 83,
+      "tmdbId": 456,
+      "firstAired": "1989-12-17T00:00:00Z",
+      "lastAired": "2026-11-01T00:00:00Z",
+      "seriesType": "standard",
+      "cleanTitle": "thesimpsons",
+      "imdbId": "tt0096697",
+      "titleSlug": "the-simpsons",
+      "certification": "TV-PG",
+      "genres": ["Animation", "Comedy"],
+      "tags": [],
+      "added": "2026-10-14T16:05:59Z",
+      "ratings": {
+        "votes": 474018,
+        "value": 8.6
+      },
+      "languageProfileId": 1,
+      "id": 1
+    },
+    "id": 878
+  }
+]
