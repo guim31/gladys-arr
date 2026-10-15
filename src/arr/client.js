@@ -1,11 +1,13 @@
 // -----------------------------------------------------------------------------
-// Sonarr and Radarr API v3 client (the API both serve under /api/v3, Sonarr
-// v3 and v4, Radarr v3 to v6). One API key per instance (Settings → General),
-// sent in the X-Api-Key header: never in the URL, never in the logs.
+// Sonarr, Radarr and Lidarr API client: v3 for Sonarr (v3, v4) and Radarr (v3
+// to v6), v1 for Lidarr (v1 to v3), same conventions. One API key per instance
+// (Settings → General), sent in the X-Api-Key header: never in the URL, never
+// in the logs.
 //
 // The client knows which application the slot expects (`kind`) and checks it
 // against /system/status: a Radarr address typed in a Sonarr slot is reported
-// as such instead of failing on every request.
+// as such instead of failing on every request. Lidarr does not serve /api/v3
+// (nor Sonarr and Radarr /api/v1): the other version is asked to tell them apart.
 // -----------------------------------------------------------------------------
 
 import { KINDS } from '../config.js';
@@ -44,12 +46,19 @@ const TLS_CODES = new Set([
   'ERR_TLS_CERT_ALTNAME_INVALID',
 ]);
 
-const APP_NAMES = { [KINDS.SONARR]: 'Sonarr', [KINDS.RADARR]: 'Radarr' };
+const APP_NAMES = { [KINDS.SONARR]: 'Sonarr', [KINDS.RADARR]: 'Radarr', [KINDS.LIDARR]: 'Lidarr' };
+
+export const API_VERSIONS = Object.freeze({
+  [KINDS.SONARR]: 'v3',
+  [KINDS.RADARR]: 'v3',
+  [KINDS.LIDARR]: 'v1',
+});
 
 // The commands of the scene actions, per application.
 export const COMMANDS = Object.freeze({
   [KINDS.SONARR]: { searchMissing: 'MissingEpisodeSearch', refresh: 'RefreshSeries' },
   [KINDS.RADARR]: { searchMissing: 'MissingMoviesSearch', refresh: 'RefreshMovie' },
+  [KINDS.LIDARR]: { searchMissing: 'MissingAlbumSearch', refresh: 'RefreshArtist' },
 });
 
 export const QUEUE_PAGE_SIZE = 100;
@@ -59,7 +68,7 @@ export class ArrClient {
    * @param {object} options
    * @param {string} options.url base URL, with the URL base if any
    * @param {string} options.apiKey
-   * @param {'sonarr'|'radarr'} options.kind
+   * @param {'sonarr'|'radarr'|'lidarr'} options.kind
    * @param {Function} [options.request] HTTP seam (src/arr/http.js)
    */
   constructor({ url, apiKey, kind, request = httpRequest }) {
@@ -69,10 +78,13 @@ export class ArrClient {
     this.request = request;
   }
 
-  async call(path, { method = 'GET', json, binary = false } = {}) {
+  async call(
+    path,
+    { method = 'GET', json, binary = false, version = API_VERSIONS[this.kind] } = {},
+  ) {
     let answer;
     try {
-      answer = await this.request(`${this.url}/api/v3/${path}`, {
+      answer = await this.request(`${this.url}/api/${version}/${path}`, {
         method,
         json,
         binary,
@@ -92,7 +104,9 @@ export class ArrClient {
       throw new ArrError(ERROR_KINDS.REDIRECT, `Redirected (HTTP ${status})`, { status });
     }
     if (status === 404 && !String(headers['content-type'] ?? '').includes('json')) {
-      throw new ArrError(ERROR_KINDS.NOT_ARR, `No API v3 at this address (/${path})`, { status });
+      throw new ArrError(ERROR_KINDS.NOT_ARR, `No API ${version} at this address (/${path})`, {
+        status,
+      });
     }
     if (status < 200 || status >= 300) {
       throw new ArrError(ERROR_KINDS.HTTP, `/${path.split('?')[0]} answered HTTP ${status}`, {
@@ -115,7 +129,7 @@ export class ArrClient {
     const status = await this.call('system/status');
     const appName = typeof status?.appName === 'string' ? status.appName : null;
     if (!appName || typeof status.version !== 'string') {
-      throw new ArrError(ERROR_KINDS.NOT_ARR, 'No Sonarr or Radarr status at this address');
+      throw new ArrError(ERROR_KINDS.NOT_ARR, 'No Sonarr, Radarr or Lidarr status at this address');
     }
     if (appName.toLowerCase() !== this.kind) {
       throw new ArrError(ERROR_KINDS.WRONG_APP, `This is ${appName}, not ${APP_NAMES[this.kind]}`, {
@@ -125,17 +139,45 @@ export class ArrClient {
     return status;
   }
 
+  /**
+   * No API of the expected version (`err`, NOT_ARR): when the other version
+   * answers with an application name, the address is the wrong application,
+   * not a stranger. Resolves with the error to report.
+   */
+  async otherApp(err) {
+    if (err.kind !== ERROR_KINDS.NOT_ARR) {
+      return err;
+    }
+    const version = API_VERSIONS[this.kind] === 'v1' ? 'v3' : 'v1';
+    try {
+      const other = await this.call('system/status', { version });
+      if (typeof other?.appName === 'string') {
+        return new ArrError(
+          ERROR_KINDS.WRONG_APP,
+          `This is ${other.appName}, not ${APP_NAMES[this.kind]}`,
+          { appName: other.appName },
+        );
+      }
+    } catch {
+      // Nothing there either: the first answer stands.
+    }
+    return err;
+  }
+
   health() {
     return this.call('health');
   }
 
   queue() {
-    const unknown =
-      this.kind === KINDS.SONARR ? 'includeUnknownSeriesItems' : 'includeUnknownMovieItems';
+    const unknown = {
+      [KINDS.SONARR]: 'includeUnknownSeriesItems',
+      [KINDS.RADARR]: 'includeUnknownMovieItems',
+      [KINDS.LIDARR]: 'includeUnknownArtistItems',
+    }[this.kind];
     return this.call(`queue?page=1&pageSize=${QUEUE_PAGE_SIZE}&${unknown}=true`);
   }
 
-  /** Number of monitored missing episodes or movies (Wanted → Missing). */
+  /** Number of monitored missing episodes, movies or albums (Wanted → Missing). */
   async missingCount() {
     const page = await this.call('wanted/missing?page=1&pageSize=1&monitored=true');
     return Number.isInteger(page?.totalRecords) ? page.totalRecords : null;
@@ -145,20 +187,24 @@ export class ArrClient {
     return this.call('rootfolder');
   }
 
-  /** Episodes (with their series) or movies released between two instants. */
+  /** Episodes (with their series), movies or albums (with their artist) released between two instants. */
   calendar(start, end) {
     const range = `start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`;
-    return this.call(
-      this.kind === KINDS.SONARR
-        ? `calendar?${range}&unmonitored=false&includeSeries=true`
-        : `calendar?${range}&unmonitored=false`,
-    );
+    const include = {
+      [KINDS.SONARR]: '&includeSeries=true',
+      [KINDS.RADARR]: '',
+      [KINDS.LIDARR]: '&includeArtist=true',
+    }[this.kind];
+    return this.call(`calendar?${range}&unmonitored=false${include}`);
   }
 
-  /** History events since an instant, with their series/episode or movie. */
+  /** History events since an instant, with their series/episode, movie or artist/album. */
   historySince(date) {
-    const include =
-      this.kind === KINDS.SONARR ? 'includeSeries=true&includeEpisode=true' : 'includeMovie=true';
+    const include = {
+      [KINDS.SONARR]: 'includeSeries=true&includeEpisode=true',
+      [KINDS.RADARR]: 'includeMovie=true',
+      [KINDS.LIDARR]: 'includeArtist=true&includeAlbum=true',
+    }[this.kind];
     return this.call(`history/since?date=${encodeURIComponent(date.toISOString())}&${include}`);
   }
 
@@ -167,8 +213,16 @@ export class ArrClient {
     return this.call('command', { method: 'POST', json: { name } });
   }
 
-  /** The small poster Sonarr/Radarr keep of a series or a movie (JPEG, ~250 px wide). */
+  /**
+   * The small poster kept of a series, a movie or an artist (JPEG, ~250 px
+   * wide). Lidarr keeps album covers at full size only (often over 300 KB, the
+   * widget limit): the artist poster stands for the album.
+   */
   poster(id) {
-    return this.call(`mediacover/${Number(id)}/poster-250.jpg`, { binary: true });
+    const path =
+      this.kind === KINDS.LIDARR
+        ? `mediacover/artist/${Number(id)}/poster-250.jpg`
+        : `mediacover/${Number(id)}/poster-250.jpg`;
+    return this.call(path, { binary: true });
   }
 }

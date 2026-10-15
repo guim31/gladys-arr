@@ -1,13 +1,14 @@
-# Sonarr & Radarr
+# Sonarr, Radarr & Lidarr
 
-Hol dir dein [Sonarr](https://sonarr.tv) (Serien) und dein
-[Radarr](https://radarr.video) (Filme) in Gladys, über dein lokales Netzwerk:
-die Episoden und Filme dieser Woche mit ihren Postern auf dem Dashboard, der
-Zustand der Download-Warteschlangen, die fehlenden Elemente, die
-Zustandsmeldungen und Szenen, die reagieren, wenn eine Episode oder ein Film
+Hol dir dein [Sonarr](https://sonarr.tv) (Serien), dein
+[Radarr](https://radarr.video) (Filme) und dein [Lidarr](https://lidarr.audio)
+(Musik) in Gladys, über dein lokales Netzwerk: die Episoden, Filme und Alben
+dieser Woche mit ihren Postern auf dem Dashboard, der Zustand der
+Download-Warteschlangen, die fehlenden Elemente, die Zustandsmeldungen und
+Szenen, die reagieren, wenn eine Episode, ein Film oder ein Album
 heruntergeladen wurde.
 
-Die Integration wurde mit echten Sonarr-4- und Radarr-6-Instanzen getestet (die
+Die Integration wurde mit echten Sonarr-4-, Radarr-6- und Lidarr-3-Instanzen getestet (die
 offiziellen Docker-Images), noch nicht in einer echten Gladys-Installation:
 Rückmeldungen sind im [Gladys-Forum](https://community.gladysassistant.com) oder
 in den [Issues](https://github.com/guim31/gladys-arr/issues) willkommen.
@@ -15,9 +16,9 @@ in den [Issues](https://github.com/guim31/gladys-arr/issues) willkommen.
 ## Was du brauchst
 
 - Gladys Assistant 5.1.0 oder neuer.
-- **Sonarr** v3 oder v4 und/oder **Radarr** v3 oder neuer, von Gladys aus
-  erreichbar (gleiches Netzwerk). Bis zu zwei von jedem.
-- Den **API-Schlüssel** jeder Instanz: in Sonarr oder Radarr unter
+- **Sonarr** v3 oder v4, **Radarr** v3 oder neuer und/oder **Lidarr** v1 oder
+  neuer, von Gladys aus erreichbar (gleiches Netzwerk). Bis zu zwei von jedem.
+- Den **API-Schlüssel** jeder Instanz: in Sonarr, Radarr oder Lidarr unter
   **Settings** → **General** → **Security** → **API Key**.
 
 ## Einrichtung
@@ -26,10 +27,10 @@ in den [Issues](https://github.com/guim31/gladys-arr/issues) willkommen.
 2. Gib in der **Konfiguration** im Abschnitt _Sonarr_ die **Adresse** deines
    Sonarr mit Port ein (zum Beispiel `192.168.1.2:8989`), seinen
    **API-Schlüssel** und optional einen **Namen**. Ebenso im Abschnitt _Radarr_
-   (standardmäßig Port `7878`). Ein Sonarr hinter einem Reverse-Proxy mit
+   (standardmäßig Port `7878`) und im Abschnitt _Lidarr_ (Port `8686`). Ein Sonarr hinter einem Reverse-Proxy mit
    URL-Basis? Gib sie auch ein: `https://example.org/sonarr`. Lass den Abschnitt
-   einer Anwendung leer, die du nicht nutzt. Ein zweites Sonarr (4K, Anime…)
-   oder Radarr? Fülle den Abschnitt _Zweites Sonarr_ oder _Zweites Radarr_ aus.
+   einer Anwendung leer, die du nicht nutzt. Ein zweites Sonarr (4K, Anime…),
+   Radarr oder Lidarr? Fülle den passenden Abschnitt _Zweites…_ aus.
 3. Speichere und klicke dann auf **Verbindung testen**: Die Meldung unter der
    Taste zeigt für jede Instanz, ob sie antwortet, ihre Version, ihre
    Warteschlange, ihre fehlenden Elemente und ihre Zustandsmeldungen.
@@ -49,19 +50,19 @@ Optionen:
 ## Das Gerät jeder Instanz
 
 Alle Funktionen sind schreibgeschützt. Die Namen sprechen bei einem Sonarr von
-„Episoden“ und bei einem Radarr von „Filmen“.
+„Episoden“, bei einem Radarr von „Filmen“ und bei einem Lidarr von „Alben“.
 
-| Funktion                                                 | Was es ist                                                                                         |
-| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Online                                                   | 1, solange die Instanz antwortet, sonst 0                                                          |
-| Download-Warteschlange                                   | Elemente der Warteschlange von Sonarr oder Radarr (Activity → Queue)                               |
-| Downloads mit Fehler                                     | Elemente der Warteschlange mit Warnung oder Fehler: blockierter Import, fehlgeschlagener Download… |
-| Fehlende Episoden / Fehlende Filme                       | Überwachte Episoden oder Filme ohne Datei (Wanted → Missing)                                       |
-| Episoden der nächsten 7 Tage / Filme der nächsten 7 Tage | Ausgestrahlte Episoden oder erscheinende Filme (Kino, digital, Disc), von heute bis in 6 Tagen     |
-| Freier Speicher                                          | Freier Speicher der Stammordner in GB; der kleinste, wenn es mehrere gibt                          |
-| Zustandswarnungen                                        | Warnungen unter System → Status (Indexer, Download-Client…)                                        |
-| Zustandsfehler                                           | Fehler unter System → Status                                                                       |
-| Version                                                  | Version von Sonarr oder Radarr                                                                     |
+| Funktion                                                                             | Was es ist                                                                                            |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| Online                                                                               | 1, solange die Instanz antwortet, sonst 0                                                             |
+| Download-Warteschlange                                                               | Elemente der Download-Warteschlange (Activity → Queue)                                                |
+| Downloads mit Fehler                                                                 | Elemente der Warteschlange mit Warnung oder Fehler: blockierter Import, fehlgeschlagener Download…    |
+| Fehlende Episoden / Fehlende Filme / Fehlende Alben                                  | Überwachte Episoden, Filme oder Alben ohne Dateien (Wanted → Missing)                                 |
+| Episoden der nächsten 7 Tage / Filme der nächsten 7 Tage / Alben der nächsten 7 Tage | Ausgestrahlte Episoden, erscheinende Filme (Kino, digital, Disc) oder Alben, von heute bis in 6 Tagen |
+| Freier Speicher                                                                      | Freier Speicher der Stammordner in GB; der kleinste, wenn es mehrere gibt                             |
+| Zustandswarnungen                                                                    | Warnungen unter System → Status (Indexer, Download-Client…)                                           |
+| Zustandsfehler                                                                       | Fehler unter System → Status                                                                          |
+| Version                                                                              | Version von Sonarr, Radarr oder Lidarr                                                                |
 
 ## Dashboard
 
@@ -73,27 +74,27 @@ Es zeigt:
 
 - zwei Kacheln: die Elemente **In Warteschlange** und die **Fehlenden**, für
   alle angezeigten Instanzen;
-- ein Raster der Episoden und Filme, die von heute bis in 6 Tagen erscheinen,
-  mit Poster, Datum und einem Abzeichen _Geladen_, sobald die Datei da ist (bei
+- ein Raster der Episoden, Filme und Alben, die von heute bis in 6 Tagen
+  erscheinen, mit Poster (bei einem Album das des Künstlers), Datum und einem Abzeichen _Geladen_, sobald die Datei da ist (bei
   einem Film vorher: _Im Kino_, _Digital_ oder _Blu-ray / DVD_). Tippe auf eine
-  Karte für den Episodentitel und die Beschreibung;
+  Karte für den Titel der Episode oder des Albums und die Beschreibung;
 - eine Zeile pro Instanz: Warteschlange, Downloads mit Fehler,
   Zustandsmeldungen oder _Nicht erreichbar_;
 - zwei Tasten: **Fehlende suchen** (wie die Aktion unten) und
   **Aktualisieren**.
 
-Die Poster kommen von Sonarr und Radarr selbst (die kleine Kopie, die sie
+Die Poster kommen von Sonarr, Radarr und Lidarr selbst (die kleine Kopie, die sie
 behalten), über Gladys: Dein Browser lädt nie eine externe Adresse.
 
 ## Szenen
 
 ### Auslöser
 
-| Auslöser                          | Wann                                                                                        | Filter                    | Variablen                                                      |
-| --------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------- |
-| Episode oder Film heruntergeladen | Sonarr oder Radarr hat einen fertigen Download in die Bibliothek importiert                 | Instanz, Anwendung        | Name der Instanz, Titel, Titel mit Episode oder Jahr, Qualität |
-| Download fehlgeschlagen           | Ein Download wurde als fehlgeschlagen markiert                                              | Instanz, Anwendung        | Name der Instanz, Titel, Titel mit Episode oder Jahr, Grund    |
-| Neue Zustandsmeldung              | Eine Warnung oder ein Fehler erscheint unter System → Status (einmal, bis sie verschwindet) | Instanz, Anwendung, Stufe | Name der Instanz, Stufe, Prüfung, Meldung                      |
+| Auslöser                                 | Wann                                                                                        | Filter                    | Variablen                                                                |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------ |
+| Episode, Film oder Album heruntergeladen | Sonarr, Radarr oder Lidarr hat einen fertigen Download in die Bibliothek importiert         | Instanz, Anwendung        | Name der Instanz, Titel, Titel mit Episode, Jahr oder Künstler, Qualität |
+| Download fehlgeschlagen                  | Ein Download wurde als fehlgeschlagen markiert                                              | Instanz, Anwendung        | Name der Instanz, Titel, Titel mit Episode, Jahr oder Künstler, Grund    |
+| Neue Zustandsmeldung                     | Eine Warnung oder ein Fehler erscheint unter System → Status (einmal, bis sie verschwindet) | Instanz, Anwendung, Stufe | Name der Instanz, Stufe, Prüfung, Meldung                                |
 
 Die Integration liest bei jeder Aktualisierung den Verlauf jeder Instanz: Ein
 Download wird höchstens ein Intervall nach dem Import gemeldet, einmal, auch
@@ -102,53 +103,64 @@ gemeldet (ein über Nacht gestopptes Gladys spielt die Nacht nicht nach). Die
 Zustandsmeldungen beim Hinzufügen einer Instanz sind der Ausgangspunkt: Nur
 neue werden gemeldet.
 
+Bei Lidarr ist der Titel das Album, und der Titel mit Künstler lautet
+„Radiohead – The King of Limbs“. Lidarr speichert einen Import pro Titel: Die
+Titel eines Albums, die zusammen gelesen werden, ergeben ein einziges
+Ereignis. Ein Album, dessen Titel über zwei Lesungen importiert werden (sehr
+selten: ein Import dauert Sekunden), wird zweimal gemeldet.
+
 ### Aktionen
 
-| Aktion                                       | Was sie tut                                                                                                                  | Ausgaben                                        |
-| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Fehlende Episoden oder Filme suchen          | Startet die Suche aller überwachten fehlenden Episoden oder Filme, auf einer Instanz oder allen                              | Instanzen, die die Suche gestartet haben        |
-| Sonarr- oder Radarr-Bibliothek aktualisieren | Fordert die Aktualisierung von Infos und Dateien aller Serien oder Filme an (Sonarr oder Radarr erledigt sie im Hintergrund) | aktualisierte Instanzen                         |
-| Sonarr/Radarr-Zusammenfassung lesen          | Baut einen Satz: Neuerscheinungen der Woche, Warteschlange, Fehlende, Zustandsmeldungen                                      | Satz, Neuerscheinungen, Warteschlange, Fehlende |
+| Aktion                                                | Was sie tut                                                                                                                       | Ausgaben                                        |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Fehlende Episoden, Filme oder Alben suchen            | Startet die Suche aller überwachten fehlenden Episoden, Filme oder Alben, auf einer Instanz oder allen                            | Instanzen, die die Suche gestartet haben        |
+| Sonarr-, Radarr- oder Lidarr-Bibliothek aktualisieren | Fordert die Aktualisierung von Infos und Dateien aller Serien, Filme oder Künstler an (die Anwendung erledigt sie im Hintergrund) | aktualisierte Instanzen                         |
+| Sonarr/Radarr/Lidarr-Zusammenfassung lesen            | Baut einen Satz: Neuerscheinungen der Woche, Warteschlange, Fehlende, Zustandsmeldungen                                           | Satz, Neuerscheinungen, Warteschlange, Fehlende |
 
 Nichts wird je gelöscht: Die Integration liest nur und startet Suchen und
 Aktualisierungen.
 
 ### Szenenideen
 
-- **Filmabend**: Auslöser _Episode oder Film heruntergeladen_ mit der Anwendung
-  _Radarr_, dann eine Benachrichtigung mit der Variable _Titel mit Episode
-  (S01E02) oder Jahr_: „Avatar (2009) ist bereit“.
-- **Zusammenfassung am Morgen**: jeden Tag um 8:00 _Sonarr/Radarr-Zusammenfassung
-  lesen_, dann den Satz per Telegram schicken oder vom Lautsprecher sagen
+- **Filmabend**: Auslöser _Episode, Film oder Album heruntergeladen_ mit der
+  Anwendung _Radarr_, dann eine Benachrichtigung mit der Variable _Titel mit
+  Episode (S01E02), Jahr oder Künstler_: „Avatar (2009) ist bereit“.
+- **Neues Album**: Auslöser _Episode, Film oder Album heruntergeladen_ mit der
+  Anwendung _Lidarr_, dann eine Benachrichtigung mit _Titel mit Episode
+  (S01E02), Jahr oder Künstler_: „Radiohead – The King of Limbs ist in der
+  Bibliothek“.
+- **Zusammenfassung am Morgen**: jeden Tag um 8:00
+  _Sonarr/Radarr/Lidarr-Zusammenfassung lesen_, dann den Satz per Telegram schicken oder vom Lautsprecher sagen
   lassen.
 - **Hängende Downloads**: Auslöser _Download fehlgeschlagen_, dann eine
   Nachricht mit dem Grund; oder eine Szene auf der Funktion _Downloads mit
   Fehler_ über 0.
-- **Wöchentliches Nachholen**: jeden Sonntagabend _Fehlende Episoden oder Filme
-  suchen_.
+- **Wöchentliches Nachholen**: jeden Sonntagabend _Fehlende Episoden, Filme oder
+  Alben suchen_.
 
 ## Fehlerbehebung
 
 - **„antwortet nicht“**: Prüfe Adresse und Port vom Gladys-Rechner aus
-  (`http://<Adresse>:8989` für Sonarr, `:7878` für Radarr). Gladys führt die
+  (`http://<Adresse>:8989` für Sonarr, `:7878` für Radarr, `:8686` für Lidarr). Gladys führt die
   Integration in einem Container aus: `localhost` ist der Container selbst,
   verwende die IP-Adresse des Rechners.
 - **„API-Schlüssel abgelehnt“**: Kopiere den Schlüssel erneut aus Settings →
-  General → Security. Ein neuer Schlüssel in Sonarr oder Radarr muss hier
-  nachgetragen werden.
-- **„diese Adresse ist die andere Anwendung“**: eine Radarr-Adresse in einem
-  Sonarr-Abschnitt oder umgekehrt (mit dem Schlüssel dieser anderen Anwendung;
+  General → Security. Ein neuer Schlüssel in Sonarr, Radarr oder Lidarr muss
+  hier nachgetragen werden.
+- **„diese Adresse ist eine andere Anwendung“**: eine Radarr-Adresse in einem
+  Sonarr-Abschnitt, ein Sonarr in einem Lidarr-Abschnitt… (mit dem Schlüssel dieser anderen Anwendung;
   mit dem richtigen Schlüssel antwortet eine falsche Adresse „API-Schlüssel
   abgelehnt“).
-- **„keine Sonarr- oder Radarr-API unter dieser Adresse“** oder **„die Adresse
+- **„keine Sonarr-, Radarr- oder Lidarr-API unter dieser Adresse“** oder **„die Adresse
   leitet um“**: Eine Instanz hinter einem Reverse-Proxy braucht ihre URL-Basis
   (`https://example.org/sonarr`), und eine Anmeldeseite des Proxys blockiert die
   API: Verwende die lokale Adresse.
 - **„Zertifikat abgelehnt“**: HTTPS mit selbstsigniertem Zertifikat wird nicht
   unterstützt; verwende die `http://`-Adresse in deinem Netzwerk.
-- Kein Poster: Sonarr oder Radarr hat es noch nicht heruntergeladen
-  (MediaCover); es kommt mit der nächsten Aktualisierung der Serie oder des
-  Films.
+- Kein Poster: Die Anwendung hat es noch nicht heruntergeladen (MediaCover); es
+  kommt mit der nächsten Aktualisierung der Serie, des Films oder des
+  Künstlers. Ein Künstler ohne Poster auf dem Metadatenserver von Lidarr lässt
+  seine Alben ohne Bild.
 
 ## Grenzen
 
@@ -161,5 +173,7 @@ Aktualisierungen.
 - Kein Kalender in der Kalenderansicht von Gladys: Eine Integration ist
   entweder ein Gerät oder ein Kalenderanbieter, und Geräte, Auslöser und
   Aktionen zählen hier mehr. Das Widget übernimmt die Rolle des Kalenders.
-- Lidarr, Readarr, Prowlarr und die Download-Clients sind nicht abgedeckt.
-- Nicht mit den Projekten Sonarr oder Radarr verbunden.
+- Lidarr behält Album-Cover nur in voller Größe (oft mehr als die 300 KB, die
+  ein Widget-Bild wiegen darf): Die Karten zeigen das Poster des Künstlers.
+- Readarr, Prowlarr und die Download-Clients sind nicht abgedeckt.
+- Nicht mit den Projekten Sonarr, Radarr oder Lidarr verbunden.

@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 // Scene action handlers (manifest `scene_actions`, Gladys 5.1+).
 //
-// Search the missing episodes or movies, refresh the library, and read the
+// Search the missing episodes, movies or albums, refresh the library, and read the
 // summary sentence (for a "say" or a notification: "this week: 3 episodes,
 // 2 downloads in queue..."). One instance, or all of them. Nothing destructive.
 // -----------------------------------------------------------------------------
@@ -27,7 +27,7 @@ export const SCENE_ACTIONS = {
     const { sentence, totals } = hub.summary(device);
     return {
       summary: pick(sentence, hub.config.language),
-      upcoming: totals.episodes + totals.movies,
+      upcoming: totals.episodes + totals.movies + totals.albums,
       queue: totals.queue,
       missing: totals.missing,
     };

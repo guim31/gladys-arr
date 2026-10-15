@@ -1,0 +1,914 @@
+[
+  {
+    "albumId": 7,
+    "artistId": 1,
+    "trackId": 2601,
+    "sourceTitle": "01 - Bloom",
+    "quality": {
+      "quality": {
+        "id": 25,
+        "name": "MP3-64"
+      },
+      "revision": {
+        "version": 1,
+        "real": 0,
+        "isRepack": false
+      }
+    },
+    "customFormats": [],
+    "customFormatScore": 0,
+    "qualityCutoffNotMet": false,
+    "date": "2026-10-15T23:39:45Z",
+    "eventType": "trackFileImported",
+    "data": {
+      "fileId": "1",
+      "droppedPath": "/downloads/Radiohead - The King of Limbs (2011) [MP3]/01 - Bloom.mp3",
+      "importedPath": "/music/Radiohead/01 - Bloom.mp3",
+      "downloadClient": null,
+      "releaseGroup": null,
+      "size": "1260519",
+      "indexerFlags": "0"
+    },
+    "album": {
+      "title": "The King of Limbs",
+      "disambiguation": "",
+      "overview": "",
+      "artistId": 1,
+      "foreignAlbumId": "899b6d09-807e-4c18-a6d4-3642e00d6a3d",
+      "monitored": true,
+      "anyReleaseOk": true,
+      "profileId": 1,
+      "duration": 2254000,
+      "albumType": "Album",
+      "secondaryTypes": [],
+      "mediumCount": 1,
+      "ratings": {
+        "votes": 40,
+        "value": 7.3
+      },
+      "releaseDate": "2011-02-18T00:00:00Z",
+      "artist": {
+        "status": "continuing",
+        "ended": false,
+        "artistName": "Radiohead",
+        "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+        "tadbId": 0,
+        "discogsId": 0,
+        "artistType": "Group",
+        "disambiguation": "",
+        "images": [],
+        "path": "/music/Radiohead",
+        "qualityProfileId": 1,
+        "metadataProfileId": 1,
+        "monitored": true,
+        "monitorNewItems": "all",
+        "cleanName": "radiohead",
+        "sortName": "radiohead",
+        "tags": [],
+        "added": "2026-10-15T23:36:33Z",
+        "ratings": {
+          "votes": 80,
+          "value": 9.0
+        },
+        "id": 1
+      },
+      "images": [
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/15dc9592-88d2-42d6-b7f3-40e07ec68ff0/2515589570-1200.jpg",
+          "coverType": "cover",
+          "extension": ".jpg"
+        },
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/5c545925-f48c-3d5b-b448-23a25f9ec048/5554301225-1200.jpg",
+          "coverType": "disc",
+          "extension": ".jpg"
+        }
+      ],
+      "id": 7
+    },
+    "artist": {
+      "status": "continuing",
+      "ended": false,
+      "artistName": "Radiohead",
+      "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+      "tadbId": 0,
+      "discogsId": 0,
+      "artistType": "Group",
+      "disambiguation": "",
+      "images": [],
+      "path": "/music/Radiohead",
+      "qualityProfileId": 1,
+      "metadataProfileId": 1,
+      "monitored": true,
+      "monitorNewItems": "all",
+      "cleanName": "radiohead",
+      "sortName": "radiohead",
+      "tags": [],
+      "added": "2026-10-15T23:36:33Z",
+      "ratings": {
+        "votes": 80,
+        "value": 9.0
+      },
+      "id": 1
+    },
+    "id": 1
+  },
+  {
+    "albumId": 7,
+    "artistId": 1,
+    "trackId": 2602,
+    "sourceTitle": "02 - Morning Mr Magpie",
+    "quality": {
+      "quality": {
+        "id": 25,
+        "name": "MP3-64"
+      },
+      "revision": {
+        "version": 1,
+        "real": 0,
+        "isRepack": false
+      }
+    },
+    "customFormats": [],
+    "customFormatScore": 0,
+    "qualityCutoffNotMet": false,
+    "date": "2026-10-15T23:39:45Z",
+    "eventType": "trackFileImported",
+    "data": {
+      "fileId": "2",
+      "droppedPath": "/downloads/Radiohead - The King of Limbs (2011) [MP3]/02 - Morning Mr Magpie.mp3",
+      "importedPath": "/music/Radiohead/02 - Morning Mr Magpie.mp3",
+      "downloadClient": null,
+      "releaseGroup": null,
+      "size": "1124590",
+      "indexerFlags": "0"
+    },
+    "album": {
+      "title": "The King of Limbs",
+      "disambiguation": "",
+      "overview": "",
+      "artistId": 1,
+      "foreignAlbumId": "899b6d09-807e-4c18-a6d4-3642e00d6a3d",
+      "monitored": true,
+      "anyReleaseOk": true,
+      "profileId": 1,
+      "duration": 2254000,
+      "albumType": "Album",
+      "secondaryTypes": [],
+      "mediumCount": 1,
+      "ratings": {
+        "votes": 40,
+        "value": 7.3
+      },
+      "releaseDate": "2011-02-18T00:00:00Z",
+      "artist": {
+        "status": "continuing",
+        "ended": false,
+        "artistName": "Radiohead",
+        "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+        "tadbId": 0,
+        "discogsId": 0,
+        "artistType": "Group",
+        "disambiguation": "",
+        "images": [],
+        "path": "/music/Radiohead",
+        "qualityProfileId": 1,
+        "metadataProfileId": 1,
+        "monitored": true,
+        "monitorNewItems": "all",
+        "cleanName": "radiohead",
+        "sortName": "radiohead",
+        "tags": [],
+        "added": "2026-10-15T23:36:33Z",
+        "ratings": {
+          "votes": 80,
+          "value": 9.0
+        },
+        "id": 1
+      },
+      "images": [
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/15dc9592-88d2-42d6-b7f3-40e07ec68ff0/2515589570-1200.jpg",
+          "coverType": "cover",
+          "extension": ".jpg"
+        },
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/5c545925-f48c-3d5b-b448-23a25f9ec048/5554301225-1200.jpg",
+          "coverType": "disc",
+          "extension": ".jpg"
+        }
+      ],
+      "id": 7
+    },
+    "artist": {
+      "status": "continuing",
+      "ended": false,
+      "artistName": "Radiohead",
+      "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+      "tadbId": 0,
+      "discogsId": 0,
+      "artistType": "Group",
+      "disambiguation": "",
+      "images": [],
+      "path": "/music/Radiohead",
+      "qualityProfileId": 1,
+      "metadataProfileId": 1,
+      "monitored": true,
+      "monitorNewItems": "all",
+      "cleanName": "radiohead",
+      "sortName": "radiohead",
+      "tags": [],
+      "added": "2026-10-15T23:36:33Z",
+      "ratings": {
+        "votes": 80,
+        "value": 9.0
+      },
+      "id": 1
+    },
+    "id": 2
+  },
+  {
+    "albumId": 7,
+    "artistId": 1,
+    "trackId": 2603,
+    "sourceTitle": "03 - Little by Little",
+    "quality": {
+      "quality": {
+        "id": 25,
+        "name": "MP3-64"
+      },
+      "revision": {
+        "version": 1,
+        "real": 0,
+        "isRepack": false
+      }
+    },
+    "customFormats": [],
+    "customFormatScore": 0,
+    "qualityCutoffNotMet": false,
+    "date": "2026-10-15T23:39:45Z",
+    "eventType": "trackFileImported",
+    "data": {
+      "fileId": "3",
+      "droppedPath": "/downloads/Radiohead - The King of Limbs (2011) [MP3]/03 - Little by Little.mp3",
+      "importedPath": "/music/Radiohead/03 - Little by Little.mp3",
+      "downloadClient": null,
+      "releaseGroup": null,
+      "size": "1068582",
+      "indexerFlags": "0"
+    },
+    "album": {
+      "title": "The King of Limbs",
+      "disambiguation": "",
+      "overview": "",
+      "artistId": 1,
+      "foreignAlbumId": "899b6d09-807e-4c18-a6d4-3642e00d6a3d",
+      "monitored": true,
+      "anyReleaseOk": true,
+      "profileId": 1,
+      "duration": 2254000,
+      "albumType": "Album",
+      "secondaryTypes": [],
+      "mediumCount": 1,
+      "ratings": {
+        "votes": 40,
+        "value": 7.3
+      },
+      "releaseDate": "2011-02-18T00:00:00Z",
+      "artist": {
+        "status": "continuing",
+        "ended": false,
+        "artistName": "Radiohead",
+        "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+        "tadbId": 0,
+        "discogsId": 0,
+        "artistType": "Group",
+        "disambiguation": "",
+        "images": [],
+        "path": "/music/Radiohead",
+        "qualityProfileId": 1,
+        "metadataProfileId": 1,
+        "monitored": true,
+        "monitorNewItems": "all",
+        "cleanName": "radiohead",
+        "sortName": "radiohead",
+        "tags": [],
+        "added": "2026-10-15T23:36:33Z",
+        "ratings": {
+          "votes": 80,
+          "value": 9.0
+        },
+        "id": 1
+      },
+      "images": [
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/15dc9592-88d2-42d6-b7f3-40e07ec68ff0/2515589570-1200.jpg",
+          "coverType": "cover",
+          "extension": ".jpg"
+        },
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/5c545925-f48c-3d5b-b448-23a25f9ec048/5554301225-1200.jpg",
+          "coverType": "disc",
+          "extension": ".jpg"
+        }
+      ],
+      "id": 7
+    },
+    "artist": {
+      "status": "continuing",
+      "ended": false,
+      "artistName": "Radiohead",
+      "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+      "tadbId": 0,
+      "discogsId": 0,
+      "artistType": "Group",
+      "disambiguation": "",
+      "images": [],
+      "path": "/music/Radiohead",
+      "qualityProfileId": 1,
+      "metadataProfileId": 1,
+      "monitored": true,
+      "monitorNewItems": "all",
+      "cleanName": "radiohead",
+      "sortName": "radiohead",
+      "tags": [],
+      "added": "2026-10-15T23:36:33Z",
+      "ratings": {
+        "votes": 80,
+        "value": 9.0
+      },
+      "id": 1
+    },
+    "id": 3
+  },
+  {
+    "albumId": 7,
+    "artistId": 1,
+    "trackId": 2604,
+    "sourceTitle": "04 - Feral",
+    "quality": {
+      "quality": {
+        "id": 25,
+        "name": "MP3-64"
+      },
+      "revision": {
+        "version": 1,
+        "real": 0,
+        "isRepack": false
+      }
+    },
+    "customFormats": [],
+    "customFormatScore": 0,
+    "qualityCutoffNotMet": false,
+    "date": "2026-10-15T23:39:45Z",
+    "eventType": "trackFileImported",
+    "data": {
+      "fileId": "4",
+      "droppedPath": "/downloads/Radiohead - The King of Limbs (2011) [MP3]/04 - Feral.mp3",
+      "importedPath": "/music/Radiohead/04 - Feral.mp3",
+      "downloadClient": null,
+      "releaseGroup": null,
+      "size": "772552",
+      "indexerFlags": "0"
+    },
+    "album": {
+      "title": "The King of Limbs",
+      "disambiguation": "",
+      "overview": "",
+      "artistId": 1,
+      "foreignAlbumId": "899b6d09-807e-4c18-a6d4-3642e00d6a3d",
+      "monitored": true,
+      "anyReleaseOk": true,
+      "profileId": 1,
+      "duration": 2254000,
+      "albumType": "Album",
+      "secondaryTypes": [],
+      "mediumCount": 1,
+      "ratings": {
+        "votes": 40,
+        "value": 7.3
+      },
+      "releaseDate": "2011-02-18T00:00:00Z",
+      "artist": {
+        "status": "continuing",
+        "ended": false,
+        "artistName": "Radiohead",
+        "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+        "tadbId": 0,
+        "discogsId": 0,
+        "artistType": "Group",
+        "disambiguation": "",
+        "images": [],
+        "path": "/music/Radiohead",
+        "qualityProfileId": 1,
+        "metadataProfileId": 1,
+        "monitored": true,
+        "monitorNewItems": "all",
+        "cleanName": "radiohead",
+        "sortName": "radiohead",
+        "tags": [],
+        "added": "2026-10-15T23:36:33Z",
+        "ratings": {
+          "votes": 80,
+          "value": 9.0
+        },
+        "id": 1
+      },
+      "images": [
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/15dc9592-88d2-42d6-b7f3-40e07ec68ff0/2515589570-1200.jpg",
+          "coverType": "cover",
+          "extension": ".jpg"
+        },
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/5c545925-f48c-3d5b-b448-23a25f9ec048/5554301225-1200.jpg",
+          "coverType": "disc",
+          "extension": ".jpg"
+        }
+      ],
+      "id": 7
+    },
+    "artist": {
+      "status": "continuing",
+      "ended": false,
+      "artistName": "Radiohead",
+      "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+      "tadbId": 0,
+      "discogsId": 0,
+      "artistType": "Group",
+      "disambiguation": "",
+      "images": [],
+      "path": "/music/Radiohead",
+      "qualityProfileId": 1,
+      "metadataProfileId": 1,
+      "monitored": true,
+      "monitorNewItems": "all",
+      "cleanName": "radiohead",
+      "sortName": "radiohead",
+      "tags": [],
+      "added": "2026-10-15T23:36:33Z",
+      "ratings": {
+        "votes": 80,
+        "value": 9.0
+      },
+      "id": 1
+    },
+    "id": 4
+  },
+  {
+    "albumId": 7,
+    "artistId": 1,
+    "trackId": 2605,
+    "sourceTitle": "05 - Lotus Flower",
+    "quality": {
+      "quality": {
+        "id": 25,
+        "name": "MP3-64"
+      },
+      "revision": {
+        "version": 1,
+        "real": 0,
+        "isRepack": false
+      }
+    },
+    "customFormats": [],
+    "customFormatScore": 0,
+    "qualityCutoffNotMet": false,
+    "date": "2026-10-15T23:39:45Z",
+    "eventType": "trackFileImported",
+    "data": {
+      "fileId": "5",
+      "droppedPath": "/downloads/Radiohead - The King of Limbs (2011) [MP3]/05 - Lotus Flower.mp3",
+      "importedPath": "/music/Radiohead/05 - Lotus Flower.mp3",
+      "downloadClient": null,
+      "releaseGroup": null,
+      "size": "1204519",
+      "indexerFlags": "0"
+    },
+    "album": {
+      "title": "The King of Limbs",
+      "disambiguation": "",
+      "overview": "",
+      "artistId": 1,
+      "foreignAlbumId": "899b6d09-807e-4c18-a6d4-3642e00d6a3d",
+      "monitored": true,
+      "anyReleaseOk": true,
+      "profileId": 1,
+      "duration": 2254000,
+      "albumType": "Album",
+      "secondaryTypes": [],
+      "mediumCount": 1,
+      "ratings": {
+        "votes": 40,
+        "value": 7.3
+      },
+      "releaseDate": "2011-02-18T00:00:00Z",
+      "artist": {
+        "status": "continuing",
+        "ended": false,
+        "artistName": "Radiohead",
+        "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+        "tadbId": 0,
+        "discogsId": 0,
+        "artistType": "Group",
+        "disambiguation": "",
+        "images": [],
+        "path": "/music/Radiohead",
+        "qualityProfileId": 1,
+        "metadataProfileId": 1,
+        "monitored": true,
+        "monitorNewItems": "all",
+        "cleanName": "radiohead",
+        "sortName": "radiohead",
+        "tags": [],
+        "added": "2026-10-15T23:36:33Z",
+        "ratings": {
+          "votes": 80,
+          "value": 9.0
+        },
+        "id": 1
+      },
+      "images": [
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/15dc9592-88d2-42d6-b7f3-40e07ec68ff0/2515589570-1200.jpg",
+          "coverType": "cover",
+          "extension": ".jpg"
+        },
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/5c545925-f48c-3d5b-b448-23a25f9ec048/5554301225-1200.jpg",
+          "coverType": "disc",
+          "extension": ".jpg"
+        }
+      ],
+      "id": 7
+    },
+    "artist": {
+      "status": "continuing",
+      "ended": false,
+      "artistName": "Radiohead",
+      "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+      "tadbId": 0,
+      "discogsId": 0,
+      "artistType": "Group",
+      "disambiguation": "",
+      "images": [],
+      "path": "/music/Radiohead",
+      "qualityProfileId": 1,
+      "metadataProfileId": 1,
+      "monitored": true,
+      "monitorNewItems": "all",
+      "cleanName": "radiohead",
+      "sortName": "radiohead",
+      "tags": [],
+      "added": "2026-10-15T23:36:33Z",
+      "ratings": {
+        "votes": 80,
+        "value": 9.0
+      },
+      "id": 1
+    },
+    "id": 5
+  },
+  {
+    "albumId": 7,
+    "artistId": 1,
+    "trackId": 2606,
+    "sourceTitle": "06 - Codex",
+    "quality": {
+      "quality": {
+        "id": 25,
+        "name": "MP3-64"
+      },
+      "revision": {
+        "version": 1,
+        "real": 0,
+        "isRepack": false
+      }
+    },
+    "customFormats": [],
+    "customFormatScore": 0,
+    "qualityCutoffNotMet": false,
+    "date": "2026-10-15T23:39:45Z",
+    "eventType": "trackFileImported",
+    "data": {
+      "fileId": "6",
+      "droppedPath": "/downloads/Radiohead - The King of Limbs (2011) [MP3]/06 - Codex.mp3",
+      "importedPath": "/music/Radiohead/06 - Codex.mp3",
+      "downloadClient": null,
+      "releaseGroup": null,
+      "size": "1148506",
+      "indexerFlags": "0"
+    },
+    "album": {
+      "title": "The King of Limbs",
+      "disambiguation": "",
+      "overview": "",
+      "artistId": 1,
+      "foreignAlbumId": "899b6d09-807e-4c18-a6d4-3642e00d6a3d",
+      "monitored": true,
+      "anyReleaseOk": true,
+      "profileId": 1,
+      "duration": 2254000,
+      "albumType": "Album",
+      "secondaryTypes": [],
+      "mediumCount": 1,
+      "ratings": {
+        "votes": 40,
+        "value": 7.3
+      },
+      "releaseDate": "2011-02-18T00:00:00Z",
+      "artist": {
+        "status": "continuing",
+        "ended": false,
+        "artistName": "Radiohead",
+        "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+        "tadbId": 0,
+        "discogsId": 0,
+        "artistType": "Group",
+        "disambiguation": "",
+        "images": [],
+        "path": "/music/Radiohead",
+        "qualityProfileId": 1,
+        "metadataProfileId": 1,
+        "monitored": true,
+        "monitorNewItems": "all",
+        "cleanName": "radiohead",
+        "sortName": "radiohead",
+        "tags": [],
+        "added": "2026-10-15T23:36:33Z",
+        "ratings": {
+          "votes": 80,
+          "value": 9.0
+        },
+        "id": 1
+      },
+      "images": [
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/15dc9592-88d2-42d6-b7f3-40e07ec68ff0/2515589570-1200.jpg",
+          "coverType": "cover",
+          "extension": ".jpg"
+        },
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/5c545925-f48c-3d5b-b448-23a25f9ec048/5554301225-1200.jpg",
+          "coverType": "disc",
+          "extension": ".jpg"
+        }
+      ],
+      "id": 7
+    },
+    "artist": {
+      "status": "continuing",
+      "ended": false,
+      "artistName": "Radiohead",
+      "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+      "tadbId": 0,
+      "discogsId": 0,
+      "artistType": "Group",
+      "disambiguation": "",
+      "images": [],
+      "path": "/music/Radiohead",
+      "qualityProfileId": 1,
+      "metadataProfileId": 1,
+      "monitored": true,
+      "monitorNewItems": "all",
+      "cleanName": "radiohead",
+      "sortName": "radiohead",
+      "tags": [],
+      "added": "2026-10-15T23:36:33Z",
+      "ratings": {
+        "votes": 80,
+        "value": 9.0
+      },
+      "id": 1
+    },
+    "id": 6
+  },
+  {
+    "albumId": 7,
+    "artistId": 1,
+    "trackId": 2607,
+    "sourceTitle": "07 - Give Up the Ghost",
+    "quality": {
+      "quality": {
+        "id": 25,
+        "name": "MP3-64"
+      },
+      "revision": {
+        "version": 1,
+        "real": 0,
+        "isRepack": false
+      }
+    },
+    "customFormats": [],
+    "customFormatScore": 0,
+    "qualityCutoffNotMet": false,
+    "date": "2026-10-15T23:39:45Z",
+    "eventType": "trackFileImported",
+    "data": {
+      "fileId": "7",
+      "droppedPath": "/downloads/Radiohead - The King of Limbs (2011) [MP3]/07 - Give Up the Ghost.mp3",
+      "importedPath": "/music/Radiohead/07 - Give Up the Ghost.mp3",
+      "downloadClient": null,
+      "releaseGroup": null,
+      "size": "1160534",
+      "indexerFlags": "0"
+    },
+    "album": {
+      "title": "The King of Limbs",
+      "disambiguation": "",
+      "overview": "",
+      "artistId": 1,
+      "foreignAlbumId": "899b6d09-807e-4c18-a6d4-3642e00d6a3d",
+      "monitored": true,
+      "anyReleaseOk": true,
+      "profileId": 1,
+      "duration": 2254000,
+      "albumType": "Album",
+      "secondaryTypes": [],
+      "mediumCount": 1,
+      "ratings": {
+        "votes": 40,
+        "value": 7.3
+      },
+      "releaseDate": "2011-02-18T00:00:00Z",
+      "artist": {
+        "status": "continuing",
+        "ended": false,
+        "artistName": "Radiohead",
+        "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+        "tadbId": 0,
+        "discogsId": 0,
+        "artistType": "Group",
+        "disambiguation": "",
+        "images": [],
+        "path": "/music/Radiohead",
+        "qualityProfileId": 1,
+        "metadataProfileId": 1,
+        "monitored": true,
+        "monitorNewItems": "all",
+        "cleanName": "radiohead",
+        "sortName": "radiohead",
+        "tags": [],
+        "added": "2026-10-15T23:36:33Z",
+        "ratings": {
+          "votes": 80,
+          "value": 9.0
+        },
+        "id": 1
+      },
+      "images": [
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/15dc9592-88d2-42d6-b7f3-40e07ec68ff0/2515589570-1200.jpg",
+          "coverType": "cover",
+          "extension": ".jpg"
+        },
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/5c545925-f48c-3d5b-b448-23a25f9ec048/5554301225-1200.jpg",
+          "coverType": "disc",
+          "extension": ".jpg"
+        }
+      ],
+      "id": 7
+    },
+    "artist": {
+      "status": "continuing",
+      "ended": false,
+      "artistName": "Radiohead",
+      "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+      "tadbId": 0,
+      "discogsId": 0,
+      "artistType": "Group",
+      "disambiguation": "",
+      "images": [],
+      "path": "/music/Radiohead",
+      "qualityProfileId": 1,
+      "metadataProfileId": 1,
+      "monitored": true,
+      "monitorNewItems": "all",
+      "cleanName": "radiohead",
+      "sortName": "radiohead",
+      "tags": [],
+      "added": "2026-10-15T23:36:33Z",
+      "ratings": {
+        "votes": 80,
+        "value": 9.0
+      },
+      "id": 1
+    },
+    "id": 7
+  },
+  {
+    "albumId": 7,
+    "artistId": 1,
+    "trackId": 2608,
+    "sourceTitle": "08 - Separator",
+    "quality": {
+      "quality": {
+        "id": 25,
+        "name": "MP3-64"
+      },
+      "revision": {
+        "version": 1,
+        "real": 0,
+        "isRepack": false
+      }
+    },
+    "customFormats": [],
+    "customFormatScore": 0,
+    "qualityCutoffNotMet": false,
+    "date": "2026-10-15T23:39:45Z",
+    "eventType": "trackFileImported",
+    "data": {
+      "fileId": "8",
+      "droppedPath": "/downloads/Radiohead - The King of Limbs (2011) [MP3]/08 - Separator.mp3",
+      "importedPath": "/music/Radiohead/08 - Separator.mp3",
+      "downloadClient": null,
+      "releaseGroup": null,
+      "size": "1280480",
+      "indexerFlags": "0"
+    },
+    "album": {
+      "title": "The King of Limbs",
+      "disambiguation": "",
+      "overview": "",
+      "artistId": 1,
+      "foreignAlbumId": "899b6d09-807e-4c18-a6d4-3642e00d6a3d",
+      "monitored": true,
+      "anyReleaseOk": true,
+      "profileId": 1,
+      "duration": 2254000,
+      "albumType": "Album",
+      "secondaryTypes": [],
+      "mediumCount": 1,
+      "ratings": {
+        "votes": 40,
+        "value": 7.3
+      },
+      "releaseDate": "2011-02-18T00:00:00Z",
+      "artist": {
+        "status": "continuing",
+        "ended": false,
+        "artistName": "Radiohead",
+        "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+        "tadbId": 0,
+        "discogsId": 0,
+        "artistType": "Group",
+        "disambiguation": "",
+        "images": [],
+        "path": "/music/Radiohead",
+        "qualityProfileId": 1,
+        "metadataProfileId": 1,
+        "monitored": true,
+        "monitorNewItems": "all",
+        "cleanName": "radiohead",
+        "sortName": "radiohead",
+        "tags": [],
+        "added": "2026-10-15T23:36:33Z",
+        "ratings": {
+          "votes": 80,
+          "value": 9.0
+        },
+        "id": 1
+      },
+      "images": [
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/15dc9592-88d2-42d6-b7f3-40e07ec68ff0/2515589570-1200.jpg",
+          "coverType": "cover",
+          "extension": ".jpg"
+        },
+        {
+          "url": "https://images.lidarr.audio/cache/https://coverartarchive.org/release/5c545925-f48c-3d5b-b448-23a25f9ec048/5554301225-1200.jpg",
+          "coverType": "disc",
+          "extension": ".jpg"
+        }
+      ],
+      "id": 7
+    },
+    "artist": {
+      "status": "continuing",
+      "ended": false,
+      "artistName": "Radiohead",
+      "foreignArtistId": "a74b1b7f-71a5-4011-9441-d0b5e4122711",
+      "tadbId": 0,
+      "discogsId": 0,
+      "artistType": "Group",
+      "disambiguation": "",
+      "images": [],
+      "path": "/music/Radiohead",
+      "qualityProfileId": 1,
+      "metadataProfileId": 1,
+      "monitored": true,
+      "monitorNewItems": "all",
+      "cleanName": "radiohead",
+      "sortName": "radiohead",
+      "tags": [],
+      "added": "2026-10-15T23:36:33Z",
+      "ratings": {
+        "votes": 80,
+        "value": 9.0
+      },
+      "id": 1
+    },
+    "id": 8
+  }
+]

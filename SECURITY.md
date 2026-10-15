@@ -32,7 +32,7 @@ In scope: the code of this repository and the Docker image it publishes.
 
 What the integration handles:
 
-- **Secrets**: the Sonarr and Radarr API keys are `secret` fields of the
+- **Secrets**: the Sonarr, Radarr and Lidarr API keys are `secret` fields of the
   Gladys configuration. The integration reads them from Gladys at startup,
   keeps them in memory, sends them only to the instance they belong to (in the
   `X-Api-Key` header, never in a URL), and never writes them to `/data` nor to
@@ -40,7 +40,7 @@ What the integration handles:
 - **Stored in `/data`**: `arr-state.json`, the id of the last history event
   read per instance (with its address) and the health checks already
   announced to the scenes. Nothing else.
-- **Network**: requests go only to the Sonarr and Radarr addresses typed in the
+- **Network**: requests go only to the Sonarr, Radarr and Lidarr addresses typed in the
   configuration, on the local network, in HTTP or HTTPS (certificates
   verified). The posters shown by the widget are read from these instances,
   never from the Internet. The integration opens no port and calls no cloud
@@ -49,5 +49,5 @@ What the integration handles:
 
 Out of scope: Gladys Assistant itself (see its
 [security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-Sonarr and Radarr themselves, and the other devices and services of your
+Sonarr, Radarr and Lidarr themselves, and the other devices and services of your
 network.

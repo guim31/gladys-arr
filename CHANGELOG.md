@@ -10,6 +10,21 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Added
+
+- Lidarr (music, API v1), in two new configuration sections: one device per
+  instance with the same features (missing albums, albums of the next 7 days…),
+  the albums of the week in the "Upcoming releases" widget with the poster of
+  their artist, the "downloaded" trigger fired once per imported album, the
+  "download failed" and "health issue" triggers, and the search missing,
+  refresh and summary actions. The triggers can be filtered on Lidarr.
+- An address of another application in a slot (Lidarr in a Sonarr section, or
+  the reverse) is reported as such.
+
+### Changed
+
+- The integration is now named "Sonarr, Radarr & Lidarr".
+
 ## [1.0.0] - 2026-10-14
 
 ### Added

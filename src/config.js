@@ -3,14 +3,14 @@
 // manifest `config_schema`, see test/manifest.test.js) and normalization, so
 // the rest of the code never deals with strings, blanks or `undefined`.
 //
-// Up to four instances in fixed slots: two Sonarr, two Radarr (address, API
-// key, name). The slot is the device identity: changing the address of a slot
+// Up to six instances in fixed slots: two Sonarr, two Radarr, two Lidarr
+// (address, API key, name). The slot is the device identity: changing the address of a slot
 // (an IP for a name, HTTP for HTTPS) keeps the device and its history.
 // -----------------------------------------------------------------------------
 
 export const LANGUAGES = ['en', 'fr', 'de', 'es'];
 
-export const KINDS = Object.freeze({ SONARR: 'sonarr', RADARR: 'radarr' });
+export const KINDS = Object.freeze({ SONARR: 'sonarr', RADARR: 'radarr', LIDARR: 'lidarr' });
 
 /** The configuration slots: `<kind>_<number>`, in display order. */
 export const SLOTS = [
@@ -18,6 +18,8 @@ export const SLOTS = [
   { kind: KINDS.SONARR, number: 2 },
   { kind: KINDS.RADARR, number: 1 },
   { kind: KINDS.RADARR, number: 2 },
+  { kind: KINDS.LIDARR, number: 1 },
+  { kind: KINDS.LIDARR, number: 2 },
 ].map((slot) => Object.freeze({ ...slot, id: `${slot.kind}_${slot.number}` }));
 
 // Refresh intervals offered in the configuration, in seconds.
@@ -36,6 +38,12 @@ export const DEFAULT_CONFIG = {
   radarr_2_url: '',
   radarr_2_api_key: '',
   radarr_2_name: '',
+  lidarr_1_url: '',
+  lidarr_1_api_key: '',
+  lidarr_1_name: '',
+  lidarr_2_url: '',
+  lidarr_2_api_key: '',
+  lidarr_2_name: '',
   poll_interval: '120',
   language: 'fr',
 };
@@ -74,7 +82,10 @@ export function parseInstanceUrl(raw) {
   }
   // A path copied from the browser: keep the URL base, drop the page.
   const path = url.pathname
-    .replace(/\/(calendar|activity|wanted|settings|system|series|movie|add)(\/.*)?$/i, '')
+    .replace(
+      /\/(calendar|activity|wanted|settings|system|series|movie|artist|album|add)(\/.*)?$/i,
+      '',
+    )
     .replace(/\/+$/, '');
   return `${url.origin}${path}`;
 }
