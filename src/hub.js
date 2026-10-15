@@ -429,6 +429,7 @@ export class ArrHub {
       events = parseHistory(
         record.instance.kind,
         await record.client.historySince(new Date(now - this.timings.historyMaxAgeMs)),
+        cursor.lastId,
       );
       this.resolved(`history:${slot}`);
     } catch (err) {

@@ -280,7 +280,7 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
   `not_arr`, le hub interroge l'autre version (`otherApp`) pour dire `wrong_app`. Le faire **dans le hub, après le
   `Promise.all`** : dans `status()`, l'échec de `health()` arrive avant et masque la détection (relevé en test).
 - **Historique Lidarr** : un `trackFileImported` **par piste**, avec ou sans client de téléchargement
-  (`downloadImported`, par album, n'existe qu'avec un client) : regroupés par `albumId` dans une même lecture, un
+  (`downloadImported`, par album, n'existe qu'avec un client) : filtrés sur le curseur **puis** regroupés par `albumId` (sinon une piste importée plus tard ramène tout l'album de la fenêtre d'une heure, relevé en relecture), un
   seul événement par album (id et date de la dernière piste). Un album importé à cheval sur deux lectures est annoncé
   deux fois (rare, documenté). `downloadFailed` est déjà par album. Titre = album, `label` = « Artiste – Album ».
 - **Pochettes Lidarr** : `/api/v1/mediacover/album/{id}/cover-250.jpg` renvoie la pochette **en taille réelle**

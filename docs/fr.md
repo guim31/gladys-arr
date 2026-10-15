@@ -107,9 +107,7 @@ nouvelles sont annoncées.
 
 Pour Lidarr, le titre est celui de l'album, et le titre avec artiste donne
 « Radiohead – The King of Limbs ». Lidarr enregistre un import par piste : les
-pistes d'un album lues ensemble font un seul événement. Un album dont les
-pistes sont importées sur deux lectures (très rare : un import prend quelques
-secondes) est annoncé deux fois.
+pistes d'un album lues ensemble font un seul événement. Des pistes importées plus tard (une piste manquante, une amélioration de qualité) annoncent de nouveau l'album ; un album dont les pistes sont importées sur deux lectures (rare : un import prend quelques secondes) est annoncé deux fois.
 
 ### Actions
 

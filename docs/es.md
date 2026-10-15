@@ -105,9 +105,7 @@ nuevos.
 
 Para Lidarr, el título es el del álbum, y el título con artista da
 «Radiohead – The King of Limbs». Lidarr registra una importación por pista: las
-pistas de un álbum leídas juntas forman un solo evento. Un álbum cuyas pistas
-se importan en dos lecturas (muy raro: una importación tarda segundos) se
-anuncia dos veces.
+pistas de un álbum leídas juntas forman un solo evento. Las pistas de un álbum importadas más tarde (una pista que faltaba, una mejora de calidad) vuelven a anunciar el álbum; un álbum cuyas pistas se importan en dos lecturas (raro: una importación tarda segundos) se anuncia dos veces.
 
 ### Acciones
 

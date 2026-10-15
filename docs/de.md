@@ -104,10 +104,8 @@ Zustandsmeldungen beim Hinzufügen einer Instanz sind der Ausgangspunkt: Nur
 neue werden gemeldet.
 
 Bei Lidarr ist der Titel das Album, und der Titel mit Künstler lautet
-„Radiohead – The King of Limbs“. Lidarr speichert einen Import pro Titel: Die
-Titel eines Albums, die zusammen gelesen werden, ergeben ein einziges
-Ereignis. Ein Album, dessen Titel über zwei Lesungen importiert werden (sehr
-selten: ein Import dauert Sekunden), wird zweimal gemeldet.
+„Radiohead – The King of Limbs“. Lidarr speichert einen Import pro Track: Die Tracks eines Albums, die zusammen gelesen werden, ergeben ein einziges
+Ereignis. Später importierte Tracks eines Albums (ein fehlender Track, ein Qualitäts-Upgrade) melden das Album erneut; ein Album, dessen Tracks über zwei Lesungen importiert werden (selten: ein Import dauert Sekunden), wird zweimal gemeldet.
 
 ### Aktionen
 

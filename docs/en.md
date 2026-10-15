@@ -102,9 +102,7 @@ added are the starting point: only the new ones are announced.
 
 For Lidarr, the title is the album and the title with artist reads
 "Radiohead – The King of Limbs". Lidarr records one import per track: the
-tracks of an album read together make a single event. An album whose tracks
-are imported across two readings (very rare: an import takes seconds) is
-announced twice.
+tracks of an album read together make a single event. Tracks of an album imported later (a missing track, an upgrade) announce the album again; an album whose tracks are imported across two readings (rare: an import takes seconds) is announced twice.
 
 ### Actions
 

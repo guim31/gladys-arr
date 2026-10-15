@@ -144,3 +144,12 @@ test('a Lidarr in a Sonarr slot, or a Sonarr in a Lidarr slot, is the wrong appl
   assert.equal(w.hub.records.get('sonarr_1').error.kind, 'wrong_app');
   assert.equal(w.hub.records.get('lidarr_1').error.kind, 'wrong_app');
 });
+
+test('tracks already announced do not bring their album back', () => {
+  const history = fixture('lidarr-history');
+  // A reading saw the first five tracks; the next one sees the last three.
+  const [event] = parseHistory('lidarr', history, 5);
+  assert.equal(event.id, 8);
+  assert.equal(event.title, 'The King of Limbs');
+  assert.deepEqual(parseHistory('lidarr', history, 8), []);
+});

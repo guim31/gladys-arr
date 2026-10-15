@@ -172,18 +172,20 @@ const LIDARR_HISTORY_EVENTS = Object.freeze({
 
 /**
  * The history events worth a scene event (an import, a failed download), in
- * chronological order. One import per album for Lidarr: the tracks of an
- * album read together make one event (id and date of its last track).
+ * chronological order, after the event `afterId` (the cursor). One import per
+ * album for Lidarr: its new tracks make one event (the highest id and the last
+ * date), filtered on the cursor first so that tracks already announced do not
+ * bring the album back.
  * @returns {Array<{ id, date: Date, type: 'imported'|'failed', title, label, quality, reason }>}
  */
-export function parseHistory(kind, list) {
+export function parseHistory(kind, list, afterId = 0) {
   const events = [];
   for (const record of Array.isArray(list) ? list : []) {
     const type = (kind === KINDS.LIDARR ? LIDARR_HISTORY_EVENTS : HISTORY_EVENTS)[
       record?.eventType
     ];
     const date = validDate(record?.date);
-    if (!type || !date || !Number.isInteger(record.id)) {
+    if (!type || !date || !Number.isInteger(record.id) || record.id <= afterId) {
       continue;
     }
     let title;
@@ -212,14 +214,17 @@ export function parseHistory(kind, list) {
     });
   }
   events.sort((a, b) => a.date - b.date || a.id - b.id);
-  // Lidarr: the last track of each album stands for the album.
+  // Lidarr: the last track of each album stands for the album, with the
+  // highest id of its tracks (the cursor moves past all of them).
   const lastOfAlbum = new Map();
+  const maxId = new Map();
   for (const event of events) {
     if (event.album !== null) {
       lastOfAlbum.set(event.album, event);
+      maxId.set(event.album, Math.max(event.id, maxId.get(event.album) ?? 0));
     }
   }
   return events
     .filter((event) => event.album === null || lastOfAlbum.get(event.album) === event)
-    .map(({ album: _album, ...event }) => event);
+    .map(({ album, ...event }) => (album === null ? event : { ...event, id: maxId.get(album) }));
 }
