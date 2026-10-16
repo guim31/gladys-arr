@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-16
+
 ### Added
 
 - Lidarr (music, API v1), in two new configuration sections: one device per
@@ -41,5 +43,6 @@ the notes of the version's GitHub Release.
   with their posters, the queues, and Search missing / Refresh buttons.
 - Documentation in English, French, German and Spanish.
 
-[Unreleased]: https://github.com/guim31/gladys-arr/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/guim31/gladys-arr/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/guim31/gladys-arr/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/guim31/gladys-arr/releases/tag/v1.0.0

@@ -1,6 +1,6 @@
 {
   "name": "gladys-arr",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Sonarr, Radarr and Lidarr integration for Gladys Assistant: releases of the week, queues, missing items, health alerts, searches.",
   "type": "module",
