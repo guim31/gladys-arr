@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// In-memory Sonarr and Radarr instances behind the `request` seam of the
+// In-memory Sonarr, Radarr and Lidarr instances behind the `request` seam of the
 // client (src/arr/http.js). Answers come from real instances
 // (test/fixtures/arr/), with the behaviors that matter: the API key, the
 // application name, a history that grows, health checks that change, a poster,
@@ -23,7 +23,7 @@ export const POSTER = readFileSync(new URL('../fixtures/arr/poster-250.jpg', imp
 export class FakeArr {
   /**
    * @param {object} [options]
-   * @param {'sonarr'|'radarr'} [options.kind]
+   * @param {'sonarr'|'radarr'|'lidarr'} [options.kind]
    * @param {string} [options.apiKey]
    * @param {string} [options.urlBase] e.g. '/sonarr'
    */
@@ -38,18 +38,24 @@ export class FakeArr {
     this.missing = fixture(`${kind}-missing`);
     this.folders = fixture(`${kind}-rootfolder`);
     this.calendarList = fixture(`${kind}-calendar`);
+    this.apiVersion = kind === 'lidarr' ? 'v1' : 'v3';
     this.history = [];
     this.commands = [];
     this.requests = [];
     this.failNext = null;
   }
 
-  /** A real import event of the fixtures, as a new event `date`. */
+  /**
+   * A real import event of the fixtures, as a new event `date`. Lidarr: the
+   * eight track imports of the captured album, as Lidarr writes them.
+   */
   addImport(date, overrides = {}) {
-    const [template] = fixture(`${this.kind}-history`);
-    const id = this.history.length + 1;
-    this.history.push({ ...template, ...overrides, id, date: new Date(date).toISOString() });
-    return id;
+    const templates = fixture(`${this.kind}-history`);
+    for (const template of this.kind === 'lidarr' ? templates : templates.slice(0, 1)) {
+      const id = this.history.length + 1;
+      this.history.push({ ...template, ...overrides, id, date: new Date(date).toISOString() });
+    }
+    return this.history.length;
   }
 
   addFailure(date, message = 'Download failed: missing articles') {
@@ -79,9 +85,10 @@ export class FakeArr {
       this.failNext = null;
       return { status, headers: {}, body: '' };
     }
-    const prefix = `${this.urlBase}/api/v3/`;
+    const prefix = `${this.urlBase}/api/${this.apiVersion}/`;
     if (!pathname.startsWith(prefix)) {
-      return { status: 404, headers: { 'content-type': 'text/html' }, body: 'Not Found' };
+      // Like the real ones: an empty 404 for another API version.
+      return { status: 404, headers: {}, body: '' };
     }
     if (headers['X-Api-Key'] !== this.apiKey) {
       return { status: 401, headers: {}, body: '' };
@@ -110,11 +117,18 @@ export class FakeArr {
       case 'calendar': {
         const start = Date.parse(searchParams.get('start'));
         const end = Date.parse(searchParams.get('end'));
-        // Sonarr filters on the air date, Radarr on any of the release dates.
+        // Sonarr filters on the air date, Radarr on any of the release dates,
+        // Lidarr on the album release date.
         return json(
           200,
           this.calendarList.filter((entry) =>
-            [entry.airDateUtc, entry.inCinemas, entry.digitalRelease, entry.physicalRelease]
+            [
+              entry.airDateUtc,
+              entry.inCinemas,
+              entry.digitalRelease,
+              entry.physicalRelease,
+              entry.releaseDate,
+            ]
               .map((value) => Date.parse(value))
               .some((time) => time >= start && time < end),
           ),

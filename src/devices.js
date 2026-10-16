@@ -1,10 +1,10 @@
 // -----------------------------------------------------------------------------
-// One Gladys device per configured Sonarr or Radarr instance.
+// One Gladys device per configured Sonarr, Radarr or Lidarr instance.
 //
 // Identity: the configuration slot (`sonarr_1`, `radarr_2`...), not the
 // address: moving an instance to another host or behind a reverse proxy keeps
 // the device and its history. The slot also fixes the application, so the
-// feature names say "episodes" or "movies" from the start (they are frozen at
+// feature names say "episodes", "movies" or "albums" from the start (they are frozen at
 // creation in Gladys).
 //
 // Features (category/type couples of the core table, see
@@ -12,8 +12,8 @@
 //   - online: input/binary, 1 while the instance answers;
 //   - queue, queue_errors: items in the download queue, and those in warning
 //     or error (stuck import, failed download);
-//   - missing: monitored episodes or movies missing (Wanted → Missing);
-//   - upcoming_7d: episodes or movies released in the next 7 days;
+//   - missing: monitored episodes, movies or albums missing (Wanted → Missing);
+//   - upcoming_7d: episodes, movies or albums released in the next 7 days;
 //   - free_space: free space of the root folders, in GB (the smallest);
 //   - health_warnings, health_errors: the System → Status health checks;
 //   - version: text/text.
@@ -45,7 +45,11 @@ export const FEATURE_KEYS = Object.freeze({
   VERSION: 'version',
 });
 
-export const APP_NAMES = { [KINDS.SONARR]: 'Sonarr', [KINDS.RADARR]: 'Radarr' };
+export const APP_NAMES = {
+  [KINDS.SONARR]: 'Sonarr',
+  [KINDS.RADARR]: 'Radarr',
+  [KINDS.LIDARR]: 'Lidarr',
+};
 
 const common = {
   en: {
@@ -98,6 +102,12 @@ const media = {
     fr: { missing: 'Films manquants', upcoming: 'Films des 7 prochains jours' },
     de: { missing: 'Fehlende Filme', upcoming: 'Filme der nächsten 7 Tage' },
     es: { missing: 'Películas que faltan', upcoming: 'Películas de los próximos 7 días' },
+  },
+  [KINDS.LIDARR]: {
+    en: { missing: 'Missing albums', upcoming: 'Albums in the next 7 days' },
+    fr: { missing: 'Albums manquants', upcoming: 'Albums des 7 prochains jours' },
+    de: { missing: 'Fehlende Alben', upcoming: 'Alben der nächsten 7 Tage' },
+    es: { missing: 'Álbumes que faltan', upcoming: 'Álbumes de los próximos 7 días' },
   },
 };
 

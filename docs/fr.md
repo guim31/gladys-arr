@@ -1,22 +1,23 @@
-# Sonarr & Radarr
+# Sonarr, Radarr & Lidarr
 
-Amenez votre [Sonarr](https://sonarr.tv) (séries) et votre
-[Radarr](https://radarr.video) (films) dans Gladys, sur votre réseau local : les
-épisodes et films qui sortent cette semaine sur le tableau de bord, avec leurs
-affiches, l'état des files de téléchargement, les manquants, les alertes de
-santé, et des scènes qui réagissent quand un épisode ou un film est téléchargé.
+Amenez votre [Sonarr](https://sonarr.tv) (séries), votre
+[Radarr](https://radarr.video) (films) et votre [Lidarr](https://lidarr.audio)
+(musique) dans Gladys, sur votre réseau local : les épisodes, films et albums
+qui sortent cette semaine sur le tableau de bord, avec leurs affiches, l'état
+des files de téléchargement, les manquants, les alertes de santé, et des scènes
+qui réagissent quand un épisode, un film ou un album est téléchargé.
 
-L'intégration a été testée contre de vrais Sonarr 4 et Radarr 6 (les images
-Docker officielles), pas encore dans une vraie installation de Gladys : vos
+L'intégration a été testée contre de vrais Sonarr 4, Radarr 6 et Lidarr 3 (les
+images Docker officielles), pas encore dans une vraie installation de Gladys : vos
 retours sont les bienvenus sur le [forum Gladys](https://community.gladysassistant.com)
 ou dans les [issues](https://github.com/guim31/gladys-arr/issues).
 
 ## Ce qu'il faut
 
 - Gladys Assistant 5.1.0 ou plus récent.
-- **Sonarr** v3 ou v4, et/ou **Radarr** v3 ou plus récent, joignables depuis
-  Gladys (même réseau). Jusqu'à deux de chaque.
-- La **clé d'API** de chaque instance : dans Sonarr ou Radarr, **Settings** →
+- **Sonarr** v3 ou v4, **Radarr** v3 ou plus récent et/ou **Lidarr** v1 ou plus
+  récent, joignables depuis Gladys (même réseau). Jusqu'à deux de chaque.
+- La **clé d'API** de chaque instance : dans Sonarr, Radarr ou Lidarr, **Settings** →
   **General** → **Security** → **API Key**.
 
 ## Mise en route
@@ -25,10 +26,10 @@ ou dans les [issues](https://github.com/guim31/gladys-arr/issues).
 2. Dans **Configuration**, section _Sonarr_, saisissez l'**Adresse** de votre
    Sonarr avec son port (par exemple `192.168.1.2:8989`), sa **Clé d'API**, et
    si vous le souhaitez un **Nom**. De même dans la section _Radarr_ (port
-   `7878` par défaut). Un Sonarr derrière un proxy inverse avec une base d'URL ?
+   `7878` par défaut) et la section _Lidarr_ (port `8686`). Un Sonarr derrière un proxy inverse avec une base d'URL ?
    Saisissez-la aussi : `https://example.org/sonarr`. Laissez vide la section
-   d'une application que vous n'utilisez pas. Un deuxième Sonarr (4K, animés…)
-   ou Radarr ? Remplissez la section _Deuxième Sonarr_ ou _Deuxième Radarr_.
+   d'une application que vous n'utilisez pas. Un deuxième Sonarr (4K, animés…),
+   Radarr ou Lidarr ? Remplissez la section _Deuxième…_ correspondante.
 3. Enregistrez, puis cliquez sur **Tester la connexion** : le message sous le
    bouton indique, pour chaque instance, si elle répond, sa version, sa file,
    ses manquants et ses alertes de santé.
@@ -48,19 +49,20 @@ Options :
 ## L'appareil de chaque instance
 
 Toutes les fonctionnalités sont en lecture seule. Les noms parlent
-d'« épisodes » sur un Sonarr et de « films » sur un Radarr.
+d'« épisodes » sur un Sonarr, de « films » sur un Radarr et d'« albums » sur un
+Lidarr.
 
-| Fonctionnalité                                               | Ce que c'est                                                                                |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| En ligne                                                     | 1 tant que l'instance répond, 0 sinon                                                       |
-| File de téléchargement                                       | Éléments de la file de Sonarr ou Radarr (Activity → Queue)                                  |
-| Téléchargements en erreur                                    | Éléments de la file en avertissement ou en erreur : import bloqué, téléchargement en échec… |
-| Épisodes manquants / Films manquants                         | Épisodes ou films surveillés sans fichier (Wanted → Missing)                                |
-| Épisodes des 7 prochains jours / Films des 7 prochains jours | Épisodes diffusés, ou films qui sortent (cinéma, numérique, disque), d'aujourd'hui à J+6    |
-| Espace libre                                                 | Espace libre des dossiers racine, en Go ; le plus petit s'il y en a plusieurs               |
-| Avertissements de santé                                      | Avertissements de System → Status (indexeur, client de téléchargement…)                     |
-| Erreurs de santé                                             | Erreurs de System → Status                                                                  |
-| Version                                                      | Version de Sonarr ou Radarr                                                                 |
+| Fonctionnalité                                                                              | Ce que c'est                                                                                    |
+| ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| En ligne                                                                                    | 1 tant que l'instance répond, 0 sinon                                                           |
+| File de téléchargement                                                                      | Éléments de la file de téléchargement (Activity → Queue)                                        |
+| Téléchargements en erreur                                                                   | Éléments de la file en avertissement ou en erreur : import bloqué, téléchargement en échec…     |
+| Épisodes manquants / Films manquants / Albums manquants                                     | Épisodes, films ou albums surveillés sans fichiers (Wanted → Missing)                           |
+| Épisodes des 7 prochains jours / Films des 7 prochains jours / Albums des 7 prochains jours | Épisodes diffusés, films (cinéma, numérique, disque) ou albums qui sortent, d'aujourd'hui à J+6 |
+| Espace libre                                                                                | Espace libre des dossiers racine, en Go ; le plus petit s'il y en a plusieurs                   |
+| Avertissements de santé                                                                     | Avertissements de System → Status (indexeur, client de téléchargement…)                         |
+| Erreurs de santé                                                                            | Erreurs de System → Status                                                                      |
+| Version                                                                                     | Version de Sonarr, Radarr ou Lidarr                                                             |
 
 ## Tableau de bord
 
@@ -72,16 +74,17 @@ Il affiche :
 
 - deux tuiles : les éléments **En file** et les **Manquants**, pour toutes les
   instances affichées ;
-- une grille des épisodes et films qui sortent d'aujourd'hui aux 6 jours
-  suivants, avec leur affiche, leur date, et un badge _Téléchargé_ une fois le
+- une grille des épisodes, films et albums qui sortent d'aujourd'hui aux 6
+  jours suivants, avec leur affiche (pour un album, celle de l'artiste), leur date, et un badge _Téléchargé_ une fois le
   fichier là (pour un film, avant cela : _Au cinéma_, _Numérique_ ou
-  _Blu-ray / DVD_). Touchez une carte pour le titre de l'épisode et le résumé ;
+  _Blu-ray / DVD_). Touchez une carte pour le titre de l'épisode ou de l'album et le
+  résumé ;
 - une ligne par instance : file, téléchargements en erreur, alertes de santé,
   ou _Injoignable_ ;
 - deux boutons : **Chercher les manquants** (comme l'action ci-dessous) et
   **Rafraîchir**.
 
-Les affiches viennent de Sonarr et Radarr eux-mêmes (la petite copie qu'ils
+Les affiches viennent de Sonarr, Radarr et Lidarr eux-mêmes (la petite copie qu'ils
 gardent), à travers Gladys : votre navigateur ne charge jamais d'adresse
 extérieure.
 
@@ -89,11 +92,11 @@ extérieure.
 
 ### Déclencheurs
 
-| Déclencheur                | Quand                                                                                           | Filtres                       | Variables                                                      |
-| -------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------- |
-| Épisode ou film téléchargé | Sonarr ou Radarr a importé un téléchargement terminé dans la bibliothèque                       | instance, application         | nom de l'instance, titre, titre avec épisode ou année, qualité |
-| Téléchargement en échec    | Un téléchargement a été marqué en échec                                                         | instance, application         | nom de l'instance, titre, titre avec épisode ou année, raison  |
-| Nouvelle alerte de santé   | Un avertissement ou une erreur apparaît dans System → Status (une fois, jusqu'à sa disparition) | instance, application, niveau | nom de l'instance, niveau, vérification, message               |
+| Déclencheur                       | Quand                                                                                           | Filtres                       | Variables                                                               |
+| --------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------- |
+| Épisode, film ou album téléchargé | Sonarr, Radarr ou Lidarr a importé un téléchargement terminé dans la bibliothèque               | instance, application         | nom de l'instance, titre, titre avec épisode, année ou artiste, qualité |
+| Téléchargement en échec           | Un téléchargement a été marqué en échec                                                         | instance, application         | nom de l'instance, titre, titre avec épisode, année ou artiste, raison  |
+| Nouvelle alerte de santé          | Un avertissement ou une erreur apparaît dans System → Status (une fois, jusqu'à sa disparition) | instance, application, niveau | nom de l'instance, niveau, vérification, message                        |
 
 L'intégration lit l'historique de chaque instance à chaque rafraîchissement :
 un téléchargement est annoncé au plus un intervalle après l'import, une seule
@@ -102,49 +105,61 @@ annoncés (Gladys arrêté une nuit ne rejoue pas la nuit). Les alertes de sant�
 présentes à l'ajout d'une instance servent de point de départ : seules les
 nouvelles sont annoncées.
 
+Pour Lidarr, le titre est celui de l'album, et le titre avec artiste donne
+« Radiohead – The King of Limbs ». Lidarr enregistre un import par piste : les
+pistes d'un album lues ensemble font un seul événement. Des pistes importées plus tard (une piste manquante, une amélioration de qualité) annoncent de nouveau l'album ; un album dont les pistes sont importées sur deux lectures (rare : un import prend quelques secondes) est annoncé deux fois.
+
 ### Actions
 
-| Action                                      | Ce qu'elle fait                                                                                                                 | Sorties                                      |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Chercher les épisodes ou films manquants    | Lance la recherche de tous les épisodes ou films surveillés manquants, sur une instance ou toutes                               | instances ayant lancé la recherche           |
-| Rafraîchir la bibliothèque Sonarr ou Radarr | Demande le rafraîchissement des informations et fichiers de chaque série ou film (exécuté en arrière-plan par Sonarr ou Radarr) | instances rafraîchies                        |
-| Lire le résumé Sonarr/Radarr                | Construit une phrase : sorties de la semaine, file, manquants, alertes de santé                                                 | phrase, sorties, éléments en file, manquants |
+| Action                                              | Ce qu'elle fait                                                                                                                       | Sorties                                      |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Chercher les épisodes, films ou albums manquants    | Lance la recherche de tous les épisodes, films ou albums surveillés manquants, sur une instance ou toutes                             | instances ayant lancé la recherche           |
+| Rafraîchir la bibliothèque Sonarr, Radarr ou Lidarr | Demande le rafraîchissement des informations et fichiers de chaque série, film ou artiste (exécuté en arrière-plan par l'application) | instances rafraîchies                        |
+| Lire le résumé Sonarr/Radarr/Lidarr                 | Construit une phrase : sorties de la semaine, file, manquants, alertes de santé                                                       | phrase, sorties, éléments en file, manquants |
 
 Rien n'est jamais supprimé : l'intégration lit, et lance des recherches et des
 rafraîchissements.
 
 ### Idées de scènes
 
-- **Soirée film** : déclencheur _Épisode ou film téléchargé_ avec
+- **Soirée film** : déclencheur _Épisode, film ou album téléchargé_ avec
   l'application _Radarr_, puis une notification qui reprend la variable
-  _Titre avec épisode (S01E02) ou année_ : « Avatar (2009) est prêt ».
-- **Résumé du matin** : chaque jour à 8 h, _Lire le résumé Sonarr/Radarr_, puis
+  _Titre avec épisode (S01E02), année ou artiste_ : « Avatar (2009) est prêt ».
+- **Nouvel album** : déclencheur _Épisode, film ou album téléchargé_ avec
+  l'application _Lidarr_, puis une notification avec _Titre avec épisode
+  (S01E02), année ou artiste_ : « Radiohead – The King of Limbs est dans la
+  bibliothèque ».
+- **Résumé du matin** : chaque jour à 8 h, _Lire le résumé Sonarr/Radarr/Lidarr_, puis
   envoyer sa phrase sur Telegram ou la faire dire par l'enceinte.
 - **Téléchargements bloqués** : déclencheur _Téléchargement en échec_, puis un
   message avec la raison ; ou une scène sur la fonctionnalité _Téléchargements
   en erreur_ au-dessus de 0.
-- **Rattrapage hebdomadaire** : chaque dimanche soir, _Chercher les épisodes ou
-  films manquants_.
+- **Rattrapage hebdomadaire** : chaque dimanche soir, _Chercher les épisodes,
+  films ou albums manquants_.
 
 ## Dépannage
 
 - **« ne répond pas »** : vérifiez l'adresse et le port depuis la machine de
-  Gladys (`http://<adresse>:8989` pour Sonarr, `:7878` pour Radarr). Gladys fait
+  Gladys (`http://<adresse>:8989` pour Sonarr, `:7878` pour Radarr, `:8686` pour
+  Lidarr). Gladys fait
   tourner l'intégration dans un conteneur : `localhost` est le conteneur
   lui-même, utilisez l'adresse IP de la machine.
 - **« clé d'API refusée »** : recopiez la clé depuis Settings → General →
-  Security. Une nouvelle clé dans Sonarr ou Radarr doit être reportée ici.
-- **« cette adresse est l'autre application »** : une adresse de Radarr dans
-  une section Sonarr, ou l'inverse (avec la clé de cette autre application ;
+  Security. Une nouvelle clé dans Sonarr, Radarr ou Lidarr doit être reportée
+  ici.
+- **« cette adresse est une autre application »** : une adresse de Radarr dans
+  une section Sonarr, un Sonarr dans une section Lidarr… (avec la clé de cette autre application ;
   avec la bonne clé, une mauvaise adresse répond « clé d'API refusée »).
-- **« aucune API Sonarr ou Radarr à cette adresse »** ou **« l'adresse
+- **« aucune API Sonarr, Radarr ou Lidarr à cette adresse »** ou **« l'adresse
   redirige »** : une instance derrière un proxy inverse demande sa base d'URL
   (`https://example.org/sonarr`), et une page de connexion du proxy bloque
   l'API : utilisez l'adresse locale.
 - **« certificat refusé »** : le HTTPS avec un certificat auto-signé n'est pas
   pris en charge ; utilisez l'adresse en `http://` de votre réseau.
-- Pas d'affiche : Sonarr ou Radarr ne l'a pas encore téléchargée (MediaCover) ;
-  elle arrive au prochain rafraîchissement de la série ou du film.
+- Pas d'affiche : l'application ne l'a pas encore téléchargée (MediaCover) ;
+  elle arrive au prochain rafraîchissement de la série, du film ou de l'artiste.
+  Un artiste sans affiche sur le serveur de métadonnées de Lidarr laisse ses
+  albums sans image.
 
 ## Limites
 
@@ -158,6 +173,8 @@ rafraîchissements.
   un appareil, soit un fournisseur de calendrier, et les appareils,
   déclencheurs et actions comptent davantage ici. Le widget joue le rôle du
   calendrier.
-- Lidarr, Readarr, Prowlarr et les clients de téléchargement ne sont pas
-  couverts.
-- Sans lien avec les projets Sonarr ou Radarr.
+- Lidarr ne garde les pochettes d'album qu'en taille réelle (souvent plus que
+  les 300 Ko permis pour une image de widget) : les cartes montrent l'affiche
+  de l'artiste.
+- Readarr, Prowlarr et les clients de téléchargement ne sont pas couverts.
+- Sans lien avec les projets Sonarr, Radarr ou Lidarr.

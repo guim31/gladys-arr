@@ -11,3 +11,12 @@ Built by hand, from the API v3 shapes (no download client in the test
 instances): `sonarr-queue.json` (one download, one blocked import, one failed
 download). The `downloadFailed` history events are derived from the real
 import events in `test/helpers/fakeArr.js`.
+
+Lidarr (API v1): captured on 16/10/2026 from `lscr.io/linuxserver/lidarr`
+(Lidarr 3.1.0.4875), with one artist added through the API and one real import
+of an eight-track album (silent MP3 files tagged with ffmpeg, imported by the
+`ManualImport` command: Lidarr writes one `trackFileImported` per track). Long
+lists trimmed (releases, links, media, genres). Edited: the release date of
+`A Moon Shaped Pool` in `lidarr-calendar.json`, moved to 2026-10-16 so that the
+week of the test clock has an album. Lidarr has the same empty queue as Radarr
+in the tests (`sonarr-queue-empty.json`).

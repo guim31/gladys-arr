@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// The hub: one record per configured Sonarr/Radarr instance, read on a timer
+// The hub: one record per configured Sonarr/Radarr/Lidarr instance, read on a timer
 // of the container (the interval chosen in the configuration), its states
 // published to Gladys when they change, its scene events fired from the
 // history and the health checks, and the commands of the scene actions and
@@ -320,7 +320,8 @@ export class ArrHub {
       if (!err.kind) {
         throw err;
       }
-      return this.applyFailure(record, err);
+      // Lidarr (API v1) in a Sonarr slot, or the reverse, answers 404 here.
+      return this.applyFailure(record, await client.otherApp(err));
     }
   }
 
@@ -428,6 +429,7 @@ export class ArrHub {
       events = parseHistory(
         record.instance.kind,
         await record.client.historySince(new Date(now - this.timings.historyMaxAgeMs)),
+        cursor.lastId,
       );
       this.resolved(`history:${slot}`);
     } catch (err) {
@@ -700,6 +702,7 @@ export class ArrHub {
       answering: ok.length,
       episodes: of(KINDS.SONARR).reduce((n, r) => n + (r.snapshot.upcoming?.length ?? 0), 0),
       movies: of(KINDS.RADARR).reduce((n, r) => n + (r.snapshot.upcoming?.length ?? 0), 0),
+      albums: of(KINDS.LIDARR).reduce((n, r) => n + (r.snapshot.upcoming?.length ?? 0), 0),
       queue: sum((s) => s.queue?.count),
       queueErrors: sum((s) => s.queue?.errors),
       missing: sum((s) => s.missing),
@@ -719,12 +722,12 @@ export class ArrHub {
             return labelled(name, text.down, language);
           }
           const { upcoming, queue, missing, health } = record.snapshot;
-          const parts = [
-            record.instance.kind === KINDS.SONARR
-              ? text.episodes(upcoming.length)
-              : text.movies(upcoming.length),
-            text.queue(queue.count, queue.errors),
-          ];
+          const media = {
+            [KINDS.SONARR]: text.episodes,
+            [KINDS.RADARR]: text.movies,
+            [KINDS.LIDARR]: text.albums,
+          }[record.instance.kind];
+          const parts = [media(upcoming.length), text.queue(queue.count, queue.errors)];
           if (missing !== null) {
             parts.push(text.missing(missing));
           }

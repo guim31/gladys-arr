@@ -1,12 +1,12 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Sonarr & Radarr",
+  "name": "Sonarr, Radarr & Lidarr",
   "description": {
-    "en": "Sonarr and Radarr: releases of the week, queue, missing items, health alerts, searches.",
-    "fr": "Sonarr et Radarr : sorties de la semaine, file, manquants, alertes de santé, recherches.",
-    "de": "Sonarr und Radarr: Neuerscheinungen, Warteschlange, Fehlende, Zustandsmeldungen, Suche.",
-    "es": "Sonarr y Radarr: estrenos de la semana, cola, pendientes, avisos de estado, búsquedas."
+    "en": "Sonarr, Radarr and Lidarr: releases of the week, queue, missing items, health alerts, searches.",
+    "fr": "Sonarr, Radarr et Lidarr : sorties de la semaine, file, manquants, alertes de santé, recherches.",
+    "de": "Sonarr, Radarr, Lidarr: Neuerscheinungen, Warteschlange, Fehlende, Zustandsmeldungen, Suche.",
+    "es": "Sonarr, Radarr y Lidarr: estrenos de la semana, cola, pendientes, avisos de estado, búsquedas."
   },
   "version": "1.0.0",
   "docker_image": "ghcr.io/guim31/gladys-arr:1.0.0",
@@ -362,6 +362,179 @@
       "default": ""
     },
     {
+      "key": "lidarr_1",
+      "type": "section",
+      "label": {
+        "en": "Lidarr",
+        "fr": "Lidarr",
+        "de": "Lidarr",
+        "es": "Lidarr"
+      },
+      "description": {
+        "en": "Address and API key of your Lidarr (Settings → General → Security). Leave empty if you do not use Lidarr.",
+        "fr": "Adresse et clé d'API de votre Lidarr (Settings → General → Security). Laissez vide si vous n'utilisez pas Lidarr.",
+        "de": "Adresse und API-Schlüssel deines Lidarr (Settings → General → Security). Leer lassen, wenn du Lidarr nicht nutzt.",
+        "es": "Dirección y clave de API de su Lidarr (Settings → General → Security). Déjelo vacío si no usa Lidarr."
+      },
+      "links": [
+        {
+          "url": "https://wiki.servarr.com/lidarr/settings#security",
+          "label": {
+            "en": "Where to find the Lidarr API key",
+            "fr": "Où trouver la clé d'API Lidarr",
+            "de": "Wo du den Lidarr-API-Schlüssel findest",
+            "es": "Dónde encontrar la clave de API de Lidarr"
+          }
+        }
+      ]
+    },
+    {
+      "key": "lidarr_1_url",
+      "type": "string",
+      "label": {
+        "en": "Address",
+        "fr": "Adresse",
+        "de": "Adresse",
+        "es": "Dirección"
+      },
+      "description": {
+        "en": "IP address or name with the port, and the URL base if any (e.g. http://192.168.1.2:8686/lidarr).",
+        "fr": "Adresse IP ou nom avec le port, et la base d'URL s'il y en a une (ex. http://192.168.1.2:8686/lidarr).",
+        "de": "IP-Adresse oder Name mit Port und gegebenenfalls URL-Basis (z. B. http://192.168.1.2:8686/lidarr).",
+        "es": "Dirección IP o nombre con el puerto, y la base de URL si la hay (p. ej. http://192.168.1.2:8686/lidarr)."
+      },
+      "placeholder": {
+        "en": "e.g. 192.168.1.2:8686",
+        "fr": "ex. 192.168.1.2:8686",
+        "de": "z. B. 192.168.1.2:8686",
+        "es": "p. ej. 192.168.1.2:8686"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "lidarr_1_api_key",
+      "type": "secret",
+      "label": {
+        "en": "API key",
+        "fr": "Clé d'API",
+        "de": "API-Schlüssel",
+        "es": "Clave de API"
+      },
+      "description": {
+        "en": "Lidarr: Settings → General → Security → API Key.",
+        "fr": "Lidarr : Settings → General → Security → API Key.",
+        "de": "Lidarr: Settings → General → Security → API Key.",
+        "es": "Lidarr: Settings → General → Security → API Key."
+      },
+      "required": false
+    },
+    {
+      "key": "lidarr_1_name",
+      "type": "string",
+      "label": {
+        "en": "Name",
+        "fr": "Nom",
+        "de": "Name",
+        "es": "Nombre"
+      },
+      "description": {
+        "en": "Name of the device in Gladys. Empty: \"Lidarr\" followed by the address.",
+        "fr": "Nom de l'appareil dans Gladys. Vide : « Lidarr » suivi de l'adresse.",
+        "de": "Name des Geräts in Gladys. Leer: „Lidarr“ gefolgt von der Adresse.",
+        "es": "Nombre del dispositivo en Gladys. Vacío: «Lidarr» seguido de la dirección."
+      },
+      "placeholder": {
+        "en": "e.g. Lidarr",
+        "fr": "ex. Lidarr",
+        "de": "z. B. Lidarr",
+        "es": "p. ej. Lidarr"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "lidarr_2",
+      "type": "section",
+      "label": {
+        "en": "Second Lidarr (optional)",
+        "fr": "Deuxième Lidarr (facultatif)",
+        "de": "Zweites Lidarr (optional)",
+        "es": "Segundo Lidarr (opcional)"
+      },
+      "description": {
+        "en": "Same fields, for another Lidarr.",
+        "fr": "Les mêmes champs, pour un autre Lidarr.",
+        "de": "Dieselben Felder, für ein weiteres Lidarr.",
+        "es": "Los mismos campos, para otro Lidarr."
+      }
+    },
+    {
+      "key": "lidarr_2_url",
+      "type": "string",
+      "label": {
+        "en": "Address",
+        "fr": "Adresse",
+        "de": "Adresse",
+        "es": "Dirección"
+      },
+      "description": {
+        "en": "IP address or name with the port, and the URL base if any (e.g. http://192.168.1.2:8686/lidarr).",
+        "fr": "Adresse IP ou nom avec le port, et la base d'URL s'il y en a une (ex. http://192.168.1.2:8686/lidarr).",
+        "de": "IP-Adresse oder Name mit Port und gegebenenfalls URL-Basis (z. B. http://192.168.1.2:8686/lidarr).",
+        "es": "Dirección IP o nombre con el puerto, y la base de URL si la hay (p. ej. http://192.168.1.2:8686/lidarr)."
+      },
+      "placeholder": {
+        "en": "e.g. 192.168.1.2:8686",
+        "fr": "ex. 192.168.1.2:8686",
+        "de": "z. B. 192.168.1.2:8686",
+        "es": "p. ej. 192.168.1.2:8686"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "lidarr_2_api_key",
+      "type": "secret",
+      "label": {
+        "en": "API key",
+        "fr": "Clé d'API",
+        "de": "API-Schlüssel",
+        "es": "Clave de API"
+      },
+      "description": {
+        "en": "Lidarr: Settings → General → Security → API Key.",
+        "fr": "Lidarr : Settings → General → Security → API Key.",
+        "de": "Lidarr: Settings → General → Security → API Key.",
+        "es": "Lidarr: Settings → General → Security → API Key."
+      },
+      "required": false
+    },
+    {
+      "key": "lidarr_2_name",
+      "type": "string",
+      "label": {
+        "en": "Name",
+        "fr": "Nom",
+        "de": "Name",
+        "es": "Nombre"
+      },
+      "description": {
+        "en": "Name of the device in Gladys. Empty: \"Lidarr\" followed by the address.",
+        "fr": "Nom de l'appareil dans Gladys. Vide : « Lidarr » suivi de l'adresse.",
+        "de": "Name des Geräts in Gladys. Leer: „Lidarr“ gefolgt von der Adresse.",
+        "es": "Nombre del dispositivo en Gladys. Vacío: «Lidarr» seguido de la dirección."
+      },
+      "placeholder": {
+        "en": "e.g. Lidarr",
+        "fr": "ex. Lidarr",
+        "de": "z. B. Lidarr",
+        "es": "p. ej. Lidarr"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
       "key": "options",
       "type": "section",
       "label": {
@@ -506,16 +679,16 @@
     {
       "key": "download_imported",
       "label": {
-        "en": "Episode or movie downloaded",
-        "fr": "Épisode ou film téléchargé",
-        "de": "Episode oder Film heruntergeladen",
-        "es": "Episodio o película descargados"
+        "en": "Episode, movie or album downloaded",
+        "fr": "Épisode, film ou album téléchargé",
+        "de": "Episode, Film oder Album heruntergeladen",
+        "es": "Episodio, película o álbum descargados"
       },
       "description": {
-        "en": "Sonarr or Radarr imported a finished download into the library.",
-        "fr": "Sonarr ou Radarr a importé un téléchargement terminé dans la bibliothèque.",
-        "de": "Sonarr oder Radarr hat einen fertigen Download in die Bibliothek importiert.",
-        "es": "Sonarr o Radarr ha importado una descarga terminada a la biblioteca."
+        "en": "Sonarr, Radarr or Lidarr imported a finished download into the library.",
+        "fr": "Sonarr, Radarr ou Lidarr a importé un téléchargement terminé dans la bibliothèque.",
+        "de": "Sonarr, Radarr oder Lidarr hat einen fertigen Download in die Bibliothek importiert.",
+        "es": "Sonarr, Radarr o Lidarr ha importado una descarga terminada a la biblioteca."
       },
       "fields": [
         {
@@ -533,10 +706,10 @@
           "key": "app",
           "type": "select",
           "label": {
-            "en": "Application (empty: both)",
-            "fr": "Application (vide : les deux)",
-            "de": "Anwendung (leer: beide)",
-            "es": "Aplicación (vacío: ambas)"
+            "en": "Application (empty: all)",
+            "fr": "Application (vide : toutes)",
+            "de": "Anwendung (leer: alle)",
+            "es": "Aplicación (vacío: todas)"
           },
           "options": [
             {
@@ -555,6 +728,15 @@
                 "fr": "Radarr (films)",
                 "de": "Radarr (Filme)",
                 "es": "Radarr (películas)"
+              }
+            },
+            {
+              "value": "lidarr",
+              "label": {
+                "en": "Lidarr (music)",
+                "fr": "Lidarr (musique)",
+                "de": "Lidarr (Musik)",
+                "es": "Lidarr (música)"
               }
             }
           ]
@@ -585,30 +767,30 @@
           "key": "app",
           "type": "string",
           "label": {
-            "en": "Application (sonarr, radarr)",
-            "fr": "Application (sonarr, radarr)",
-            "de": "Anwendung (sonarr, radarr)",
-            "es": "Aplicación (sonarr, radarr)"
+            "en": "Application (sonarr, radarr, lidarr)",
+            "fr": "Application (sonarr, radarr, lidarr)",
+            "de": "Anwendung (sonarr, radarr, lidarr)",
+            "es": "Aplicación (sonarr, radarr, lidarr)"
           }
         },
         {
           "key": "title",
           "type": "string",
           "label": {
-            "en": "Series or movie title",
-            "fr": "Titre de la série ou du film",
-            "de": "Titel der Serie oder des Films",
-            "es": "Título de la serie o película"
+            "en": "Series, movie or album title",
+            "fr": "Titre de la série, du film ou de l'album",
+            "de": "Titel der Serie, des Films oder des Albums",
+            "es": "Título de la serie, película o álbum"
           }
         },
         {
           "key": "label",
           "type": "string",
           "label": {
-            "en": "Title with episode (S01E02) or year",
-            "fr": "Titre avec épisode (S01E02) ou année",
-            "de": "Titel mit Episode (S01E02) oder Jahr",
-            "es": "Título con episodio (S01E02) o año"
+            "en": "Title with episode (S01E02), year or artist",
+            "fr": "Titre avec épisode (S01E02), année ou artiste",
+            "de": "Titel mit Episode (S01E02), Jahr oder Künstler",
+            "es": "Título con episodio (S01E02), año o artista"
           }
         },
         {
@@ -632,10 +814,10 @@
         "es": "Descarga fallida"
       },
       "description": {
-        "en": "A download was marked as failed by Sonarr or Radarr, with the reason.",
-        "fr": "Un téléchargement a été marqué en échec par Sonarr ou Radarr, avec la raison.",
-        "de": "Ein Download wurde von Sonarr oder Radarr als fehlgeschlagen markiert, mit dem Grund.",
-        "es": "Sonarr o Radarr ha marcado una descarga como fallida, con el motivo."
+        "en": "A download was marked as failed by Sonarr, Radarr or Lidarr, with the reason.",
+        "fr": "Un téléchargement a été marqué en échec par Sonarr, Radarr ou Lidarr, avec la raison.",
+        "de": "Ein Download wurde von Sonarr, Radarr oder Lidarr als fehlgeschlagen markiert, mit dem Grund.",
+        "es": "Sonarr, Radarr o Lidarr ha marcado una descarga como fallida, con el motivo."
       },
       "fields": [
         {
@@ -653,10 +835,10 @@
           "key": "app",
           "type": "select",
           "label": {
-            "en": "Application (empty: both)",
-            "fr": "Application (vide : les deux)",
-            "de": "Anwendung (leer: beide)",
-            "es": "Aplicación (vacío: ambas)"
+            "en": "Application (empty: all)",
+            "fr": "Application (vide : toutes)",
+            "de": "Anwendung (leer: alle)",
+            "es": "Aplicación (vacío: todas)"
           },
           "options": [
             {
@@ -675,6 +857,15 @@
                 "fr": "Radarr (films)",
                 "de": "Radarr (Filme)",
                 "es": "Radarr (películas)"
+              }
+            },
+            {
+              "value": "lidarr",
+              "label": {
+                "en": "Lidarr (music)",
+                "fr": "Lidarr (musique)",
+                "de": "Lidarr (Musik)",
+                "es": "Lidarr (música)"
               }
             }
           ]
@@ -705,30 +896,30 @@
           "key": "app",
           "type": "string",
           "label": {
-            "en": "Application (sonarr, radarr)",
-            "fr": "Application (sonarr, radarr)",
-            "de": "Anwendung (sonarr, radarr)",
-            "es": "Aplicación (sonarr, radarr)"
+            "en": "Application (sonarr, radarr, lidarr)",
+            "fr": "Application (sonarr, radarr, lidarr)",
+            "de": "Anwendung (sonarr, radarr, lidarr)",
+            "es": "Aplicación (sonarr, radarr, lidarr)"
           }
         },
         {
           "key": "title",
           "type": "string",
           "label": {
-            "en": "Series or movie title",
-            "fr": "Titre de la série ou du film",
-            "de": "Titel der Serie oder des Films",
-            "es": "Título de la serie o película"
+            "en": "Series, movie or album title",
+            "fr": "Titre de la série, du film ou de l'album",
+            "de": "Titel der Serie, des Films oder des Albums",
+            "es": "Título de la serie, película o álbum"
           }
         },
         {
           "key": "label",
           "type": "string",
           "label": {
-            "en": "Title with episode (S01E02) or year",
-            "fr": "Titre avec épisode (S01E02) ou année",
-            "de": "Titel mit Episode (S01E02) oder Jahr",
-            "es": "Título con episodio (S01E02) o año"
+            "en": "Title with episode (S01E02), year or artist",
+            "fr": "Titre avec épisode (S01E02), année ou artiste",
+            "de": "Titel mit Episode (S01E02), Jahr oder Künstler",
+            "es": "Título con episodio (S01E02), año o artista"
           }
         },
         {
@@ -773,10 +964,10 @@
           "key": "app",
           "type": "select",
           "label": {
-            "en": "Application (empty: both)",
-            "fr": "Application (vide : les deux)",
-            "de": "Anwendung (leer: beide)",
-            "es": "Aplicación (vacío: ambas)"
+            "en": "Application (empty: all)",
+            "fr": "Application (vide : toutes)",
+            "de": "Anwendung (leer: alle)",
+            "es": "Aplicación (vacío: todas)"
           },
           "options": [
             {
@@ -795,6 +986,15 @@
                 "fr": "Radarr (films)",
                 "de": "Radarr (Filme)",
                 "es": "Radarr (películas)"
+              }
+            },
+            {
+              "value": "lidarr",
+              "label": {
+                "en": "Lidarr (music)",
+                "fr": "Lidarr (musique)",
+                "de": "Lidarr (Musik)",
+                "es": "Lidarr (música)"
               }
             }
           ]
@@ -855,10 +1055,10 @@
           "key": "app",
           "type": "string",
           "label": {
-            "en": "Application (sonarr, radarr)",
-            "fr": "Application (sonarr, radarr)",
-            "de": "Anwendung (sonarr, radarr)",
-            "es": "Aplicación (sonarr, radarr)"
+            "en": "Application (sonarr, radarr, lidarr)",
+            "fr": "Application (sonarr, radarr, lidarr)",
+            "de": "Anwendung (sonarr, radarr, lidarr)",
+            "es": "Aplicación (sonarr, radarr, lidarr)"
           }
         },
         {
@@ -885,10 +1085,10 @@
           "key": "message",
           "type": "string",
           "label": {
-            "en": "Message of Sonarr or Radarr",
-            "fr": "Message de Sonarr ou Radarr",
-            "de": "Meldung von Sonarr oder Radarr",
-            "es": "Mensaje de Sonarr o Radarr"
+            "en": "Message of Sonarr, Radarr or Lidarr",
+            "fr": "Message de Sonarr, Radarr ou Lidarr",
+            "de": "Meldung von Sonarr, Radarr oder Lidarr",
+            "es": "Mensaje de Sonarr, Radarr o Lidarr"
           }
         }
       ]
@@ -898,16 +1098,16 @@
     {
       "key": "search_missing",
       "label": {
-        "en": "Search missing episodes or movies",
-        "fr": "Chercher les épisodes ou films manquants",
-        "de": "Fehlende Episoden oder Filme suchen",
-        "es": "Buscar episodios o películas pendientes"
+        "en": "Search missing episodes, movies or albums",
+        "fr": "Chercher les épisodes, films ou albums manquants",
+        "de": "Fehlende Episoden, Filme oder Alben suchen",
+        "es": "Buscar episodios, películas o álbumes pendientes"
       },
       "description": {
-        "en": "Starts the search of every monitored missing episode or movie (Wanted → Missing).",
-        "fr": "Lance la recherche de tous les épisodes ou films surveillés manquants (Wanted → Missing).",
-        "de": "Startet die Suche aller überwachten fehlenden Episoden oder Filme (Wanted → Missing).",
-        "es": "Inicia la búsqueda de todos los episodios o películas vigilados pendientes (Wanted → Missing)."
+        "en": "Starts the search of every monitored missing episode, movie or album (Wanted → Missing).",
+        "fr": "Lance la recherche de tous les épisodes, films ou albums surveillés manquants (Wanted → Missing).",
+        "de": "Startet die Suche aller überwachten fehlenden Episoden, Filme oder Alben (Wanted → Missing).",
+        "es": "Inicia la búsqueda de todos los episodios, películas o álbumes vigilados pendientes (Wanted → Missing)."
       },
       "timeout_seconds": 20,
       "fields": [
@@ -939,16 +1139,16 @@
     {
       "key": "refresh_library",
       "label": {
-        "en": "Refresh the Sonarr or Radarr library",
-        "fr": "Rafraîchir la bibliothèque Sonarr ou Radarr",
-        "de": "Sonarr- oder Radarr-Bibliothek aktualisieren",
-        "es": "Actualizar la biblioteca de Sonarr o Radarr"
+        "en": "Refresh the Sonarr, Radarr or Lidarr library",
+        "fr": "Rafraîchir la bibliothèque Sonarr, Radarr ou Lidarr",
+        "de": "Sonarr-, Radarr- oder Lidarr-Bibliothek aktualisieren",
+        "es": "Actualizar la biblioteca de Sonarr, Radarr o Lidarr"
       },
       "description": {
-        "en": "Asks Sonarr or Radarr to refresh the information and files of every series or movie.",
-        "fr": "Demande à Sonarr ou Radarr de rafraîchir les informations et fichiers de chaque série ou film.",
-        "de": "Bittet Sonarr oder Radarr, Infos und Dateien aller Serien oder Filme zu aktualisieren.",
-        "es": "Pide a Sonarr o Radarr que actualice la información y los archivos de cada serie o película."
+        "en": "Asks Sonarr, Radarr or Lidarr to refresh the information and files of every series, movie or artist.",
+        "fr": "Demande à Sonarr, Radarr ou Lidarr de rafraîchir les informations et fichiers de chaque série, film ou artiste.",
+        "de": "Bittet Sonarr, Radarr oder Lidarr, Infos und Dateien aller Serien, Filme oder Künstler zu aktualisieren.",
+        "es": "Pide a Sonarr, Radarr o Lidarr que actualice la información y los archivos de cada serie, película o artista."
       },
       "timeout_seconds": 30,
       "fields": [
@@ -980,10 +1180,10 @@
     {
       "key": "read_summary",
       "label": {
-        "en": "Read the Sonarr/Radarr summary",
-        "fr": "Lire le résumé Sonarr/Radarr",
-        "de": "Sonarr/Radarr-Zusammenfassung lesen",
-        "es": "Leer el resumen de Sonarr/Radarr"
+        "en": "Read the Sonarr/Radarr/Lidarr summary",
+        "fr": "Lire le résumé Sonarr/Radarr/Lidarr",
+        "de": "Sonarr/Radarr/Lidarr-Zusammenfassung lesen",
+        "es": "Leer el resumen de Sonarr/Radarr/Lidarr"
       },
       "description": {
         "en": "A sentence for a message: releases this week, queue, missing items, health issues.",
@@ -1059,10 +1259,10 @@
         "es": "Próximos estrenos"
       },
       "description": {
-        "en": "Episodes and movies of the week with their posters, and the state of the queues.",
-        "fr": "Épisodes et films de la semaine avec leurs affiches, et l'état des files.",
-        "de": "Episoden und Filme der Woche mit Postern und der Zustand der Warteschlangen.",
-        "es": "Episodios y películas de la semana con sus carteles, y el estado de las colas."
+        "en": "Episodes, movies and albums of the week with their posters, and the state of the queues.",
+        "fr": "Épisodes, films et albums de la semaine avec leurs affiches, et l'état des files.",
+        "de": "Episoden, Filme und Alben der Woche mit Postern und der Zustand der Warteschlangen.",
+        "es": "Episodios, películas y álbumes de la semana con sus carteles, y el estado de las colas."
       },
       "icon": "film",
       "action_timeout_seconds": 30,

@@ -51,7 +51,7 @@ function isAtLeast(version, required) {
 }
 
 test('identity: name, image, cover, local transport, multimedia category', () => {
-  assert.equal(manifest.name, 'Sonarr & Radarr');
+  assert.equal(manifest.name, 'Sonarr, Radarr & Lidarr');
   assert.equal(manifest.type, 'device');
   assert.match(manifest.docker_image, /^ghcr\.io\/guim31\/gladys-arr:/);
   assert.equal(

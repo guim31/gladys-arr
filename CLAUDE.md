@@ -36,7 +36,7 @@ src/app.js                        registers every SDK handler on the hub (shared
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults), slots, URL parsing
 src/hub.js                        one record per instance: timer, states, history and health events, commands
 src/devices.js                    one device per instance: features, names (4 languages), external ids
-src/arr/client.js                 Sonarr/Radarr API v3 client (X-Api-Key), error kinds, commands
+src/arr/client.js                 API client (v3 Sonarr/Radarr, v1 Lidarr, X-Api-Key), error kinds, commands
 src/arr/model.js                  pure parsers: queue, health, free space, calendar, history
 src/arr/http.js                   the only network function (node:http/https), the test seam
 src/widgets.js                    "Upcoming releases" widget (poster grid, posters via onWidgetGetImage)
@@ -45,7 +45,7 @@ src/texts.js                      messages in en/fr/de/es
 src/store.js                      /data/arr-state.json: history cursor, health issues announced
 gladys-assistant-integration.json manifest: name, config_schema, actions, triggers, widget...
 docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys, same sections
-test/                             node --test, fake Sonarr/Radarr (test/helpers) + the SDK's fake Gladys
+test/                             node --test, fake Sonarr/Radarr/Lidarr (test/helpers) + the SDK's fake Gladys
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -274,6 +274,23 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - La file de test (`sonarr-queue.json`) est construite à la main faute de client de téléchargement : les valeurs
   `trackedDownloadStatus` (`ok`/`warning`/`error`) et `status` sont celles de l'API, à revérifier sur une vraie
   file.
+- **Lidarr** (ajouté en 1.1.0) : **API v1** (`/api/v1/…`, même clé `X-Api-Key`), vérifiée le 16/10/2026 sur
+  `lscr.io/linuxserver/lidarr` (3.1.0.4875). Emplacements `lidarr_1`, `lidarr_2`, ajoutés après ceux de Radarr (les
+  identifiants publiés ne bougent pas). Lidarr ne sert pas `/api/v3` (404 vide) ni Sonarr/Radarr `/api/v1` : sur un
+  `not_arr`, le hub interroge l'autre version (`otherApp`) pour dire `wrong_app`. Le faire **dans le hub, après le
+  `Promise.all`** : dans `status()`, l'échec de `health()` arrive avant et masque la détection (relevé en test).
+- **Historique Lidarr** : un `trackFileImported` **par piste**, avec ou sans client de téléchargement
+  (`downloadImported`, par album, n'existe qu'avec un client) : filtrés sur le curseur **puis** regroupés par `albumId` (sinon une piste importée plus tard ramène tout l'album de la fenêtre d'une heure, relevé en relecture), un
+  seul événement par album (id et date de la dernière piste). Un album importé à cheval sur deux lectures est annoncé
+  deux fois (rare, documenté). `downloadFailed` est déjà par album. Titre = album, `label` = « Artiste – Album ».
+- **Pochettes Lidarr** : `/api/v1/mediacover/album/{id}/cover-250.jpg` renvoie la pochette **en taille réelle**
+  (1200 px, 458 Ko relevés), au-delà des 300 Ko de `validateWidgetImage`. Le widget prend l'affiche réduite de
+  l'artiste, `/api/v1/mediacover/artist/{artistId}/poster-250.jpg` (≈ 33 Ko), clé `poster-lidarr-<n>-<artistId>`.
+- **Calendrier Lidarr** : `releaseDate` est un jour à minuit UTC, lu comme les dates Radarr. « Téléchargé » =
+  `statistics.trackFileCount >= trackCount` (la release choisie), Lidarr n'a pas de `hasFile` d'album.
+- **Provoquer un import Lidarr** : l'import automatique (`DownloadedAlbumsScan`) refuse des MP3 muets étiquetés
+  (« Album match is not close enough: 77 % vs 80 % [tracks] »). Passer par `GET /manualimport?folder=…` puis la
+  commande `ManualImport` avec `artistId`, `albumId`, `albumReleaseId` et `trackIds` (`trackNumber` est une chaîne).
 - Une commande refusée (HTTP 4xx/5xx sur `/command`) ne met pas l'instance hors ligne : seule une erreur de
   connexion le fait. `Refresh*` s'exécute en arrière-plan côté Sonarr/Radarr : la relecture qui suit ne voit pas
   encore son résultat.

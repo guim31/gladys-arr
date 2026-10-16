@@ -3,7 +3,7 @@
 //
 // The use case: what comes out this week, at a glance on the wall tablet,
 // and whether the downloads are stuck. So the widget shows a poster grid of
-// the episodes and movies released from today to the next 6 days (a check
+// the episodes, movies and albums released from today to the next 6 days (a check
 // mark badge once downloaded), two tiles (queue, missing), one status row per
 // instance, and two direct buttons: search the missing ones, refresh.
 //
@@ -11,8 +11,8 @@
 // figures are sent as values, not bound to device features, so the widget
 // works before the devices are added to Gladys and sums several instances.
 //
-// Posters: Sonarr and Radarr keep a small copy of each poster (MediaCover,
-// ~250 px wide JPEG). The content declares a key per poster, Gladys asks for
+// Posters: Sonarr, Radarr and Lidarr keep a small copy of each poster
+// (MediaCover, ~250 px wide JPEG; for an album, the poster of its artist). The content declares a key per poster, Gladys asks for
 // its bytes through onWidgetGetImage, and the hub reads them from the
 // instance: the browser never loads a third-party URL.
 // -----------------------------------------------------------------------------
@@ -32,14 +32,14 @@ export const ACTIONS = Object.freeze({
 
 const MAX_CARDS = 12;
 const MAX_IMAGE_BYTES = 300 * 1024;
-const POSTER_KEY = /^poster-(sonarr|radarr)-(\d)-(\d{1,12})$/;
+const POSTER_KEY = /^poster-(sonarr|radarr|lidarr)-(\d)-(\d{1,12})$/;
 
 export const TEXT = {
   pick: {
-    en: 'Enter the address and API key of your Sonarr or Radarr in the configuration of the integration.',
-    fr: "Saisissez l'adresse et la clé d'API de votre Sonarr ou Radarr dans la configuration de l'intégration.",
-    de: 'Gib die Adresse und den API-Schlüssel deines Sonarr oder Radarr in der Konfiguration der Integration ein.',
-    es: 'Introduzca la dirección y la clave de API de su Sonarr o Radarr en la configuración de la integración.',
+    en: 'Enter the address and API key of your Sonarr, Radarr or Lidarr in the configuration of the integration.',
+    fr: "Saisissez l'adresse et la clé d'API de votre Sonarr, Radarr ou Lidarr dans la configuration de l'intégration.",
+    de: 'Gib die Adresse und den API-Schlüssel deines Sonarr, Radarr oder Lidarr in der Konfiguration der Integration ein.',
+    es: 'Introduzca la dirección y la clave de API de su Sonarr, Radarr o Lidarr en la configuración de la integración.',
   },
   unknown: {
     en: 'This instance is no longer in the configuration: choose another one in the widget settings.',
@@ -115,14 +115,16 @@ export const posterKey = (slot, mediaId) => `poster-${slot.replace('_', '-')}-${
 
 /** One card of the grid. */
 function card(record, item, language) {
+  // Under the series: its episode code; under the artist: the album.
   const isEpisode = item.kind === KINDS.SONARR;
-  const code = isEpisode ? item.subtitle.split(' · ')[0] : '';
+  const isAlbum = item.kind === KINDS.LIDARR;
+  const code = isEpisode ? item.subtitle.split(' · ')[0] : isAlbum ? item.subtitle : '';
   const title = fit(code ? `${item.title} · ${code}` : item.title, 60);
   const overview = item.overview
     .replace(/\r\n?/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
-  const description = [isEpisode ? item.subtitle : item.title, overview]
+  const description = [isEpisode || isAlbum ? item.subtitle : item.title, overview]
     .filter(Boolean)
     .join('\n\n');
   const badge = item.hasFile
@@ -173,7 +175,9 @@ function instanceRow(record, language) {
         : WIDGET_COLORS.SUCCESS;
   return {
     label,
-    icon: record.instance.kind === KINDS.SONARR ? 'tv' : 'film',
+    icon: { [KINDS.SONARR]: 'tv', [KINDS.RADARR]: 'film', [KINDS.LIDARR]: 'music' }[
+      record.instance.kind
+    ],
     value: fit(parts.join(' · '), 40),
     color,
   };
