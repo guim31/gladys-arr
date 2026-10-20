@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 // Conformity with the Gladys core, on every device discovered from realistic
-// fixtures (answers of real Sonarr 4, Radarr 6 and Lidarr 3 instances): one to
-// five instances, one that does not answer, in every feature-name language.
+// fixtures (answers of real Sonarr 4, Radarr 6, Lidarr 3, Prowlarr 2 and Bazarr 1
+// instances): one to seven instances, one that does not answer, in every feature-name language.
 //
 // The table (test/fixtures/gladys-feature-table.json) is extracted from the
 // core code: a category/type couple missing there shows as "undefined" or
@@ -14,7 +14,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { BOTH, FakeArr, LIDARR_URL, RADARR_URL, SONARR_URL, createWorld } from './helpers/world.js';
+import {
+  BAZARR_URL,
+  BOTH,
+  FakeArr,
+  FakeTool,
+  LIDARR_URL,
+  PROWLARR_URL,
+  RADARR_URL,
+  SONARR_URL,
+  createWorld,
+} from './helpers/world.js';
 
 const table = JSON.parse(
   await readFile(new URL('./fixtures/gladys-feature-table.json', import.meta.url), 'utf8'),
@@ -22,7 +32,7 @@ const table = JSON.parse(
 
 const SONARR_2 = 'https://198.51.100.20/sonarr';
 const RADARR_2 = 'http://198.51.100.30:7878';
-const fiveInstances = {
+const sevenInstances = {
   ...BOTH,
   sonarr_2_url: SONARR_2,
   sonarr_2_api_key: 'key-3',
@@ -31,6 +41,10 @@ const fiveInstances = {
   radarr_2_name: 'Radarr 4K',
   lidarr_1_url: LIDARR_URL,
   lidarr_1_api_key: 'key-5',
+  prowlarr_1_url: PROWLARR_URL,
+  prowlarr_1_api_key: 'key-p',
+  bazarr_1_url: BAZARR_URL,
+  bazarr_1_api_key: 'key-b',
 };
 
 const scenarios = [
@@ -39,10 +53,10 @@ const scenarios = [
     config: { sonarr_1_url: SONARR_URL, sonarr_1_api_key: 'key-1' },
     count: 1,
   },
-  { label: 'five instances', config: fiveInstances, count: 5 },
-  { label: 'French names', config: { ...fiveInstances, language: 'fr' }, count: 5 },
-  { label: 'German names', config: { ...fiveInstances, language: 'de' }, count: 5 },
-  { label: 'Spanish names', config: { ...fiveInstances, language: 'es' }, count: 5 },
+  { label: 'seven instances', config: sevenInstances, count: 7 },
+  { label: 'French names', config: { ...sevenInstances, language: 'fr' }, count: 7 },
+  { label: 'German names', config: { ...sevenInstances, language: 'de' }, count: 7 },
+  { label: 'Spanish names', config: { ...sevenInstances, language: 'es' }, count: 7 },
 ];
 
 const instances = () => {
@@ -54,6 +68,8 @@ const instances = () => {
     [SONARR_2]: new FakeArr({ kind: 'sonarr', apiKey: 'key-3', urlBase: '/sonarr' }),
     [RADARR_2]: offline,
     [LIDARR_URL]: new FakeArr({ kind: 'lidarr', apiKey: 'key-5' }),
+    [PROWLARR_URL]: new FakeTool({ kind: 'prowlarr', apiKey: 'key-p' }),
+    [BAZARR_URL]: new FakeTool({ kind: 'bazarr', apiKey: 'key-b' }),
   };
 };
 
