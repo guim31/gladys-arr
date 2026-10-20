@@ -102,7 +102,7 @@ export function parseInstanceUrl(raw) {
   // A path copied from the browser: keep the URL base, drop the page.
   const path = url.pathname
     .replace(
-      /\/(calendar|activity|wanted|settings|system|series|movies?|artist|album|add|indexers|search|history|blacklist)(\/.*)?$/i,
+      /\/(calendar|activity|wanted|settings|system|series|movie|artist|album|add)(\/.*)?$/i,
       '',
     )
     .replace(/\/+$/, '');

@@ -20,8 +20,8 @@ o en las [issues](https://github.com/guim31/gladys-arr/issues).
 - La **clave de API** de cada instancia: en Sonarr, Radarr o Lidarr, **Settings** →
   **General** → **Security** → **API Key**.
 
-- Opcionalmente **Prowlarr** (v1 o posterior, uno) y **Bazarr** (v1 o
-  posterior, uno): clave de API en **Settings** → **General** → **Security** →
+- Opcionalmente **Prowlarr** (v1 o posterior, uno) y **Bazarr** (1.x,
+  probado con 1.6, uno): clave de API en **Settings** → **General** → **Security** →
   **API Key**.
 
 ## Puesta en marcha
@@ -76,7 +76,7 @@ API** y **Nombre**. Cada uno tiene su dispositivo en la pestaña **Descubrir** y
 una línea en el widget. Probado con instancias reales de Prowlarr 2.6 y Bazarr
 1.6 (las imágenes Docker oficiales).
 
-El dispositivo Prowlarr (5 pequeñas peticiones por lectura, 6 una vez por hora):
+El dispositivo Prowlarr (4 pequeñas peticiones por lectura, 5 una vez por hora):
 
 | Función               | Qué es                                                                                                 |
 | --------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -89,7 +89,7 @@ El dispositivo Prowlarr (5 pequeñas peticiones por lectura, 6 una vez por hora)
 | Errores de estado     | Errores de System → Status                                                                             |
 | Versión               | Versión de Prowlarr                                                                                    |
 
-El dispositivo Bazarr (4 peticiones por lectura, 5 una vez por hora):
+El dispositivo Bazarr (3 peticiones por lectura, 4 una vez por hora):
 
 | Función                  | Qué es                                                                             |
 | ------------------------ | ---------------------------------------------------------------------------------- |
@@ -153,7 +153,7 @@ Prowlarr y Bazarr tienen sus propios disparadores:
 | Disparador                                    | Cuándo                                                                                           | Filtros   | Variables                                                     |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------------- |
 | Indexador de Prowlarr con error               | Prowlarr ha pausado un indexador tras errores                                                    | instancia | nombre de la instancia, indexador, en pausa hasta (fecha ISO) |
-| Indexador de Prowlarr restablecido            | Ese indexador vuelve a funcionar (su pausa ha terminado)                                         | instancia | nombre de la instancia, indexador                             |
+| Indexador de Prowlarr restablecido            | Prowlarr ha levantado la pausa de ese indexador (lo volverá a intentar)                          | instancia | nombre de la instancia, indexador                             |
 | Bazarr: subtítulos pendientes sobre el umbral | Los episodios y películas sin subtítulos alcanzan el umbral (una vez, hasta que vuelvan a bajar) | instancia | episodios, películas, total, umbral                           |
 | Proveedor de subtítulos de Bazarr con error   | Bazarr ha pausado un proveedor de subtítulos tras un error                                       | instancia | nombre de la instancia, proveedor, motivo, en pausa hasta     |
 
@@ -245,4 +245,8 @@ no tiene biblioteca: las acciones lo omiten.
 - Readarr y los clientes de descarga no están cubiertos. Un Prowlarr y un
   Bazarr como máximo.
 - El umbral de Bazarr cuenta juntos episodios y películas.
+- «Indexador de Prowlarr restablecido» significa que la pausa ha terminado, no
+  que el sitio funcione: un indexador que sigue caído vuelve a pausarse en el
+  siguiente error (con error, restablecido, con error… con pausas cada vez más
+  largas).
 - Sin relación con los proyectos Sonarr, Radarr, Lidarr, Prowlarr o Bazarr.

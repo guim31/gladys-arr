@@ -1381,10 +1381,10 @@
         "es": "Indexador de Prowlarr restablecido"
       },
       "description": {
-        "en": "An indexer Prowlarr had paused after failures works again.",
-        "fr": "Un indexeur que Prowlarr avait mis en pause après des échecs fonctionne de nouveau.",
-        "de": "Ein Indexer, den Prowlarr nach Fehlern pausiert hatte, funktioniert wieder.",
-        "es": "Un indexador que Prowlarr había pausado tras errores vuelve a funcionar."
+        "en": "Prowlarr lifted the pause of an indexer paused after failures: it will try it again.",
+        "fr": "Prowlarr a levé la pause d'un indexeur mis en pause après des échecs : il va le réessayer.",
+        "de": "Prowlarr hat die Pause eines nach Fehlern pausierten Indexers aufgehoben: Er wird erneut versucht.",
+        "es": "Prowlarr ha levantado la pausa de un indexador pausado tras errores: lo volverá a intentar."
       },
       "fields": [
         {

@@ -20,7 +20,7 @@ welcome on the [Gladys forum](https://community.gladysassistant.com) or in the
 - The **API key** of each instance: in Sonarr, Radarr or Lidarr, **Settings** →
   **General** → **Security** → **API Key**.
 
-- Optionally **Prowlarr** (v1 or later, one) and **Bazarr** (v1 or later, one):
+- Optionally **Prowlarr** (v1 or later, one) and **Bazarr** (1.x, tested on 1.6, one):
   API key in **Settings** → **General** → **Security** → **API Key**.
 
 ## Set up
@@ -74,7 +74,7 @@ get their own device in the **Discover** tab, and the widget gives them one
 line each. Tested against real Prowlarr 2.6 and Bazarr 1.6 instances (the
 official Docker images).
 
-The Prowlarr device (5 small requests per reading, 6 once an hour):
+The Prowlarr device (4 small requests per reading, 5 once an hour):
 
 | Feature          | What it is                                                                           |
 | ---------------- | ------------------------------------------------------------------------------------ |
@@ -87,7 +87,7 @@ The Prowlarr device (5 small requests per reading, 6 once an hour):
 | Health errors    | Errors of System → Status                                                            |
 | Version          | Version of Prowlarr                                                                  |
 
-The Bazarr device (4 requests per reading, 5 once an hour):
+The Bazarr device (3 requests per reading, 4 once an hour):
 
 | Feature                    | What it is                                                                    |
 | -------------------------- | ----------------------------------------------------------------------------- |
@@ -149,7 +149,7 @@ Prowlarr and Bazarr have their own triggers:
 | Trigger                                      | When                                                                                         | Filters  | Variables                                       |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
 | Prowlarr indexer failing                     | Prowlarr paused an indexer after failures                                                    | instance | instance name, indexer, paused until (ISO date) |
-| Prowlarr indexer back                        | That indexer works again (its pause is over)                                                 | instance | instance name, indexer                          |
+| Prowlarr indexer back                        | Prowlarr lifted the pause of that indexer (it will try it again)                             | instance | instance name, indexer                          |
 | Bazarr: missing subtitles over the threshold | The episodes and movies missing subtitles reach the threshold (once, until they go under it) | instance | episodes, movies, total, threshold              |
 | Bazarr subtitle provider failing             | Bazarr paused a subtitle provider after an error                                             | instance | instance name, provider, reason, paused until   |
 
@@ -234,4 +234,7 @@ skip it.
 - Readarr and the download clients are not covered. One Prowlarr and one
   Bazarr at most.
 - The Bazarr threshold counts episodes and movies together.
+- "Prowlarr indexer back" means the pause is over, not that the site works:
+  an indexer that stays down is paused again at the next failure (failing,
+  back, failing… with longer and longer pauses).
 - Not affiliated with the Sonarr, Radarr, Lidarr, Prowlarr or Bazarr projects.

@@ -35,7 +35,7 @@ download or a failing indexer.
 - Gladys Assistant 5.1.0 or later.
 - Sonarr v3 or v4, Radarr v3 or later and/or Lidarr v1 or later, reachable from
   Gladys, and the API key of each (Settings → General → Security).
-- Optionally Prowlarr v1 or later and Bazarr v1 or later (one of each), same
+- Optionally Prowlarr v1 or later and Bazarr 1.x (tested on 1.6), one of each, same
   place for the API key.
 
 ## Installation

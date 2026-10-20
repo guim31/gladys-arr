@@ -20,8 +20,8 @@ ou dans les [issues](https://github.com/guim31/gladys-arr/issues).
 - La **clé d'API** de chaque instance : dans Sonarr, Radarr ou Lidarr, **Settings** →
   **General** → **Security** → **API Key**.
 
-- En option, **Prowlarr** (v1 ou plus récent, un seul) et **Bazarr** (v1 ou
-  plus récent, un seul) : clé d'API dans **Settings** → **General** →
+- En option, **Prowlarr** (v1 ou plus récent, un seul) et **Bazarr** (1.x,
+  testé sur 1.6, un seul) : clé d'API dans **Settings** → **General** →
   **Security** → **API Key**.
 
 ## Mise en route
@@ -77,7 +77,7 @@ ont chacun leur appareil dans l'onglet **Découverte**, et une ligne dans le
 widget. Testé contre de vrais Prowlarr 2.6 et Bazarr 1.6 (images Docker
 officielles).
 
-L'appareil Prowlarr (5 petites requêtes par lecture, 6 une fois par heure) :
+L'appareil Prowlarr (4 petites requêtes par lecture, 5 une fois par heure) :
 
 | Fonctionnalité          | Ce que c'est                                                                                   |
 | ----------------------- | ---------------------------------------------------------------------------------------------- |
@@ -90,7 +90,7 @@ L'appareil Prowlarr (5 petites requêtes par lecture, 6 une fois par heure) :
 | Erreurs de santé        | Erreurs de System → Status                                                                     |
 | Version                 | Version de Prowlarr                                                                            |
 
-L'appareil Bazarr (4 requêtes par lecture, 5 une fois par heure) :
+L'appareil Bazarr (3 requêtes par lecture, 4 une fois par heure) :
 
 | Fonctionnalité            | Ce que c'est                                                                                           |
 | ------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -155,7 +155,7 @@ Prowlarr et Bazarr ont leurs propres déclencheurs :
 | Déclencheur                                     | Quand                                                                                                 | Filtres  | Variables                                                |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------- |
 | Indexeur Prowlarr en échec                      | Prowlarr a mis un indexeur en pause après des échecs                                                  | instance | nom de l'instance, indexeur, en pause jusqu'à (date ISO) |
-| Indexeur Prowlarr rétabli                       | Cet indexeur fonctionne de nouveau (sa pause est finie)                                               | instance | nom de l'instance, indexeur                              |
+| Indexeur Prowlarr rétabli                       | Prowlarr a levé la pause de cet indexeur (il va le réessayer)                                         | instance | nom de l'instance, indexeur                              |
 | Bazarr : sous-titres manquants au-delà du seuil | Les épisodes et films sans sous-titres atteignent le seuil (une fois, jusqu'à repasser sous le seuil) | instance | épisodes, films, total, seuil                            |
 | Fournisseur de sous-titres Bazarr en échec      | Bazarr a mis un fournisseur de sous-titres en pause après une erreur                                  | instance | nom de l'instance, fournisseur, raison, en pause jusqu'à |
 
@@ -252,4 +252,7 @@ Bazarr. Prowlarr n'a pas de bibliothèque : les actions le sautent.
 - Readarr et les clients de téléchargement ne sont pas couverts. Un Prowlarr et
   un Bazarr au plus.
 - Le seuil de Bazarr compte ensemble épisodes et films.
+- « Indexeur Prowlarr rétabli » veut dire que la pause est finie, pas que le
+  site marche : un indexeur toujours en panne repart en pause au prochain échec
+  (en échec, rétabli, en échec… avec des pauses de plus en plus longues).
 - Sans lien avec les projets Sonarr, Radarr, Lidarr, Prowlarr ou Bazarr.

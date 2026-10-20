@@ -435,6 +435,7 @@ export class ArrHub {
         snapshot.queue,
         snapshot.missing,
         snapshot.upcoming,
+        snapshot.indexers?.enabled,
         snapshot.indexers?.failing,
         snapshot.subtitles,
         snapshot.providers?.count,

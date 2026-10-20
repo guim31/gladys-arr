@@ -21,8 +21,8 @@ in den [Issues](https://github.com/guim31/gladys-arr/issues) willkommen.
 - Den **API-Schlüssel** jeder Instanz: in Sonarr, Radarr oder Lidarr unter
   **Settings** → **General** → **Security** → **API Key**.
 
-- Optional **Prowlarr** (v1 oder neuer, eins) und **Bazarr** (v1 oder neuer,
-  eins): API-Schlüssel unter **Settings** → **General** → **Security** → **API
+- Optional **Prowlarr** (v1 oder neuer, eins) und **Bazarr** (1.x, getestet mit
+  1.6, eins): API-Schlüssel unter **Settings** → **General** → **Security** → **API
   Key**.
 
 ## Einrichtung
@@ -77,7 +77,7 @@ Zwei optionale Abschnitte der Konfiguration, je eine Instanz:
 Widget. Getestet mit echten Instanzen von Prowlarr 2.6 und Bazarr 1.6 (die
 offiziellen Docker-Images).
 
-Das Prowlarr-Gerät (5 kleine Anfragen pro Abruf, 6 einmal pro Stunde):
+Das Prowlarr-Gerät (4 kleine Anfragen pro Abruf, 5 einmal pro Stunde):
 
 | Funktion            | Was es ist                                                                                           |
 | ------------------- | ---------------------------------------------------------------------------------------------------- |
@@ -90,7 +90,7 @@ Das Prowlarr-Gerät (5 kleine Anfragen pro Abruf, 6 einmal pro Stunde):
 | Zustandsfehler      | Fehler unter System → Status                                                                         |
 | Version             | Version von Prowlarr                                                                                 |
 
-Das Bazarr-Gerät (4 Anfragen pro Abruf, 5 einmal pro Stunde):
+Das Bazarr-Gerät (3 Anfragen pro Abruf, 4 einmal pro Stunde):
 
 | Funktion                 | Was es ist                                                                                |
 | ------------------------ | ----------------------------------------------------------------------------------------- |
@@ -153,7 +153,7 @@ Prowlarr und Bazarr haben eigene Auslöser:
 | Auslöser                                      | Wann                                                                                               | Filter  | Variablen                                           |
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------- |
 | Prowlarr-Indexer fehlerhaft                   | Prowlarr hat einen Indexer nach Fehlern pausiert                                                   | Instanz | Name der Instanz, Indexer, pausiert bis (ISO-Datum) |
-| Prowlarr-Indexer wieder da                    | Dieser Indexer funktioniert wieder (seine Pause ist vorbei)                                        | Instanz | Name der Instanz, Indexer                           |
+| Prowlarr-Indexer wieder da                    | Prowlarr hat die Pause dieses Indexers aufgehoben (er wird erneut versucht)                        | Instanz | Name der Instanz, Indexer                           |
 | Bazarr: fehlende Untertitel über der Schwelle | Episoden und Filme ohne Untertitel erreichen die Schwelle (einmal, bis sie wieder darunter liegen) | Instanz | Episoden, Filme, insgesamt, Schwelle                |
 | Bazarr-Untertitelanbieter fehlerhaft          | Bazarr hat einen Untertitelanbieter nach einem Fehler pausiert                                     | Instanz | Name der Instanz, Anbieter, Grund, pausiert bis     |
 
@@ -249,4 +249,7 @@ Prowlarr hat keine Bibliothek: Die Aktionen überspringen es.
 - Readarr und die Download-Clients sind nicht abgedeckt. Höchstens ein
   Prowlarr und ein Bazarr.
 - Die Bazarr-Schwelle zählt Episoden und Filme zusammen.
+- „Prowlarr-Indexer wieder da“ heißt, dass die Pause vorbei ist, nicht dass die
+  Seite funktioniert: Ein weiter ausgefallener Indexer wird beim nächsten Fehler
+  wieder pausiert (fehlerhaft, wieder da, fehlerhaft… mit immer längeren Pausen).
 - Nicht mit den Projekten Sonarr, Radarr, Lidarr, Prowlarr oder Bazarr verbunden.
