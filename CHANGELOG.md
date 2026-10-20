@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-20
+
 ### Added
 
 - Prowlarr (indexers, API v1), in a new configuration section: a device with
@@ -61,6 +63,7 @@ the notes of the version's GitHub Release.
   with their posters, the queues, and Search missing / Refresh buttons.
 - Documentation in English, French, German and Spanish.
 
-[Unreleased]: https://github.com/guim31/gladys-arr/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/guim31/gladys-arr/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/guim31/gladys-arr/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/guim31/gladys-arr/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/guim31/gladys-arr/releases/tag/v1.0.0
