@@ -17,10 +17,10 @@ export const INIT_FAILED = {
 
 export const CONNECTION_TEXT = {
   noInstance: {
-    en: 'Enter the address and API key of your Sonarr, Radarr or Lidarr in the configuration.',
-    fr: "Saisissez l'adresse et la clé d'API de votre Sonarr, Radarr ou Lidarr dans la configuration.",
-    de: 'Gib die Adresse und den API-Schlüssel deines Sonarr, Radarr oder Lidarr in der Konfiguration ein.',
-    es: 'Introduzca la dirección y la clave de API de su Sonarr, Radarr o Lidarr en la configuración.',
+    en: 'Enter the address and API key of your Sonarr, Radarr, Lidarr, Prowlarr or Bazarr in the configuration.',
+    fr: "Saisissez l'adresse et la clé d'API de votre Sonarr, Radarr, Lidarr, Prowlarr ou Bazarr dans la configuration.",
+    de: 'Gib die Adresse und den API-Schlüssel deines Sonarr, Radarr, Lidarr, Prowlarr oder Bazarr in der Konfiguration ein.',
+    es: 'Introduzca la dirección y la clave de API de su Sonarr, Radarr, Lidarr, Prowlarr o Bazarr en la configuración.',
   },
   invalid: {
     en: 'An instance is incomplete: address (e.g. http://192.168.1.2:8989) and API key.',
@@ -51,16 +51,16 @@ export const ERROR_TEXT = {
     es: 'clave de API rechazada',
   },
   [ERROR_KINDS.WRONG_APP]: {
-    en: 'this address is another application (Sonarr/Radarr/Lidarr): check the slot',
-    fr: "cette adresse est une autre application (Sonarr/Radarr/Lidarr) : vérifiez l'emplacement",
-    de: 'diese Adresse ist eine andere Anwendung (Sonarr/Radarr/Lidarr): Prüfe den Platz',
-    es: 'esta dirección es otra aplicación (Sonarr/Radarr/Lidarr): compruebe la ranura',
+    en: 'this address is another application (Sonarr, Radarr, Lidarr…): check the slot',
+    fr: "cette adresse est une autre application (Sonarr, Radarr, Lidarr…) : vérifiez l'emplacement",
+    de: 'diese Adresse ist eine andere Anwendung (Sonarr, Radarr, Lidarr…): Prüfe den Platz',
+    es: 'esta dirección es otra aplicación (Sonarr, Radarr, Lidarr…): compruebe la ranura',
   },
   [ERROR_KINDS.NOT_ARR]: {
-    en: 'no Sonarr, Radarr or Lidarr API at this address',
-    fr: 'aucune API Sonarr, Radarr ou Lidarr à cette adresse',
-    de: 'keine Sonarr-, Radarr- oder Lidarr-API unter dieser Adresse',
-    es: 'no hay ninguna API de Sonarr, Radarr o Lidarr en esta dirección',
+    en: 'no Sonarr, Radarr, Lidarr, Prowlarr or Bazarr API at this address',
+    fr: 'aucune API Sonarr, Radarr, Lidarr, Prowlarr ou Bazarr à cette adresse',
+    de: 'keine Sonarr-, Radarr-, Lidarr-, Prowlarr- oder Bazarr-API unter dieser Adresse',
+    es: 'no hay ninguna API de Sonarr, Radarr, Lidarr, Prowlarr o Bazarr en esta dirección',
   },
   [ERROR_KINDS.REDIRECT]: {
     en: 'the address redirects: enter the final address, with its URL base',
@@ -80,24 +80,38 @@ export const ERROR_TEXT = {
 export const REPORT_TEXT = {
   en: {
     ok: (version) => `OK, version ${version}`,
+    indexers: (enabled, failing) =>
+      `${enabled} indexer(s) enabled${failing ? `, ${failing} failing` : ''}`,
+    subtitles: (episodes, movies) =>
+      `${episodes} episode(s) and ${movies} movie(s) missing subtitles`,
     queue: (count) => `${count} in queue`,
     missing: (count) => `${count} missing`,
     health: (count) => `${count} health issue(s)`,
   },
   fr: {
     ok: (version) => `OK, version ${version}`,
+    indexers: (enabled, failing) =>
+      `${enabled} indexeur(s) actif(s)${failing ? `, ${failing} en échec` : ''}`,
+    subtitles: (episodes, movies) => `${episodes} épisode(s) et ${movies} film(s) sans sous-titres`,
     queue: (count) => `${count} en file`,
     missing: (count) => `${count} manquant(s)`,
     health: (count) => `${count} alerte(s) de santé`,
   },
   de: {
     ok: (version) => `OK, Version ${version}`,
+    indexers: (enabled, failing) =>
+      `${enabled} aktive(r) Indexer${failing ? `, ${failing} fehlerhaft` : ''}`,
+    subtitles: (episodes, movies) => `${episodes} Episode(n) und ${movies} Film(e) ohne Untertitel`,
     queue: (count) => `${count} in der Warteschlange`,
     missing: (count) => `${count} fehlend`,
     health: (count) => `${count} Zustandsmeldung(en)`,
   },
   es: {
     ok: (version) => `OK, versión ${version}`,
+    indexers: (enabled, failing) =>
+      `${enabled} indexador(es) activo(s)${failing ? `, ${failing} con error` : ''}`,
+    subtitles: (episodes, movies) =>
+      `${episodes} episodio(s) y ${movies} película(s) sin subtítulos`,
     queue: (count) => `${count} en cola`,
     missing: (count) => `${count} pendiente(s)`,
     health: (count) => `${count} aviso(s) de estado`,
@@ -114,6 +128,11 @@ export const SUMMARY_TEXT = {
     missing: (count) => `${count} missing`,
     health: (count) => `${count} health issue(s)`,
     down: 'not answering',
+    indexers: (enabled, failing) =>
+      `${enabled} indexer(s) enabled${failing ? `, ${failing} failing` : ''}`,
+    subtitles: (episodes, movies) =>
+      `${episodes} episode(s) and ${movies} movie(s) missing subtitles`,
+    providers: (count) => `${count} provider(s) failing`,
   },
   fr: {
     episodes: (count) => `${count} épisode(s) cette semaine`,
@@ -123,6 +142,10 @@ export const SUMMARY_TEXT = {
     missing: (count) => `${count} manquant(s)`,
     health: (count) => `${count} alerte(s) de santé`,
     down: 'ne répond pas',
+    indexers: (enabled, failing) =>
+      `${enabled} indexeur(s) actif(s)${failing ? `, ${failing} en échec` : ''}`,
+    subtitles: (episodes, movies) => `${episodes} épisode(s) et ${movies} film(s) sans sous-titres`,
+    providers: (count) => `${count} fournisseur(s) en échec`,
   },
   de: {
     episodes: (count) => `${count} Episode(n) diese Woche`,
@@ -133,6 +156,10 @@ export const SUMMARY_TEXT = {
     missing: (count) => `${count} fehlend`,
     health: (count) => `${count} Zustandsmeldung(en)`,
     down: 'antwortet nicht',
+    indexers: (enabled, failing) =>
+      `${enabled} aktive(r) Indexer${failing ? `, ${failing} fehlerhaft` : ''}`,
+    subtitles: (episodes, movies) => `${episodes} Episode(n) und ${movies} Film(e) ohne Untertitel`,
+    providers: (count) => `${count} fehlerhafte(r) Anbieter`,
   },
   es: {
     episodes: (count) => `${count} episodio(s) esta semana`,
@@ -142,22 +169,33 @@ export const SUMMARY_TEXT = {
     missing: (count) => `${count} pendiente(s)`,
     health: (count) => `${count} aviso(s) de estado`,
     down: 'no responde',
+    indexers: (enabled, failing) =>
+      `${enabled} indexador(es) activo(s)${failing ? `, ${failing} con error` : ''}`,
+    subtitles: (episodes, movies) =>
+      `${episodes} episodio(s) y ${movies} película(s) sin subtítulos`,
+    providers: (count) => `${count} proveedor(es) con error`,
   },
 };
 
 // Errors of the scene actions and widget buttons (shown in Gladys).
 export const ACTION_TEXT = {
   noInstance: {
-    en: 'No Sonarr, Radarr or Lidarr is configured.',
-    fr: "Aucun Sonarr, Radarr ni Lidarr n'est configuré.",
-    de: 'Kein Sonarr, Radarr oder Lidarr ist konfiguriert.',
-    es: 'No hay ningún Sonarr, Radarr ni Lidarr configurado.',
+    en: 'No Sonarr, Radarr, Lidarr, Prowlarr or Bazarr is configured.',
+    fr: "Aucun Sonarr, Radarr, Lidarr, Prowlarr ni Bazarr n'est configuré.",
+    de: 'Kein Sonarr, Radarr, Lidarr, Prowlarr oder Bazarr ist konfiguriert.',
+    es: 'No hay ningún Sonarr, Radarr, Lidarr, Prowlarr ni Bazarr configurado.',
   },
   unknownInstance: {
     en: 'This instance is no longer in the configuration.',
     fr: "Cette instance n'est plus dans la configuration.",
     de: 'Diese Instanz ist nicht mehr in der Konfiguration.',
     es: 'Esta instancia ya no está en la configuración.',
+  },
+  unsupported: {
+    en: 'Prowlarr has no library: choose a Sonarr, Radarr, Lidarr or Bazarr.',
+    fr: "Prowlarr n'a pas de bibliothèque : choisissez un Sonarr, Radarr, Lidarr ou Bazarr.",
+    de: 'Prowlarr hat keine Bibliothek: Wähle ein Sonarr, Radarr, Lidarr oder Bazarr.',
+    es: 'Prowlarr no tiene biblioteca: elija un Sonarr, Radarr, Lidarr o Bazarr.',
   },
   failed: {
     en: 'No instance accepted the command.',

@@ -34,18 +34,18 @@ pushing.
 index.js                          SDK wiring only: handlers registered before connect()
 src/app.js                        registers every SDK handler on the hub (shared with the tests)
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults), slots, URL parsing
-src/hub.js                        one record per instance: timer, states, history and health events, commands
-src/devices.js                    one device per instance: features, names (4 languages), external ids
-src/arr/client.js                 API client (v3 Sonarr/Radarr, v1 Lidarr, X-Api-Key), error kinds, commands
-src/arr/model.js                  pure parsers: queue, health, free space, calendar, history
+src/hub.js                        one record per instance: timer, states, history, health, indexer and subtitle events, commands
+src/devices.js                    one device per instance: features per application, names (4 languages), external ids
+src/arr/client.js                 API client (v3 Sonarr/Radarr, v1 Lidarr/Prowlarr, Bazarr), error kinds, commands
+src/arr/model.js                  pure parsers: queue, health, free space, calendar, history, indexers, subtitles
 src/arr/http.js                   the only network function (node:http/https), the test seam
 src/widgets.js                    "Upcoming releases" widget (poster grid, posters via onWidgetGetImage)
 src/scenes.js                     scene action handlers (manifest `scene_actions`)
 src/texts.js                      messages in en/fr/de/es
-src/store.js                      /data/arr-state.json: history cursor, health issues announced
+src/store.js                      /data/arr-state.json: history cursor, health issues, indexers, providers, threshold state
 gladys-assistant-integration.json manifest: name, config_schema, actions, triggers, widget...
 docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys, same sections
-test/                             node --test, fake Sonarr/Radarr/Lidarr (test/helpers) + the SDK's fake Gladys
+test/                             node --test, fake *arr instances (test/helpers) + the SDK's fake Gladys
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -294,3 +294,24 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Une commande refusée (HTTP 4xx/5xx sur `/command`) ne met pas l'instance hors ligne : seule une erreur de
   connexion le fait. `Refresh*` s'exécute en arrière-plan côté Sonarr/Radarr : la relecture qui suit ne voit pas
   encore son résultat.
+- **Prowlarr et Bazarr** (ajoutés en 1.2.0, vérifiés le 20/10/2026 sur `lscr.io/linuxserver/prowlarr` 2.6.5 et
+  `bazarr` 1.6.2) : un emplacement chacun (`prowlarr_1`, `bazarr_1`), après ceux de Lidarr. Pas de bibliothèque :
+  leurs appareils ont leurs propres fonctionnalités (`featuresOf`), la liste des appareils Sonarr/Radarr/Lidarr ne
+  bouge pas (un test fige ses `external_id`). Les événements viennent de la différence entre deux lectures, mémorisée
+  dans `/data` comme la santé (`remember`) : première lecture = point de départ.
+- **Prowlarr** : API v1, `/indexerstatus` ne liste que les indexeurs **bloqués** (`disabledTill` dans le futur).
+  `/indexerstats?startDate&endDate` donne requêtes et récupérations par indexeur (agrégat en base, léger). Une
+  recherche en échec n'écrit rien dans `/history`. Lidarr sert aussi `/api/v1/indexer…` : une route absente peut répondre
+  un 404 **en JSON** (non vérifié sur un vrai Lidarr pour `/indexerstats`), donc `otherApp` sonde aussi sur un 404
+  HTTP, et teste la même version (Prowlarr dans un emplacement Lidarr). Provoquer un échec : un faux Torznab (petit serveur Python qui sert les caps et un flux RSS avec
+  `enclosure`, sinon « no results » refuse l'ajout), l'ajouter, chercher, l'arrêter, chercher.
+- **Bazarr** : API sans version (`/api/...`), réponses dans `data`, clé `X-API-KEY` (insensible à la casse : le
+  client envoie `X-Api-Key` partout). **Toute adresse inconnue répond 200 en HTML** (l'interface web) : le JSON
+  invalide devient `not_arr`. `/api/system/status` → `data.bazarr_version`, pas d'`appName`. `/api/badges` donne
+  `episodes`, `movies` (sous-titres manquants) et `providers` (bloqués). **`/api/providers` liste tous les
+  fournisseurs activés**, les sains avec `status: "Good"` et `retry: "-"`. `/api/system/health` : `{object, issue}`
+  sans niveau (comptés en avertissements). Les commandes sont des tâches (`POST /api/system/tasks?taskid=…`, 204) ;
+  une tâche absente répond 500, et les tâches `wanted_search_missing_subtitles_*` / `update_*` n'existent que si
+  Sonarr ou Radarr est activé dans Bazarr : le client lit `GET /system/tasks` d'abord.
+- Seuil Bazarr : champ `number` `bazarr_1_missing_threshold` (20), déclencheur à la montée seulement (une fois,
+  jusqu'à repasser sous le seuil) : les filtres de scène ne savent pas faire de seuil.

@@ -32,15 +32,17 @@ In scope: the code of this repository and the Docker image it publishes.
 
 What the integration handles:
 
-- **Secrets**: the Sonarr, Radarr and Lidarr API keys are `secret` fields of the
+- **Secrets**: the Sonarr, Radarr, Lidarr, Prowlarr and Bazarr API keys are `secret` fields of the
   Gladys configuration. The integration reads them from Gladys at startup,
   keeps them in memory, sends them only to the instance they belong to (in the
   `X-Api-Key` header, never in a URL), and never writes them to `/data` nor to
   the logs.
 - **Stored in `/data`**: `arr-state.json`, the id of the last history event
   read per instance (with its address) and the health checks already
-  announced to the scenes. Nothing else.
-- **Network**: requests go only to the Sonarr, Radarr and Lidarr addresses typed in the
+  announced to the scenes; for Prowlarr and Bazarr, the ids of the indexers
+  paused, the names of the subtitle providers throttled, and whether the
+  missing subtitles were over the threshold. Nothing else.
+- **Network**: requests go only to the Sonarr, Radarr, Lidarr, Prowlarr and Bazarr addresses typed in the
   configuration, on the local network, in HTTP or HTTPS (certificates
   verified). The posters shown by the widget are read from these instances,
   never from the Internet. The integration opens no port and calls no cloud

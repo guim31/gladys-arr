@@ -1,4 +1,4 @@
-# Sonarr, Radarr & Lidarr
+# Sonarr, Radarr, Lidarr & co
 
 Amenez votre [Sonarr](https://sonarr.tv) (séries), votre
 [Radarr](https://radarr.video) (films) et votre [Lidarr](https://lidarr.audio)
@@ -19,6 +19,10 @@ ou dans les [issues](https://github.com/guim31/gladys-arr/issues).
   récent, joignables depuis Gladys (même réseau). Jusqu'à deux de chaque.
 - La **clé d'API** de chaque instance : dans Sonarr, Radarr ou Lidarr, **Settings** →
   **General** → **Security** → **API Key**.
+
+- En option, **Prowlarr** (v1 ou plus récent, un seul) et **Bazarr** (v1 ou
+  plus récent, un seul) : clé d'API dans **Settings** → **General** →
+  **Security** → **API Key**.
 
 ## Mise en route
 
@@ -63,6 +67,43 @@ Lidarr.
 | Avertissements de santé                                                                     | Avertissements de System → Status (indexeur, client de téléchargement…)                         |
 | Erreurs de santé                                                                            | Erreurs de System → Status                                                                      |
 | Version                                                                                     | Version de Sonarr, Radarr ou Lidarr                                                             |
+
+## Prowlarr et Bazarr
+
+Deux sections facultatives de la configuration, une instance chacune :
+**Prowlarr (indexeurs)** (port `9696` par défaut) et **Bazarr (sous-titres)**
+(port `6767`), avec les mêmes champs **Adresse**, **Clé d'API** et **Nom**. Ils
+ont chacun leur appareil dans l'onglet **Découverte**, et une ligne dans le
+widget. Testé contre de vrais Prowlarr 2.6 et Bazarr 1.6 (images Docker
+officielles).
+
+L'appareil Prowlarr (5 petites requêtes par lecture, 6 une fois par heure) :
+
+| Fonctionnalité          | Ce que c'est                                                                                   |
+| ----------------------- | ---------------------------------------------------------------------------------------------- |
+| En ligne                | 1 tant que Prowlarr répond                                                                     |
+| Indexeurs actifs        | Indexeurs activés dans Prowlarr                                                                |
+| Indexeurs en échec      | Indexeurs mis en pause par Prowlarr après des échecs (site en panne, connexion refusée, quota) |
+| Requêtes (24 h)         | Requêtes envoyées aux indexeurs sur les dernières 24 heures                                    |
+| Récupérations (24 h)    | Releases récupérées via Prowlarr sur les dernières 24 heures                                   |
+| Avertissements de santé | Avertissements de System → Status                                                              |
+| Erreurs de santé        | Erreurs de System → Status                                                                     |
+| Version                 | Version de Prowlarr                                                                            |
+
+L'appareil Bazarr (4 requêtes par lecture, 5 une fois par heure) :
+
+| Fonctionnalité            | Ce que c'est                                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------ |
+| En ligne                  | 1 tant que Bazarr répond                                                                               |
+| Épisodes sans sous-titres | Épisodes en attente de sous-titres (Wanted → Series), comptés par Bazarr                               |
+| Films sans sous-titres    | Films en attente de sous-titres (Wanted → Movies)                                                      |
+| Fournisseurs en échec     | Fournisseurs de sous-titres mis en pause par Bazarr après une erreur (System → Providers)              |
+| Avertissements de santé   | Problèmes de System → Status (Bazarr ne leur donne pas de niveau : tous comptent comme avertissements) |
+| Version                   | Version de Bazarr                                                                                      |
+
+Le **Seuil de sous-titres manquants** de la section Bazarr (20 par défaut) est
+le nombre d'épisodes et de films sans sous-titres à partir duquel le
+déclencheur ci-dessous part.
 
 ## Tableau de bord
 
@@ -109,16 +150,35 @@ Pour Lidarr, le titre est celui de l'album, et le titre avec artiste donne
 « Radiohead – The King of Limbs ». Lidarr enregistre un import par piste : les
 pistes d'un album lues ensemble font un seul événement. Des pistes importées plus tard (une piste manquante, une amélioration de qualité) annoncent de nouveau l'album ; un album dont les pistes sont importées sur deux lectures (rare : un import prend quelques secondes) est annoncé deux fois.
 
+Prowlarr et Bazarr ont leurs propres déclencheurs :
+
+| Déclencheur                                     | Quand                                                                                                 | Filtres  | Variables                                                |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------- |
+| Indexeur Prowlarr en échec                      | Prowlarr a mis un indexeur en pause après des échecs                                                  | instance | nom de l'instance, indexeur, en pause jusqu'à (date ISO) |
+| Indexeur Prowlarr rétabli                       | Cet indexeur fonctionne de nouveau (sa pause est finie)                                               | instance | nom de l'instance, indexeur                              |
+| Bazarr : sous-titres manquants au-delà du seuil | Les épisodes et films sans sous-titres atteignent le seuil (une fois, jusqu'à repasser sous le seuil) | instance | épisodes, films, total, seuil                            |
+| Fournisseur de sous-titres Bazarr en échec      | Bazarr a mis un fournisseur de sous-titres en pause après une erreur                                  | instance | nom de l'instance, fournisseur, raison, en pause jusqu'à |
+
+Le déclencheur _Nouvelle alerte de santé_ couvre aussi Prowlarr et Bazarr
+(filtre d'application). Comme pour les alertes de santé, l'état trouvé à la
+première lecture d'une instance est le point de départ : un indexeur déjà en
+pause, ou des sous-titres déjà au-delà du seuil, ne sont pas annoncés.
+
 ### Actions
 
-| Action                                              | Ce qu'elle fait                                                                                                                       | Sorties                                      |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Chercher les épisodes, films ou albums manquants    | Lance la recherche de tous les épisodes, films ou albums surveillés manquants, sur une instance ou toutes                             | instances ayant lancé la recherche           |
-| Rafraîchir la bibliothèque Sonarr, Radarr ou Lidarr | Demande le rafraîchissement des informations et fichiers de chaque série, film ou artiste (exécuté en arrière-plan par l'application) | instances rafraîchies                        |
-| Lire le résumé Sonarr/Radarr/Lidarr                 | Construit une phrase : sorties de la semaine, file, manquants, alertes de santé                                                       | phrase, sorties, éléments en file, manquants |
+| Action                                                      | Ce qu'elle fait                                                                                                                       | Sorties                                      |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Chercher épisodes, films, albums ou sous-titres manquants   | Lance la recherche de tous les épisodes, films ou albums surveillés manquants, sur une instance ou toutes                             | instances ayant lancé la recherche           |
+| Rafraîchir la bibliothèque Sonarr, Radarr, Lidarr ou Bazarr | Demande le rafraîchissement des informations et fichiers de chaque série, film ou artiste (exécuté en arrière-plan par l'application) | instances rafraîchies                        |
+| Lire le résumé *arr                                         | Construit une phrase : sorties de la semaine, file, manquants, alertes de santé                                                       | phrase, sorties, éléments en file, manquants |
 
 Rien n'est jamais supprimé : l'intégration lit, et lance des recherches et des
 rafraîchissements.
+
+Sur Bazarr, la recherche lance ses tâches « recherche des sous-titres
+manquants » (séries et films) et le rafraîchissement sa synchronisation avec
+Sonarr et Radarr ; ces tâches n'existent que si Sonarr ou Radarr est activé dans
+Bazarr. Prowlarr n'a pas de bibliothèque : les actions le sautent.
 
 ### Idées de scènes
 
@@ -129,13 +189,18 @@ rafraîchissements.
   l'application _Lidarr_, puis une notification avec _Titre avec épisode
   (S01E02), année ou artiste_ : « Radiohead – The King of Limbs est dans la
   bibliothèque ».
-- **Résumé du matin** : chaque jour à 8 h, _Lire le résumé Sonarr/Radarr/Lidarr_, puis
+- **Résumé du matin** : chaque jour à 8 h, _Lire le résumé \*arr_, puis
   envoyer sa phrase sur Telegram ou la faire dire par l'enceinte.
 - **Téléchargements bloqués** : déclencheur _Téléchargement en échec_, puis un
   message avec la raison ; ou une scène sur la fonctionnalité _Téléchargements
   en erreur_ au-dessus de 0.
-- **Rattrapage hebdomadaire** : chaque dimanche soir, _Chercher les épisodes,
-  films ou albums manquants_.
+- **Rattrapage hebdomadaire** : chaque dimanche soir, _Chercher épisodes, films, albums ou sous-titres manquants_.
+
+- **Indexeur en panne** : déclencheur _Indexeur Prowlarr en échec_, puis une
+  notification « Indexeur {{indexer}} en pause jusqu'à {{until}} ».
+- **Sous-titres en retard** : déclencheur _Bazarr : sous-titres manquants au-delà
+  du seuil_, puis _Chercher épisodes, films, albums ou sous-titres manquants_ sur
+  l'appareil Bazarr.
 
 ## Dépannage
 
@@ -150,7 +215,7 @@ rafraîchissements.
 - **« cette adresse est une autre application »** : une adresse de Radarr dans
   une section Sonarr, un Sonarr dans une section Lidarr… (avec la clé de cette autre application ;
   avec la bonne clé, une mauvaise adresse répond « clé d'API refusée »).
-- **« aucune API Sonarr, Radarr ou Lidarr à cette adresse »** ou **« l'adresse
+- **« aucune API Sonarr, Radarr, Lidarr, Prowlarr ou Bazarr à cette adresse »** ou **« l'adresse
   redirige »** : une instance derrière un proxy inverse demande sa base d'URL
   (`https://example.org/sonarr`), et une page de connexion du proxy bloque
   l'API : utilisez l'adresse locale.
@@ -160,6 +225,14 @@ rafraîchissements.
   elle arrive au prochain rafraîchissement de la série, du film ou de l'artiste.
   Un artiste sans affiche sur le serveur de métadonnées de Lidarr laisse ses
   albums sans image.
+
+- **Bazarr « clé d'API refusée »** : la clé est dans Bazarr, Settings → General
+  → Security. Bazarr répond à toute autre adresse par sa page web : une adresse
+  de Sonarr dans la section Bazarr donne « cette adresse est une autre
+  application ».
+- **Bazarr « Aucune instance n'a accepté la commande »** : Sonarr et Radarr ne
+  sont pas activés dans Bazarr (Settings → Sonarr / Radarr), il n'a rien à
+  chercher.
 
 ## Limites
 
@@ -176,5 +249,7 @@ rafraîchissements.
 - Lidarr ne garde les pochettes d'album qu'en taille réelle (souvent plus que
   les 300 Ko permis pour une image de widget) : les cartes montrent l'affiche
   de l'artiste.
-- Readarr, Prowlarr et les clients de téléchargement ne sont pas couverts.
-- Sans lien avec les projets Sonarr, Radarr ou Lidarr.
+- Readarr et les clients de téléchargement ne sont pas couverts. Un Prowlarr et
+  un Bazarr au plus.
+- Le seuil de Bazarr compte ensemble épisodes et films.
+- Sans lien avec les projets Sonarr, Radarr, Lidarr, Prowlarr ou Bazarr.

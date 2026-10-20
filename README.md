@@ -1,21 +1,27 @@
-# Sonarr, Radarr & Lidarr for Gladys Assistant
+# Sonarr, Radarr, Lidarr, Prowlarr & Bazarr for Gladys Assistant
 
 An external integration for [Gladys Assistant](https://gladysassistant.com)
 that brings [Sonarr](https://sonarr.tv) (series),
 [Radarr](https://radarr.video) (movies) and [Lidarr](https://lidarr.audio)
-(music) into Gladys, over the local network:
-what comes out this week, the download queues, the missing items, the health
-alerts, and scenes that react to a finished download.
+(music), with [Prowlarr](https://prowlarr.com) (indexers) and
+[Bazarr](https://www.bazarr.media) (subtitles), into Gladys, over the local
+network: what comes out this week, the download queues, the missing items, the
+indexers and subtitles, the health alerts, and scenes that react to a finished
+download or a failing indexer.
 
 ## Features
 
 - **One device per instance**, up to two Sonarr, two Radarr and two Lidarr:
   online, download queue, downloads in error, missing episodes, movies or albums, releases of the next 7
   days, free space of the root folders, health warnings and errors, version.
+- **Prowlarr and Bazarr devices** (one of each): enabled and failing indexers,
+  queries and grabs of the last 24 hours; episodes and movies missing
+  subtitles, failing subtitle providers; health and version.
 - **Scene triggers**: episode, movie or album downloaded, download failed, new health
-  issue — read from the history and the health checks of each instance, each
+  issue, Prowlarr indexer failing or back, Bazarr missing subtitles over a
+  threshold (20 by default), Bazarr provider failing — read from the history and the health checks of each instance, each
   event announced once, also across restarts.
-- **Scene actions**: search missing episodes, movies or albums, refresh the library,
+- **Scene actions**: search missing episodes, movies, albums or subtitles, refresh the library,
   read a summary sentence (for a notification or a speaker). Nothing
   destructive.
 - **"Upcoming releases" widget**: the episodes, movies and albums of the week as
@@ -29,15 +35,18 @@ alerts, and scenes that react to a finished download.
 - Gladys Assistant 5.1.0 or later.
 - Sonarr v3 or v4, Radarr v3 or later and/or Lidarr v1 or later, reachable from
   Gladys, and the API key of each (Settings → General → Security).
+- Optionally Prowlarr v1 or later and Bazarr v1 or later (one of each), same
+  place for the API key.
 
 ## Installation
 
 1. In Gladys, open **Integrations** → **Install from GitHub** and enter the
    address of this repository: `https://github.com/guim31/gladys-arr` (or
-   install **Sonarr, Radarr & Lidarr** from the catalog).
+   install **Sonarr, Radarr, Lidarr & co** from the catalog).
 2. In **Configuration**, enter the address of your Sonarr (`192.168.1.2:8989`,
    or `https://example.org/sonarr` with a URL base) and its API key, then the
-   same for Radarr (`:7878`) and Lidarr (`:8686`). Save, then click **Test the connection**.
+   same for Radarr (`:7878`), Lidarr (`:8686`), Prowlarr (`:9696`) and Bazarr
+   (`:6767`). Save, then click **Test the connection**.
 3. Open the **Discover** tab and add the devices.
 
 The user guide is in [`docs/en.md`](docs/en.md) (also in
@@ -49,6 +58,10 @@ links it from the Configuration screen.
 The integration reads each instance on its own timer (1 to 10 minutes, 2 by
 default) through the documented API (v3 for Sonarr and Radarr, v1 for Lidarr): `/system/status` (hourly), `/health`,
 `/queue`, `/wanted/missing`, `/rootfolder`, `/calendar` and `/history/since`.
+Prowlarr (API v1): `/indexer`, `/indexerstatus`, `/indexerstats` and `/health`;
+Bazarr (its own API): `/api/badges`, `/api/providers` and `/api/system/health`.
+Their events (indexer paused or back, provider throttled, threshold crossed)
+come from the difference between two readings, remembered in `/data`.
 States are published only when they change (and every 12 hours otherwise).
 The devices are published with `should_poll: false`: Gladys does not poll
 them.
@@ -70,7 +83,10 @@ Tested with the official `lscr.io/linuxserver/sonarr` (Sonarr 4.0.20) and
 `lscr.io/linuxserver/lidarr` (an artist, a real eight-track import, calendar,
 missing albums, health, commands, artist posters): series and movies added
 through the API, real imports, calendar, missing items, health checks, root
-folders, commands, posters; the fixtures of the tests are their answers. Not
+folders, commands, posters; the fixtures of the tests are their answers.
+Prowlarr 2.6.5 (`lscr.io/linuxserver/prowlarr`) with a test indexer really
+paused after failures, and Bazarr 1.6.2 (`lscr.io/linuxserver/bazarr`) with
+its providers, health checks and tasks. Not
 checked yet in a real Gladys installation, nor with a download client (the
 queue fixture is built from the API shapes), nor on Sonarr v3: feedback
 welcome in the [issues](https://github.com/guim31/gladys-arr/issues).
@@ -86,7 +102,10 @@ welcome in the [issues](https://github.com/guim31/gladys-arr/issues).
   the artist. A Lidarr import is announced once per album when its tracks are
   read in the same refresh (an album split across two readings is announced
   twice).
-- Readarr, Prowlarr and the download clients are not covered.
+- One Prowlarr and one Bazarr at most. The missing subtitles counts and a
+  throttled provider were not observed with real content (no Sonarr/Radarr
+  library behind the test Bazarr): their shapes come from the Bazarr API.
+- Readarr and the download clients are not covered.
 
 ## Development
 
@@ -98,7 +117,7 @@ npm test
 npx -y github:GladysAssistant/integration-store --skip-image-check .
 ```
 
-The tests run against fake Sonarr, Radarr and Lidarr instances built from real answers
+The tests run against fake Sonarr, Radarr, Lidarr, Prowlarr and Bazarr instances built from real answers
 (`test/fixtures/arr/`) and the fake Gladys of the SDK; they never touch the
 network. See [`CLAUDE.md`](CLAUDE.md) for the project rules.
 
@@ -106,7 +125,8 @@ network. See [`CLAUDE.md`](CLAUDE.md) for the project rules.
 
 - [Sonarr](https://github.com/Sonarr/Sonarr),
   [Radarr](https://github.com/Radarr/Radarr) and
-  [Lidarr](https://github.com/Lidarr/Lidarr) (GPL-3.0) and their
+  [Lidarr](https://github.com/Lidarr/Lidarr), [Prowlarr](https://github.com/Prowlarr/Prowlarr)
+  and [Bazarr](https://github.com/morpheus65535/bazarr) (GPL-3.0) and their
   [API documentation](https://wiki.servarr.com); the Home Assistant
   [Sonarr](https://www.home-assistant.io/integrations/sonarr/) and
   [Radarr](https://www.home-assistant.io/integrations/radarr/) and
@@ -118,7 +138,7 @@ network. See [`CLAUDE.md`](CLAUDE.md) for the project rules.
 
 ## Disclaimer
 
-Not affiliated with, nor endorsed by, the Sonarr, Radarr or Lidarr projects.
+Not affiliated with, nor endorsed by, the Sonarr, Radarr, Lidarr, Prowlarr or Bazarr projects.
 Sonarr, Radarr and Lidarr are the names of their respective projects.
 
 ## License

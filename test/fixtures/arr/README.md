@@ -20,3 +20,16 @@ lists trimmed (releases, links, media, genres). Edited: the release date of
 `A Moon Shaped Pool` in `lidarr-calendar.json`, moved to 2026-10-16 so that the
 week of the test clock has an album. Lidarr has the same empty queue as Radarr
 in the tests (`sonarr-queue-empty.json`).
+
+Prowlarr (API v1): captured on 20/10/2026 from `lscr.io/linuxserver/prowlarr`
+(Prowlarr 2.6.5.5623), with three Generic Torznab indexers: two disabled, one
+enabled behind a small fake Torznab server, used for one search, then stopped
+so that the next search paused it (`prowlarr-indexerstatus.json`, the
+`IndexerStatusCheck` of `prowlarr-health.json`). Edited: the indexer addresses
+(documentation range).
+
+Bazarr: captured on 20/10/2026 from `lscr.io/linuxserver/bazarr` (Bazarr
+1.6.2), without Sonarr nor Radarr behind it: the badges count nothing missing,
+and the one enabled provider is healthy (`status: "Good"`). The missing counts
+and a throttled provider are set by the tests. Edited: the kernel version in
+`bazarr-status.json`.

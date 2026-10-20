@@ -1,4 +1,4 @@
-# Sonarr, Radarr & Lidarr
+# Sonarr, Radarr, Lidarr & co
 
 Hol dir dein [Sonarr](https://sonarr.tv) (Serien), dein
 [Radarr](https://radarr.video) (Filme) und dein [Lidarr](https://lidarr.audio)
@@ -20,6 +20,10 @@ in den [Issues](https://github.com/guim31/gladys-arr/issues) willkommen.
   neuer, von Gladys aus erreichbar (gleiches Netzwerk). Bis zu zwei von jedem.
 - Den **API-Schlüssel** jeder Instanz: in Sonarr, Radarr oder Lidarr unter
   **Settings** → **General** → **Security** → **API Key**.
+
+- Optional **Prowlarr** (v1 oder neuer, eins) und **Bazarr** (v1 oder neuer,
+  eins): API-Schlüssel unter **Settings** → **General** → **Security** → **API
+  Key**.
 
 ## Einrichtung
 
@@ -64,6 +68,43 @@ Alle Funktionen sind schreibgeschützt. Die Namen sprechen bei einem Sonarr von
 | Zustandsfehler                                                                       | Fehler unter System → Status                                                                          |
 | Version                                                                              | Version von Sonarr, Radarr oder Lidarr                                                                |
 
+## Prowlarr und Bazarr
+
+Zwei optionale Abschnitte der Konfiguration, je eine Instanz:
+**Prowlarr (Indexer)** (Port `9696` standardmäßig) und **Bazarr (Untertitel)**
+(Port `6767`), mit denselben Feldern **Adresse**, **API-Schlüssel** und
+**Name**. Jedes bekommt sein Gerät im Tab **Entdecken** und eine Zeile im
+Widget. Getestet mit echten Instanzen von Prowlarr 2.6 und Bazarr 1.6 (die
+offiziellen Docker-Images).
+
+Das Prowlarr-Gerät (5 kleine Anfragen pro Abruf, 6 einmal pro Stunde):
+
+| Funktion            | Was es ist                                                                                           |
+| ------------------- | ---------------------------------------------------------------------------------------------------- |
+| Online              | 1, solange Prowlarr antwortet                                                                        |
+| Aktive Indexer      | In Prowlarr aktivierte Indexer                                                                       |
+| Fehlerhafte Indexer | Indexer, die Prowlarr nach Fehlern pausiert hat (Seite down, Anmeldung abgelehnt, zu viele Anfragen) |
+| Abfragen (24 h)     | An die Indexer gesendete Abfragen der letzten 24 Stunden                                             |
+| Grabs (24 h)        | Über Prowlarr geholte Releases der letzten 24 Stunden                                                |
+| Zustandswarnungen   | Warnungen unter System → Status                                                                      |
+| Zustandsfehler      | Fehler unter System → Status                                                                         |
+| Version             | Version von Prowlarr                                                                                 |
+
+Das Bazarr-Gerät (4 Anfragen pro Abruf, 5 einmal pro Stunde):
+
+| Funktion                 | Was es ist                                                                                |
+| ------------------------ | ----------------------------------------------------------------------------------------- |
+| Online                   | 1, solange Bazarr antwortet                                                               |
+| Episoden ohne Untertitel | Episoden, die auf Untertitel warten (Wanted → Series), wie Bazarr sie zählt               |
+| Filme ohne Untertitel    | Filme, die auf Untertitel warten (Wanted → Movies)                                        |
+| Fehlerhafte Anbieter     | Untertitelanbieter, die Bazarr nach einem Fehler pausiert hat (System → Providers)        |
+| Zustandswarnungen        | Probleme unter System → Status (Bazarr gibt ihnen keine Stufe: alle zählen als Warnungen) |
+| Version                  | Version von Bazarr                                                                        |
+
+Die **Schwelle fehlender Untertitel** im Bazarr-Abschnitt (standardmäßig 20)
+ist die Zahl der Episoden und Filme ohne Untertitel, ab der der Auslöser unten
+startet.
+
 ## Dashboard
 
 Füge das Widget **Neuerscheinungen** hinzu (die Widgets der Integration im
@@ -107,16 +148,35 @@ Bei Lidarr ist der Titel das Album, und der Titel mit Künstler lautet
 „Radiohead – The King of Limbs“. Lidarr speichert einen Import pro Track: Die Tracks eines Albums, die zusammen gelesen werden, ergeben ein einziges
 Ereignis. Später importierte Tracks eines Albums (ein fehlender Track, ein Qualitäts-Upgrade) melden das Album erneut; ein Album, dessen Tracks über zwei Lesungen importiert werden (selten: ein Import dauert Sekunden), wird zweimal gemeldet.
 
+Prowlarr und Bazarr haben eigene Auslöser:
+
+| Auslöser                                      | Wann                                                                                               | Filter  | Variablen                                           |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------- |
+| Prowlarr-Indexer fehlerhaft                   | Prowlarr hat einen Indexer nach Fehlern pausiert                                                   | Instanz | Name der Instanz, Indexer, pausiert bis (ISO-Datum) |
+| Prowlarr-Indexer wieder da                    | Dieser Indexer funktioniert wieder (seine Pause ist vorbei)                                        | Instanz | Name der Instanz, Indexer                           |
+| Bazarr: fehlende Untertitel über der Schwelle | Episoden und Filme ohne Untertitel erreichen die Schwelle (einmal, bis sie wieder darunter liegen) | Instanz | Episoden, Filme, insgesamt, Schwelle                |
+| Bazarr-Untertitelanbieter fehlerhaft          | Bazarr hat einen Untertitelanbieter nach einem Fehler pausiert                                     | Instanz | Name der Instanz, Anbieter, Grund, pausiert bis     |
+
+Der Auslöser _Neue Zustandsmeldung_ deckt auch Prowlarr und Bazarr ab
+(Anwendungsfilter). Wie bei den Zustandsmeldungen ist der Zustand beim ersten
+Abruf einer Instanz der Ausgangspunkt: ein schon pausierter Indexer oder schon
+über der Schwelle liegende Untertitel werden nicht gemeldet.
+
 ### Aktionen
 
-| Aktion                                                | Was sie tut                                                                                                                       | Ausgaben                                        |
-| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Fehlende Episoden, Filme oder Alben suchen            | Startet die Suche aller überwachten fehlenden Episoden, Filme oder Alben, auf einer Instanz oder allen                            | Instanzen, die die Suche gestartet haben        |
-| Sonarr-, Radarr- oder Lidarr-Bibliothek aktualisieren | Fordert die Aktualisierung von Infos und Dateien aller Serien, Filme oder Künstler an (die Anwendung erledigt sie im Hintergrund) | aktualisierte Instanzen                         |
-| Sonarr/Radarr/Lidarr-Zusammenfassung lesen            | Baut einen Satz: Neuerscheinungen der Woche, Warteschlange, Fehlende, Zustandsmeldungen                                           | Satz, Neuerscheinungen, Warteschlange, Fehlende |
+| Aktion                                                  | Was sie tut                                                                                                                       | Ausgaben                                        |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Fehlende Episoden, Filme, Alben oder Untertitel suchen  | Startet die Suche aller überwachten fehlenden Episoden, Filme oder Alben, auf einer Instanz oder allen                            | Instanzen, die die Suche gestartet haben        |
+| Sonarr-/Radarr-/Lidarr-/Bazarr-Bibliothek aktualisieren | Fordert die Aktualisierung von Infos und Dateien aller Serien, Filme oder Künstler an (die Anwendung erledigt sie im Hintergrund) | aktualisierte Instanzen                         |
+| *arr-Zusammenfassung lesen                              | Baut einen Satz: Neuerscheinungen der Woche, Warteschlange, Fehlende, Zustandsmeldungen                                           | Satz, Neuerscheinungen, Warteschlange, Fehlende |
 
 Nichts wird je gelöscht: Die Integration liest nur und startet Suchen und
 Aktualisierungen.
+
+Bei Bazarr startet die Suche seine Aufgaben „fehlende Untertitel suchen“
+(Serien und Filme) und die Aktualisierung den Abgleich mit Sonarr und Radarr;
+diese Aufgaben gibt es nur, wenn Sonarr oder Radarr in Bazarr aktiviert ist.
+Prowlarr hat keine Bibliothek: Die Aktionen überspringen es.
 
 ### Szenenideen
 
@@ -128,13 +188,18 @@ Aktualisierungen.
   (S01E02), Jahr oder Künstler_: „Radiohead – The King of Limbs ist in der
   Bibliothek“.
 - **Zusammenfassung am Morgen**: jeden Tag um 8:00
-  _Sonarr/Radarr/Lidarr-Zusammenfassung lesen_, dann den Satz per Telegram schicken oder vom Lautsprecher sagen
+  _\*arr-Zusammenfassung lesen_, dann den Satz per Telegram schicken oder vom Lautsprecher sagen
   lassen.
 - **Hängende Downloads**: Auslöser _Download fehlgeschlagen_, dann eine
   Nachricht mit dem Grund; oder eine Szene auf der Funktion _Downloads mit
   Fehler_ über 0.
-- **Wöchentliches Nachholen**: jeden Sonntagabend _Fehlende Episoden, Filme oder
-  Alben suchen_.
+- **Wöchentliches Nachholen**: jeden Sonntagabend _Fehlende Episoden, Filme, Alben oder Untertitel suchen_.
+
+- **Indexer ausgefallen**: Auslöser _Prowlarr-Indexer fehlerhaft_, dann eine
+  Benachrichtigung „Indexer {{indexer}} pausiert bis {{until}}“.
+- **Untertitel stauen sich**: Auslöser _Bazarr: fehlende Untertitel über der
+  Schwelle_, dann _Fehlende Episoden, Filme, Alben oder Untertitel suchen_ auf
+  dem Bazarr-Gerät.
 
 ## Fehlerbehebung
 
@@ -149,7 +214,7 @@ Aktualisierungen.
   Sonarr-Abschnitt, ein Sonarr in einem Lidarr-Abschnitt… (mit dem Schlüssel dieser anderen Anwendung;
   mit dem richtigen Schlüssel antwortet eine falsche Adresse „API-Schlüssel
   abgelehnt“).
-- **„keine Sonarr-, Radarr- oder Lidarr-API unter dieser Adresse“** oder **„die Adresse
+- **„keine Sonarr-, Radarr-, Lidarr-, Prowlarr- oder Bazarr-API unter dieser Adresse“** oder **„die Adresse
   leitet um“**: Eine Instanz hinter einem Reverse-Proxy braucht ihre URL-Basis
   (`https://example.org/sonarr`), und eine Anmeldeseite des Proxys blockiert die
   API: Verwende die lokale Adresse.
@@ -159,6 +224,14 @@ Aktualisierungen.
   kommt mit der nächsten Aktualisierung der Serie, des Films oder des
   Künstlers. Ein Künstler ohne Poster auf dem Metadatenserver von Lidarr lässt
   seine Alben ohne Bild.
+
+- **Bazarr „API-Schlüssel abgelehnt“**: Der Schlüssel steht in Bazarr unter
+  Settings → General → Security. Bazarr beantwortet jede andere Adresse mit
+  seiner Webseite: Eine Sonarr-Adresse im Bazarr-Abschnitt ergibt „diese
+  Adresse ist eine andere Anwendung“.
+- **Bazarr „Keine Instanz hat den Befehl angenommen“**: Sonarr und Radarr sind
+  in Bazarr nicht aktiviert (Settings → Sonarr / Radarr), es hat nichts zu
+  suchen.
 
 ## Grenzen
 
@@ -173,5 +246,7 @@ Aktualisierungen.
   Aktionen zählen hier mehr. Das Widget übernimmt die Rolle des Kalenders.
 - Lidarr behält Album-Cover nur in voller Größe (oft mehr als die 300 KB, die
   ein Widget-Bild wiegen darf): Die Karten zeigen das Poster des Künstlers.
-- Readarr, Prowlarr und die Download-Clients sind nicht abgedeckt.
-- Nicht mit den Projekten Sonarr, Radarr oder Lidarr verbunden.
+- Readarr und die Download-Clients sind nicht abgedeckt. Höchstens ein
+  Prowlarr und ein Bazarr.
+- Die Bazarr-Schwelle zählt Episoden und Filme zusammen.
+- Nicht mit den Projekten Sonarr, Radarr, Lidarr, Prowlarr oder Bazarr verbunden.
