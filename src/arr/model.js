@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------
-// Pure functions from the Sonarr/Radarr API v3 and Lidarr API v1 answers to
-// what the integration uses. Shapes checked on Sonarr 4.0, Radarr 6.4 and
-// Lidarr 3.1 (fixtures in test/fixtures/arr/, captured from real instances and
-// anonymized).
+// Pure functions from the Sonarr/Radarr API v3, Lidarr/Prowlarr API v1 and
+// Bazarr API answers to what the integration uses. Shapes checked on Sonarr
+// 4.0, Radarr 6.4, Lidarr 3.1, Prowlarr 2.6 and Bazarr 1.6 (fixtures in
+// test/fixtures/arr/, captured from real instances and anonymized).
 // -----------------------------------------------------------------------------
 
 import { KINDS } from '../config.js';
@@ -227,4 +227,85 @@ export function parseHistory(kind, list, afterId = 0) {
   return events
     .filter((event) => event.album === null || lastOfAlbum.get(event.album) === event)
     .map(({ album, ...event }) => (album === null ? event : { ...event, id: maxId.get(album) }));
+}
+
+// --- Prowlarr ------------------------------------------------------------------
+
+/**
+ * Indexers: the enabled ones, and those Prowlarr paused after failures
+ * (/indexerstatus lists the blocked ones only), with their name.
+ * @returns {{ enabled: number, failing: number, failures: Array<{ id, name, until }>, names: Record<string, string> }}
+ */
+export function parseIndexers(indexers, statuses) {
+  const list = Array.isArray(indexers) ? indexers : [];
+  const names = new Map(list.map((indexer) => [indexer?.id, String(indexer?.name ?? '')]));
+  const failures = (Array.isArray(statuses) ? statuses : [])
+    .filter((status) => Number.isInteger(status?.indexerId))
+    .map((status) => ({
+      id: status.indexerId,
+      name: (names.get(status.indexerId) || `#${status.indexerId}`).slice(0, 200),
+      until: validDate(status.disabledTill)?.toISOString() ?? '',
+    }))
+    .sort((a, b) => a.id - b.id);
+  return {
+    enabled: list.filter((indexer) => indexer?.enable === true).length,
+    failing: failures.length,
+    failures,
+    // Every indexer by id (an indexer back from a failure is announced by name).
+    names: Object.fromEntries([...names].map(([id, name]) => [String(id), name || `#${id}`])),
+  };
+}
+
+/** Queries and grabs of every indexer over the period of /indexerstats. */
+export function parseIndexerStats(stats) {
+  const indexers = Array.isArray(stats?.indexers) ? stats.indexers : [];
+  const sum = (key) =>
+    indexers.reduce((total, item) => total + (Number.isInteger(item?.[key]) ? item[key] : 0), 0);
+  return { queries: sum('numberOfQueries'), grabs: sum('numberOfGrabs') };
+}
+
+// --- Bazarr --------------------------------------------------------------------
+
+/** Episodes and movies missing subtitles (the Wanted badges). */
+export function parseBadges(badges) {
+  const count = (value) => (Number.isInteger(value) && value >= 0 ? value : 0);
+  return { episodes: count(badges?.episodes), movies: count(badges?.movies) };
+}
+
+/**
+ * The throttled providers (Bazarr pauses a provider after an error: too many
+ * requests, refused login...). /providers lists every enabled provider, the
+ * healthy ones with the status "Good" (checked on Bazarr 1.6.2).
+ * @returns {{ count: number, list: Array<{ name, reason, until }> }}
+ */
+export function parseProviders(answer) {
+  const list = (Array.isArray(answer?.data) ? answer.data : [])
+    .filter(
+      (provider) =>
+        typeof provider?.name === 'string' &&
+        provider.name &&
+        provider.status &&
+        provider.status !== 'Good',
+    )
+    .map((provider) => ({
+      name: provider.name.slice(0, 200),
+      reason: String(provider.status ?? '').slice(0, 300),
+      until: String(provider.retry ?? '').slice(0, 100),
+    }));
+  return { count: list.length, list };
+}
+
+/**
+ * Bazarr health issues (System → Status): an object and a message, no level:
+ * warnings, in the shape of parseHealth.
+ */
+export function parseBazarrHealth(answer) {
+  const issues = (Array.isArray(answer?.data) ? answer.data : [])
+    .filter((item) => item && (item.object || item.issue))
+    .map((item) => ({
+      source: String(item.object ?? ''),
+      level: 'warning',
+      message: String(item.issue ?? '').slice(0, 300),
+    }));
+  return { warnings: issues.length, errors: 0, issues };
 }

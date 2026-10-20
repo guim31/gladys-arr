@@ -5,7 +5,8 @@
 // and whether the downloads are stuck. So the widget shows a poster grid of
 // the episodes, movies and albums released from today to the next 6 days (a check
 // mark badge once downloaded), two tiles (queue, missing), one status row per
-// instance, and two direct buttons: search the missing ones, refresh.
+// instance (Prowlarr: its indexers; Bazarr: the missing subtitles), and two
+// direct buttons: search the missing ones, refresh.
 //
 // Every instance by default, or the one chosen in the widget settings. The
 // figures are sent as values, not bound to device features, so the widget
@@ -36,10 +37,10 @@ const POSTER_KEY = /^poster-(sonarr|radarr|lidarr)-(\d)-(\d{1,12})$/;
 
 export const TEXT = {
   pick: {
-    en: 'Enter the address and API key of your Sonarr, Radarr or Lidarr in the configuration of the integration.',
-    fr: "Saisissez l'adresse et la clé d'API de votre Sonarr, Radarr ou Lidarr dans la configuration de l'intégration.",
-    de: 'Gib die Adresse und den API-Schlüssel deines Sonarr, Radarr oder Lidarr in der Konfiguration der Integration ein.',
-    es: 'Introduzca la dirección y la clave de API de su Sonarr, Radarr o Lidarr en la configuración de la integración.',
+    en: 'Enter the address and API key of your Sonarr, Radarr, Lidarr, Prowlarr or Bazarr in the configuration of the integration.',
+    fr: "Saisissez l'adresse et la clé d'API de votre Sonarr, Radarr, Lidarr, Prowlarr ou Bazarr dans la configuration de l'intégration.",
+    de: 'Gib die Adresse und den API-Schlüssel deines Sonarr, Radarr, Lidarr, Prowlarr oder Bazarr in der Konfiguration der Integration ein.',
+    es: 'Introduzca la dirección y la clave de API de su Sonarr, Radarr, Lidarr, Prowlarr o Bazarr en la configuración de la integración.',
   },
   unknown: {
     en: 'This instance is no longer in the configuration: choose another one in the widget settings.',
@@ -59,6 +60,11 @@ export const TEXT = {
   inError: { en: 'in error', fr: 'en erreur', de: 'mit Fehler', es: 'con error' },
   healthy: { en: 'OK', fr: 'OK', de: 'OK', es: 'OK' },
   issues: { en: 'alert(s)', fr: 'alerte(s)', de: 'Meldung(en)', es: 'aviso(s)' },
+  indexers: { en: 'indexer(s)', fr: 'indexeur(s)', de: 'Indexer', es: 'indexador(es)' },
+  failing: { en: 'failing', fr: 'en échec', de: 'fehlerhaft', es: 'con error' },
+  noSubtitles: { en: 'w/o subs', fr: 'sans s.-t.', de: 'ohne UT', es: 'sin subt.' },
+  episodesShort: { en: 'ep.', fr: 'ép.', de: 'Ep.', es: 'ep.' },
+  moviesShort: { en: 'movies', fr: 'films', de: 'Filme', es: 'pelíc.' },
   unreachable: {
     en: 'Unreachable',
     fr: 'Injoignable',
@@ -155,29 +161,55 @@ function instanceRow(record, language) {
       color: WIDGET_COLORS.DANGER,
     };
   }
-  const { queue, health } = record.snapshot;
-  if (!queue || !health) {
+  const { kind } = record.instance;
+  const { queue, health, indexers, subtitles, providers } = record.snapshot;
+  const main =
+    kind === KINDS.PROWLARR ? indexers : kind === KINDS.BAZARR ? subtitles && providers : queue;
+  if (!main || !health) {
     return { label, icon: 'clock', value: t(TEXT.waiting, language), color: WIDGET_COLORS.NEUTRAL };
   }
-  const parts = [`${queue.count} ${t(TEXT.inQueue, language)}`];
-  if (queue.errors) {
-    parts.push(`${queue.errors} ${t(TEXT.inError, language)}`);
+  const parts = [];
+  let trouble;
+  if (kind === KINDS.PROWLARR) {
+    parts.push(`${indexers.enabled} ${t(TEXT.indexers, language)}`);
+    if (indexers.failing) {
+      parts.push(`${indexers.failing} ${t(TEXT.failing, language)}`);
+    }
+    trouble = indexers.failing;
+  } else if (kind === KINDS.BAZARR) {
+    parts.push(
+      `${subtitles.episodes} ${t(TEXT.episodesShort, language)} / ${subtitles.movies} ${t(TEXT.moviesShort, language)} ${t(TEXT.noSubtitles, language)}`,
+    );
+    if (providers.count) {
+      parts.push(`${providers.count} ${t(TEXT.failing, language)}`);
+    }
+    trouble = providers.count;
+  } else {
+    parts.push(`${queue.count} ${t(TEXT.inQueue, language)}`);
+    if (queue.errors) {
+      parts.push(`${queue.errors} ${t(TEXT.inError, language)}`);
+    }
+    trouble = queue.errors;
   }
   const issues = health.warnings + health.errors;
   if (issues) {
     parts.push(`${issues} ${t(TEXT.issues, language)}`);
   }
   const color =
-    health.errors || queue.errors
+    health.errors || trouble
       ? WIDGET_COLORS.DANGER
       : health.warnings
         ? WIDGET_COLORS.WARNING
         : WIDGET_COLORS.SUCCESS;
   return {
     label,
-    icon: { [KINDS.SONARR]: 'tv', [KINDS.RADARR]: 'film', [KINDS.LIDARR]: 'music' }[
-      record.instance.kind
-    ],
+    icon: {
+      [KINDS.SONARR]: 'tv',
+      [KINDS.RADARR]: 'film',
+      [KINDS.LIDARR]: 'music',
+      [KINDS.PROWLARR]: 'search',
+      [KINDS.BAZARR]: 'message-square',
+    }[kind],
     value: fit(parts.join(' · '), 40),
     color,
   };
@@ -212,7 +244,7 @@ async function get(hub, { settings, language = 'en' }) {
   }
   const totals = hub.totals(records);
   const components = [];
-  if (totals.answering > 0) {
+  if (totals.media > 0) {
     components.push(
       { type: 'value', value: totals.queue, label: t(TEXT.queue, language), icon: 'download' },
       {
@@ -232,7 +264,7 @@ async function get(hub, { settings, language = 'en' }) {
     .map(({ record, item }) => card(record, item, language));
   if (cards.length > 0) {
     components.push({ type: 'card-list', display: 'grid', items: cards });
-  } else if (totals.answering > 0) {
+  } else if (totals.media > 0) {
     components.push({ type: 'text', variant: 'body', text: t(TEXT.nothing, language) });
   }
   components.push({

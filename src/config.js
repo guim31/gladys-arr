@@ -3,14 +3,23 @@
 // manifest `config_schema`, see test/manifest.test.js) and normalization, so
 // the rest of the code never deals with strings, blanks or `undefined`.
 //
-// Up to six instances in fixed slots: two Sonarr, two Radarr, two Lidarr
-// (address, API key, name). The slot is the device identity: changing the address of a slot
+// Up to eight instances in fixed slots: two Sonarr, two Radarr, two Lidarr,
+// one Prowlarr, one Bazarr (address, API key, name). The slot is the device identity: changing the address of a slot
 // (an IP for a name, HTTP for HTTPS) keeps the device and its history.
 // -----------------------------------------------------------------------------
 
 export const LANGUAGES = ['en', 'fr', 'de', 'es'];
 
-export const KINDS = Object.freeze({ SONARR: 'sonarr', RADARR: 'radarr', LIDARR: 'lidarr' });
+export const KINDS = Object.freeze({
+  SONARR: 'sonarr',
+  RADARR: 'radarr',
+  LIDARR: 'lidarr',
+  PROWLARR: 'prowlarr',
+  BAZARR: 'bazarr',
+});
+
+/** The applications that manage a library (calendar, queue, history). */
+export const MEDIA_KINDS = Object.freeze([KINDS.SONARR, KINDS.RADARR, KINDS.LIDARR]);
 
 /** The configuration slots: `<kind>_<number>`, in display order. */
 export const SLOTS = [
@@ -20,6 +29,8 @@ export const SLOTS = [
   { kind: KINDS.RADARR, number: 2 },
   { kind: KINDS.LIDARR, number: 1 },
   { kind: KINDS.LIDARR, number: 2 },
+  { kind: KINDS.PROWLARR, number: 1 },
+  { kind: KINDS.BAZARR, number: 1 },
 ].map((slot) => Object.freeze({ ...slot, id: `${slot.kind}_${slot.number}` }));
 
 // Refresh intervals offered in the configuration, in seconds.
@@ -44,11 +55,19 @@ export const DEFAULT_CONFIG = {
   lidarr_2_url: '',
   lidarr_2_api_key: '',
   lidarr_2_name: '',
+  prowlarr_1_url: '',
+  prowlarr_1_api_key: '',
+  prowlarr_1_name: '',
+  bazarr_1_url: '',
+  bazarr_1_api_key: '',
+  bazarr_1_name: '',
+  bazarr_1_missing_threshold: 20,
   poll_interval: '120',
   language: 'fr',
 };
 
 const MAX_NAME_LENGTH = 40;
+const MAX_THRESHOLD = 100_000;
 
 /**
  * Parse the address typed by the user into a base URL: a bare host or IP
@@ -93,6 +112,14 @@ export function parseInstanceUrl(raw) {
 /** Host part shown to the user (no scheme). */
 export const hostOf = (url) => url.replace(/^https?:\/\//, '');
 
+/** The Bazarr "missing subtitles" threshold: a whole number from 1, else the default. */
+function threshold(raw) {
+  const value = typeof raw === 'string' ? Number(raw.trim()) : raw;
+  return Number.isInteger(value) && value >= 1 && value <= MAX_THRESHOLD
+    ? value
+    : DEFAULT_CONFIG.bazarr_1_missing_threshold;
+}
+
 /**
  * @param {Record<string, unknown>} raw the configuration returned by the SDK
  */
@@ -123,6 +150,9 @@ export function normalizeConfig(raw = {}) {
       url,
       apiKey,
       name: text(`${slot.id}_name`).slice(0, MAX_NAME_LENGTH) || null,
+      ...(slot.kind === KINDS.BAZARR
+        ? { missingThreshold: threshold(source[`${slot.id}_missing_threshold`]) }
+        : {}),
     });
   }
 

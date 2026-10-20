@@ -1,4 +1,4 @@
-# Sonarr, Radarr & Lidarr
+# Sonarr, Radarr, Lidarr & co
 
 Bring your [Sonarr](https://sonarr.tv) (series), [Radarr](https://radarr.video)
 (movies) and [Lidarr](https://lidarr.audio) (music) into Gladys, over your local
@@ -19,6 +19,9 @@ welcome on the [Gladys forum](https://community.gladysassistant.com) or in the
   reachable from Gladys (same network). Up to two of each.
 - The **API key** of each instance: in Sonarr, Radarr or Lidarr, **Settings** →
   **General** → **Security** → **API Key**.
+
+- Optionally **Prowlarr** (v1 or later, one) and **Bazarr** (1.x, tested on 1.6, one):
+  API key in **Settings** → **General** → **Security** → **API Key**.
 
 ## Set up
 
@@ -62,6 +65,43 @@ on a Radarr and "albums" on a Lidarr.
 | Health errors                                                                       | Errors of System → Status                                                              |
 | Version                                                                             | Version of Sonarr, Radarr or Lidarr                                                    |
 
+## Prowlarr and Bazarr
+
+Two optional sections of the configuration, one instance each:
+**Prowlarr (indexers)** (port `9696` by default) and **Bazarr (subtitles)**
+(port `6767`), with the same **Address**, **API key** and **Name** fields. They
+get their own device in the **Discover** tab, and the widget gives them one
+line each. Tested against real Prowlarr 2.6 and Bazarr 1.6 instances (the
+official Docker images).
+
+The Prowlarr device (4 small requests per reading, 5 once an hour):
+
+| Feature          | What it is                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------ |
+| Online           | 1 while Prowlarr answers                                                             |
+| Enabled indexers | Indexers enabled in Prowlarr                                                         |
+| Failing indexers | Indexers Prowlarr paused after failures (down site, refused login, too many queries) |
+| Queries (24 h)   | Queries sent to the indexers over the last 24 hours                                  |
+| Grabs (24 h)     | Releases grabbed through Prowlarr over the last 24 hours                             |
+| Health warnings  | Warnings of System → Status                                                          |
+| Health errors    | Errors of System → Status                                                            |
+| Version          | Version of Prowlarr                                                                  |
+
+The Bazarr device (3 requests per reading, 4 once an hour):
+
+| Feature                    | What it is                                                                    |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| Online                     | 1 while Bazarr answers                                                        |
+| Episodes missing subtitles | Episodes waiting for subtitles (Wanted → Series), as Bazarr counts them       |
+| Movies missing subtitles   | Movies waiting for subtitles (Wanted → Movies)                                |
+| Failing providers          | Subtitle providers Bazarr paused after an error (System → Providers)          |
+| Health warnings            | Issues of System → Status (Bazarr gives them no level: all count as warnings) |
+| Version                    | Version of Bazarr                                                             |
+
+The **Missing subtitles threshold** of the Bazarr section (20 by default) is
+the number of episodes and movies without subtitles from which the trigger
+below fires.
+
 ## Dashboard
 
 Add the **Upcoming releases** widget (the integration's widgets in the
@@ -104,16 +144,35 @@ For Lidarr, the title is the album and the title with artist reads
 "Radiohead – The King of Limbs". Lidarr records one import per track: the
 tracks of an album read together make a single event. Tracks of an album imported later (a missing track, an upgrade) announce the album again; an album whose tracks are imported across two readings (rare: an import takes seconds) is announced twice.
 
+Prowlarr and Bazarr have their own triggers:
+
+| Trigger                                      | When                                                                                         | Filters  | Variables                                       |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
+| Prowlarr indexer failing                     | Prowlarr paused an indexer after failures                                                    | instance | instance name, indexer, paused until (ISO date) |
+| Prowlarr indexer back                        | Prowlarr lifted the pause of that indexer (it will try it again)                             | instance | instance name, indexer                          |
+| Bazarr: missing subtitles over the threshold | The episodes and movies missing subtitles reach the threshold (once, until they go under it) | instance | episodes, movies, total, threshold              |
+| Bazarr subtitle provider failing             | Bazarr paused a subtitle provider after an error                                             | instance | instance name, provider, reason, paused until   |
+
+The _New health issue_ trigger covers Prowlarr and Bazarr too (application
+filter). As for the health alerts, the state found at the first reading of an
+instance is the starting point: an indexer already paused, or subtitles already
+over the threshold, are not announced.
+
 ### Actions
 
-| Action                                       | What it does                                                                                                                | Outputs                                     |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Search missing episodes, movies or albums    | Starts the search of every monitored missing episode, movie or album, on one instance or all of them                        | instances that started the search           |
-| Refresh the Sonarr, Radarr or Lidarr library | Asks for a refresh of the information and files of every series, movie or artist (run in the background by the application) | instances refreshed                         |
-| Read the Sonarr/Radarr/Lidarr summary        | Builds a sentence: releases this week, queue, missing items, health alerts                                                  | sentence, releases, items in queue, missing |
+| Action                                               | What it does                                                                                                                | Outputs                                     |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Search missing episodes, movies, albums or subtitles | Starts the search of every monitored missing episode, movie or album, on one instance or all of them                        | instances that started the search           |
+| Refresh the Sonarr, Radarr, Lidarr or Bazarr library | Asks for a refresh of the information and files of every series, movie or artist (run in the background by the application) | instances refreshed                         |
+| Read the *arr summary                                | Builds a sentence: releases this week, queue, missing items, health alerts                                                  | sentence, releases, items in queue, missing |
 
 Nothing is ever deleted: the integration only reads, and starts searches and
 refreshes.
+
+On Bazarr, the search runs its "search missing subtitles" tasks (series and
+movies) and the refresh its sync with Sonarr and Radarr; these tasks exist only
+when Sonarr or Radarr is enabled in Bazarr. Prowlarr has no library: the actions
+skip it.
 
 ### Scene ideas
 
@@ -123,12 +182,16 @@ refreshes.
 - **New album**: trigger _Episode, movie or album downloaded_ with the
   application _Lidarr_, then a notification with _Title with episode (S01E02),
   year or artist_: "Radiohead – The King of Limbs is in the library".
-- **Morning summary**: every day at 8:00, _Read the Sonarr/Radarr/Lidarr summary_,
+- **Morning summary**: every day at 8:00, _Read the \*arr summary_,
   then send its sentence on Telegram or have it said by the speaker.
 - **Stuck downloads**: trigger _Download failed_, then a message with the
   reason; or a scene on the _Downloads in error_ feature above 0.
-- **Weekly catch-up**: every Sunday night, _Search missing episodes, movies or
-  albums_.
+- **Weekly catch-up**: every Sunday night, _Search missing episodes, movies, albums or subtitles_.
+
+- **Indexer down**: trigger _Prowlarr indexer failing_, then a notification
+  "Indexer {{indexer}} paused until {{until}}".
+- **Subtitles piling up**: trigger _Bazarr: missing subtitles over the threshold_,
+  then _Search missing episodes, movies, albums or subtitles_ on the Bazarr device.
 
 ## Troubleshooting
 
@@ -141,7 +204,7 @@ refreshes.
 - **"this address is another application"**: a Radarr address in a Sonarr
   section, a Sonarr in a Lidarr section… (with the key of that other application; with the
   right key, a wrong address answers "API key refused").
-- **"no Sonarr, Radarr or Lidarr API at this address"** or **"the address redirects"**:
+- **"no Sonarr, Radarr, Lidarr, Prowlarr or Bazarr API at this address"** or **"the address redirects"**:
   an instance behind a reverse proxy needs its URL base
   (`https://example.org/sonarr`), and a login page of the proxy blocks the API:
   use the local address.
@@ -150,6 +213,12 @@ refreshes.
 - No poster: the application has not downloaded it yet (MediaCover); it comes
   with the next refresh of the series, movie or artist. An artist without a
   poster on Lidarr's metadata server leaves its albums without one.
+
+- **Bazarr "API key refused"**: the key is in Bazarr under Settings → General →
+  Security. Bazarr answers any other address with its web page: an address of
+  Sonarr in the Bazarr section says "this address is another application".
+- **Bazarr "No instance accepted the command"**: Sonarr and Radarr are not
+  enabled in Bazarr (Settings → Sonarr / Radarr), so it has nothing to search.
 
 ## Limits
 
@@ -162,5 +231,10 @@ refreshes.
   here. The widget plays the calendar part.
 - Lidarr keeps album covers at full size only (often over the 300 KB a widget
   image may weigh): the cards show the poster of the artist.
-- Readarr, Prowlarr and the download clients are not covered.
-- Not affiliated with the Sonarr, Radarr or Lidarr projects.
+- Readarr and the download clients are not covered. One Prowlarr and one
+  Bazarr at most.
+- The Bazarr threshold counts episodes and movies together.
+- "Prowlarr indexer back" means the pause is over, not that the site works:
+  an indexer that stays down is paused again at the next failure (failing,
+  back, failing… with longer and longer pauses).
+- Not affiliated with the Sonarr, Radarr, Lidarr, Prowlarr or Bazarr projects.

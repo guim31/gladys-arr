@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// The hub: one record per configured Sonarr/Radarr/Lidarr instance, read on a timer
+// The hub: one record per configured *arr instance, read on a timer
 // of the container (the interval chosen in the configuration), its states
 // published to Gladys when they change, its scene events fired from the
 // history and the health checks, and the commands of the scene actions and
@@ -13,16 +13,27 @@
 // last event id per instance), so an import is announced once, also across
 // restarts; events older than an hour are not announced (a container stopped
 // for a night does not replay it). No webhook: the sandbox has no inbound port.
+//
+// Prowlarr and Bazarr have no library (no calendar, queue nor history): the
+// hub reads their indexers or subtitles instead, and fires their events from
+// what changed between two readings (an indexer paused or back, a provider
+// throttled, the missing subtitles crossing the threshold), remembered under
+// /data like the health issues.
 // -----------------------------------------------------------------------------
 
 import { DEVICE_TRANSPORTS, createLogger } from '@gladysassistant/integration-sdk';
-import { KINDS } from './config.js';
+import { KINDS, MEDIA_KINDS } from './config.js';
 import { ArrClient, COMMANDS, ERROR_KINDS } from './arr/client.js';
 import {
+  parseBadges,
+  parseBazarrHealth,
   parseCalendar,
   parseFreeSpace,
   parseHealth,
   parseHistory,
+  parseIndexerStats,
+  parseIndexers,
+  parseProviders,
   parseQueue,
 } from './arr/model.js';
 import {
@@ -53,7 +64,14 @@ export const TRIGGERS = Object.freeze({
   IMPORTED: 'download_imported',
   FAILED: 'download_failed',
   HEALTH: 'health_issue',
+  INDEXER_FAILED: 'indexer_failed',
+  INDEXER_RESTORED: 'indexer_restored',
+  SUBTITLES_MISSING: 'subtitles_missing',
+  PROVIDER_FAILED: 'provider_failed',
 });
+
+// What the hub remembers per slot under /data, besides the history cursor.
+const SAVED_SETS = ['health', 'indexers', 'providers', 'subtitles'];
 
 export const HUB_TIMINGS = {
   // The version changes with an update: read it hourly, not at every reading.
@@ -66,6 +84,8 @@ export const HUB_TIMINGS = {
   heartbeatMs: 12 * 60 * 60_000,
   // Width of the calendar window: today and the next 6 days.
   calendarDays: 7,
+  // Period of the Prowlarr query and grab counters.
+  statsMs: 24 * 60 * 60_000,
 };
 
 const MAX_STATES_PER_REQUEST = 100;
@@ -103,7 +123,7 @@ export class ArrHub {
     this.published = new Map();
     this.transports = new Map();
     this.connection = null;
-    this.saved = { history: {}, health: {} };
+    this.saved = { history: {}, ...Object.fromEntries(SAVED_SETS.map((name) => [name, {}])) };
     this.pollTimer = null;
     this.stopped = false;
     /** Problems already logged, by key: repeats go to debug. */
@@ -135,7 +155,10 @@ export class ArrHub {
   async start(config) {
     const saved = await this.store.load();
     const object = (value) => (value && typeof value === 'object' ? value : {});
-    this.saved = { history: object(saved.history), health: object(saved.health) };
+    this.saved = {
+      history: object(saved.history),
+      ...Object.fromEntries(SAVED_SETS.map((name) => [name, object(saved[name])])),
+    };
     await this.reconfigure(config);
   }
 
@@ -293,6 +316,19 @@ export class ArrHub {
     const { client } = record;
     const statusDue =
       !record.snapshot.version || this.now() - record.statusAt >= this.timings.statusMs;
+    const { kind } = record.instance;
+    if (kind === KINDS.PROWLARR || kind === KINDS.BAZARR) {
+      try {
+        return await (kind === KINDS.PROWLARR
+          ? this.readProwlarr(record, statusDue)
+          : this.readBazarr(record, statusDue));
+      } catch (err) {
+        if (!err.kind) {
+          throw err;
+        }
+        return this.applyFailure(record, await client.otherApp(err));
+      }
+    }
     const { start, end } = this.calendarWindow();
     try {
       const [status, health, queue, missing, folders, calendar] = await Promise.all([
@@ -325,6 +361,57 @@ export class ArrHub {
     }
   }
 
+  async readProwlarr(record, statusDue) {
+    const { client } = record;
+    const now = this.now();
+    const [status, health, indexers, statuses, stats] = await Promise.all([
+      statusDue ? client.status() : null,
+      client.health(),
+      client.indexers(),
+      client.indexerStatus(),
+      client.indexerStats(new Date(now - this.timings.statsMs), new Date(now)),
+    ]);
+    if (status) {
+      record.statusAt = now;
+    }
+    const parsed = parseIndexers(indexers, statuses);
+    const changed = await this.applySuccess(record, {
+      version: status ? status.version : record.snapshot.version,
+      health: parseHealth(health),
+      indexers: parsed,
+      stats: parseIndexerStats(stats),
+    });
+    if (!record.dropped) {
+      await this.indexerTransition(record, parsed);
+    }
+    return changed;
+  }
+
+  async readBazarr(record, statusDue) {
+    const { client } = record;
+    const [status, health, badges, providers] = await Promise.all([
+      statusDue ? client.status() : null,
+      client.health(),
+      client.badges(),
+      client.providers(),
+    ]);
+    if (status) {
+      record.statusAt = this.now();
+    }
+    const subtitles = parseBadges(badges);
+    const throttled = parseProviders(providers);
+    const changed = await this.applySuccess(record, {
+      version: status ? status.version : record.snapshot.version,
+      health: parseBazarrHealth(health),
+      subtitles,
+      providers: throttled,
+    });
+    if (!record.dropped) {
+      await this.bazarrTransition(record, subtitles, throttled);
+    }
+    return changed;
+  }
+
   label(record) {
     return `${APP_NAMES[record.instance.kind]} ${record.instance.slot.slice(-1)} (${instanceName(record.instance)})`;
   }
@@ -343,11 +430,17 @@ export class ArrHub {
     record.snapshot = { reachable: true, ...next };
     await this.healthTransition(record, next.health);
     await this.publishStates(record);
-    return (
-      previous.reachable !== true ||
-      JSON.stringify([previous.queue, previous.missing, previous.upcoming]) !==
-        JSON.stringify([next.queue, next.missing, next.upcoming])
-    );
+    const shown = (snapshot) =>
+      JSON.stringify([
+        snapshot.queue,
+        snapshot.missing,
+        snapshot.upcoming,
+        snapshot.indexers?.enabled,
+        snapshot.indexers?.failing,
+        snapshot.subtitles,
+        snapshot.providers?.count,
+      ]);
+    return previous.reachable !== true || shown(previous) !== shown(next);
   }
 
   async applyFailure(record, err) {
@@ -394,6 +487,84 @@ export class ArrHub {
           message: issue.message,
         });
       }
+    }
+  }
+
+  /**
+   * Remember the keys present now for the slot (a set: failing indexers,
+   * throttled providers...), with the address. Resolves with the keys known
+   * before, null at the first reading of the instance (or of another server
+   * in the slot): a starting point, not news.
+   */
+  remember(bucket, record, keys) {
+    const { slot, url } = record.instance;
+    const saved = this.saved[bucket][slot];
+    const known = saved?.url === url && Array.isArray(saved.keys) ? saved.keys : null;
+    this.saved[bucket][slot] = { url, keys };
+    if (JSON.stringify(known) !== JSON.stringify(keys)) {
+      this.store.save(this.saved);
+    }
+    return known;
+  }
+
+  /** Prowlarr: an indexer paused after failures, or back (its pause lifted). */
+  async indexerTransition(record, indexers) {
+    const keys = indexers.failures.map((failure) => String(failure.id));
+    const known = this.remember('indexers', record, keys);
+    if (!known) {
+      return;
+    }
+    for (const failure of indexers.failures) {
+      if (!known.includes(String(failure.id))) {
+        logger.info(`${this.label(record)}: indexer ${failure.name} failing`);
+        await this.fire(TRIGGERS.INDEXER_FAILED, record, {
+          indexer: failure.name,
+          until: failure.until,
+        });
+      }
+    }
+    for (const id of known) {
+      // An indexer deleted meanwhile is gone, not back.
+      const name = indexers.names[id];
+      if (!keys.includes(id) && name !== undefined) {
+        logger.info(`${this.label(record)}: indexer ${name} back`);
+        await this.fire(TRIGGERS.INDEXER_RESTORED, record, { indexer: name });
+      }
+    }
+  }
+
+  /**
+   * Bazarr: a provider newly throttled, and the missing subtitles (episodes
+   * and movies) reaching the threshold of the configuration. The threshold
+   * event fires when the count crosses it upwards: once, until it goes back
+   * under.
+   */
+  async bazarrTransition(record, subtitles, providers) {
+    const names = providers.list.map((provider) => provider.name);
+    const knownProviders = this.remember('providers', record, names);
+    if (knownProviders) {
+      for (const provider of providers.list) {
+        if (!knownProviders.includes(provider.name)) {
+          logger.info(`${this.label(record)}: provider ${provider.name} throttled`);
+          await this.fire(TRIGGERS.PROVIDER_FAILED, record, {
+            provider: provider.name,
+            reason: provider.reason,
+            until: provider.until,
+          });
+        }
+      }
+    }
+    const threshold = record.instance.missingThreshold;
+    const total = subtitles.episodes + subtitles.movies;
+    const knownLevel = this.remember('subtitles', record, total >= threshold ? ['above'] : []);
+    if (knownLevel && knownLevel.length === 0 && total >= threshold) {
+      logger.info(`${this.label(record)}: ${total} missing subtitles, threshold ${threshold}`);
+      await this.fire(TRIGGERS.SUBTITLES_MISSING, record, {
+        episodes: subtitles.episodes,
+        movies: subtitles.movies,
+        total,
+        threshold,
+      });
     }
   }
 
@@ -639,19 +810,25 @@ export class ArrHub {
    * Resolves with the number of instances that accepted it.
    */
   async command(deviceExternalId, which) {
-    const records = this.targets(deviceExternalId);
+    // Prowlarr has no library: the commands skip it.
+    const records = this.targets(deviceExternalId).filter(
+      (record) => COMMANDS[record.instance.kind][which],
+    );
+    if (records.length === 0) {
+      throw new Error(pick(ACTION_TEXT.unsupported, this.config.language));
+    }
     const results = await Promise.all(
       records.map(async (record) => {
         const name = COMMANDS[record.instance.kind][which];
         try {
           await record.client.command(name);
-          logger.info(`${this.label(record)}: ${name} started`);
+          logger.info(`${this.label(record)}: ${[name].flat().join(', ')} started`);
           return true;
         } catch (err) {
           if (!err.kind) {
             throw err;
           }
-          logger.warn(`${this.label(record)}: ${name} refused: ${err.message}`);
+          logger.warn(`${this.label(record)}: ${[name].flat().join(', ')} refused: ${err.message}`);
           // A command refused by an instance that answers says nothing of its
           // connection: only a connection problem marks it offline.
           if (err.kind !== ERROR_KINDS.HTTP) {
@@ -700,6 +877,8 @@ export class ArrHub {
     const of = (kind) => ok.filter((record) => record.instance.kind === kind);
     return {
       answering: ok.length,
+      // Those with a library: the queue and missing tiles of the widget.
+      media: ok.filter((record) => MEDIA_KINDS.includes(record.instance.kind)).length,
       episodes: of(KINDS.SONARR).reduce((n, r) => n + (r.snapshot.upcoming?.length ?? 0), 0),
       movies: of(KINDS.RADARR).reduce((n, r) => n + (r.snapshot.upcoming?.length ?? 0), 0),
       albums: of(KINDS.LIDARR).reduce((n, r) => n + (r.snapshot.upcoming?.length ?? 0), 0),
@@ -722,6 +901,24 @@ export class ArrHub {
             return labelled(name, text.down, language);
           }
           const { upcoming, queue, missing, health } = record.snapshot;
+          const issues = health.warnings + health.errors;
+          const extra = issues ? [text.health(issues)] : [];
+          if (record.instance.kind === KINDS.PROWLARR) {
+            const { indexers } = record.snapshot;
+            return labelled(
+              name,
+              [text.indexers(indexers.enabled, indexers.failing), ...extra].join(', '),
+              language,
+            );
+          }
+          if (record.instance.kind === KINDS.BAZARR) {
+            const { subtitles, providers } = record.snapshot;
+            const parts = [text.subtitles(subtitles.episodes, subtitles.movies)];
+            if (providers.count) {
+              parts.push(text.providers(providers.count));
+            }
+            return labelled(name, [...parts, ...extra].join(', '), language);
+          }
           const media = {
             [KINDS.SONARR]: text.episodes,
             [KINDS.RADARR]: text.movies,
@@ -731,11 +928,7 @@ export class ArrHub {
           if (missing !== null) {
             parts.push(text.missing(missing));
           }
-          const issues = health.warnings + health.errors;
-          if (issues) {
-            parts.push(text.health(issues));
-          }
-          return labelled(name, parts.join(', '), language);
+          return labelled(name, [...parts, ...extra].join(', '), language);
         })
         .join('. ')
         .concat('.')
@@ -758,10 +951,17 @@ export class ArrHub {
         if (record.error) {
           return labelled(name, pick(ERROR_TEXT[record.error.kind], language), language);
         }
-        const { version, queue, missing, health } = record.snapshot;
-        const parts = [text.ok(version), text.queue(queue.count)];
-        if (missing !== null) {
-          parts.push(text.missing(missing));
+        const { version, queue, missing, health, indexers, subtitles } = record.snapshot;
+        const parts = [text.ok(version)];
+        if (record.instance.kind === KINDS.PROWLARR) {
+          parts.push(text.indexers(indexers.enabled, indexers.failing));
+        } else if (record.instance.kind === KINDS.BAZARR) {
+          parts.push(text.subtitles(subtitles.episodes, subtitles.movies));
+        } else {
+          parts.push(text.queue(queue.count));
+          if (missing !== null) {
+            parts.push(text.missing(missing));
+          }
         }
         if (health.issues.length) {
           parts.push(text.health(health.issues.length));

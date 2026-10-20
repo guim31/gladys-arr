@@ -37,3 +37,12 @@ test('the defaults and an incomplete slot', () => {
     language: 'fr',
   });
 });
+
+test('a URL base named like a page of another application is kept', () => {
+  assert.equal(parseInstanceUrl('http://192.0.2.1:7878/movies'), 'http://192.0.2.1:7878/movies');
+  assert.equal(
+    parseInstanceUrl('https://example.org/media/movies/radarr/'),
+    'https://example.org/media/movies/radarr',
+  );
+  assert.equal(parseInstanceUrl('http://192.0.2.1/history'), 'http://192.0.2.1/history');
+});

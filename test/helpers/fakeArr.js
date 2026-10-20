@@ -166,3 +166,96 @@ export function createNetwork(instances = {}) {
     },
   };
 }
+
+/**
+ * A fake Prowlarr (API v1) or Bazarr (unversioned API, answers in `data`),
+ * from the answers of real instances (Prowlarr 2.6.5, Bazarr 1.6.2): one
+ * enabled indexer paused after failures, two disabled; a healthy subtitle
+ * provider. Tests change the fields to move the state.
+ */
+export class FakeTool {
+  /**
+   * @param {object} [options]
+   * @param {'prowlarr'|'bazarr'} [options.kind]
+   * @param {string} [options.apiKey]
+   */
+  constructor({ kind = 'prowlarr', apiKey = 'key-p' } = {}) {
+    this.kind = kind;
+    this.apiKey = apiKey;
+    this.online = true;
+    this.requests = [];
+    this.tasksRun = [];
+    if (kind === 'prowlarr') {
+      this.status = fixture('prowlarr-status');
+      this.healthChecks = fixture('prowlarr-health');
+      this.indexers = fixture('prowlarr-indexer');
+      this.statuses = fixture('prowlarr-indexerstatus');
+      this.stats = fixture('prowlarr-indexerstats');
+    } else {
+      this.status = fixture('bazarr-status');
+      this.healthChecks = fixture('bazarr-health');
+      this.badges = fixture('bazarr-badges');
+      this.providers = fixture('bazarr-providers');
+      // The tasks of a Bazarr with Sonarr and Radarr enabled.
+      this.tasks = [
+        'update_series',
+        'update_movies',
+        'wanted_search_missing_subtitles_series',
+        'wanted_search_missing_subtitles_movies',
+        'check_health',
+      ];
+    }
+  }
+
+  handle(url, { method = 'GET', headers = {} } = {}) {
+    const { pathname, searchParams } = new URL(url);
+    this.requests.push({ method, path: pathname, query: Object.fromEntries(searchParams) });
+    if (!this.online) {
+      const error = new Error('connect ECONNREFUSED');
+      error.code = 'ECONNREFUSED';
+      throw error;
+    }
+    const prefix = this.kind === 'prowlarr' ? '/api/v1/' : '/api/';
+    if (this.kind === 'bazarr' && !/^\/api\/(?!v\d\/)/.test(pathname)) {
+      // Bazarr's web interface answers any other path with its HTML page.
+      return { status: 200, headers: { 'content-type': 'text/html' }, body: '<!doctype html>' };
+    }
+    if (!pathname.startsWith(prefix)) {
+      return { status: 404, headers: {}, body: '' };
+    }
+    // HTTP header names are case-insensitive (X-Api-Key, X-API-KEY).
+    const key = Object.entries(headers).find(([name]) => name.toLowerCase() === 'x-api-key')?.[1];
+    if (key !== this.apiKey) {
+      return json(401, { message: 'Unauthorized' });
+    }
+    const path = pathname.slice(prefix.length);
+    if (this.kind === 'prowlarr') {
+      const answers = {
+        'system/status': this.status,
+        health: this.healthChecks,
+        indexer: this.indexers,
+        indexerstatus: this.statuses,
+        indexerstats: this.stats,
+      };
+      return path in answers ? json(200, answers[path]) : { status: 404, headers: {}, body: '' };
+    }
+    if (path === 'system/tasks' && method === 'POST') {
+      const task = searchParams.get('taskid');
+      if (!this.tasks.includes(task)) {
+        return json(500, { message: 'Internal Server Error' });
+      }
+      this.tasksRun.push(task);
+      return { status: 204, headers: {}, body: '' };
+    }
+    const answers = {
+      'system/status': this.status,
+      'system/health': this.healthChecks,
+      'system/tasks': { data: this.tasks.map((job_id) => ({ job_id, name: job_id })) },
+      badges: this.badges,
+      providers: this.providers,
+    };
+    return path in answers
+      ? json(200, answers[path])
+      : { status: 200, headers: { 'content-type': 'text/html' }, body: '<!doctype html>' };
+  }
+}

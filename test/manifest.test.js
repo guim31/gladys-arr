@@ -7,11 +7,27 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { DEFAULT_CONFIG, KINDS, LANGUAGES, POLL_INTERVALS, SLOTS } from '../src/config.js';
+import {
+  DEFAULT_CONFIG,
+  KINDS,
+  LANGUAGES,
+  MEDIA_KINDS,
+  POLL_INTERVALS,
+  SLOTS,
+} from '../src/config.js';
 import { TRIGGERS, WIDGET_KEY } from '../src/hub.js';
 import { SCENE_ACTIONS } from '../src/scenes.js';
 import { WIDGETS } from '../src/widgets.js';
-import { createWorld, deviceId } from './helpers/world.js';
+import { fixture } from './helpers/fakeArr.js';
+import {
+  BAZARR_URL,
+  BOTH,
+  FakeTool,
+  PROWLARR_URL,
+  createWorld,
+  defaultInstances,
+  deviceId,
+} from './helpers/world.js';
 
 const manifest = JSON.parse(
   await readFile(new URL('../gladys-assistant-integration.json', import.meta.url), 'utf8'),
@@ -51,7 +67,7 @@ function isAtLeast(version, required) {
 }
 
 test('identity: name, image, cover, local transport, multimedia category', () => {
-  assert.equal(manifest.name, 'Sonarr, Radarr & Lidarr');
+  assert.equal(manifest.name, 'Sonarr, Radarr, Lidarr & co');
   assert.equal(manifest.type, 'device');
   assert.match(manifest.docker_image, /^ghcr\.io\/guim31\/gladys-arr:/);
   assert.equal(
@@ -101,9 +117,29 @@ test('every scene_actions key has a handler, and returns the declared outputs', 
 
 test('the scene triggers are the ones the hub fires, with their filters and variables', async (t) => {
   assert.deepEqual(keysOf(manifest.scene_triggers).sort(), Object.values(TRIGGERS).sort());
-  const world = await createWorld();
+  const prowlarr = new FakeTool({ kind: 'prowlarr', apiKey: 'key-p' });
+  const bazarr = new FakeTool({ kind: 'bazarr', apiKey: 'key-b' });
+  const world = await createWorld({
+    config: {
+      ...BOTH,
+      prowlarr_1_url: PROWLARR_URL,
+      prowlarr_1_api_key: 'key-p',
+      bazarr_1_url: BAZARR_URL,
+      bazarr_1_api_key: 'key-b',
+    },
+    instances: { ...defaultInstances(), [PROWLARR_URL]: prowlarr, [BAZARR_URL]: bazarr },
+  });
   t.after(() => world.app.stop());
-  // Every trigger once: an import, a failed download, a new health issue.
+  // Every trigger once: an import, a failed download, a new health issue,
+  // an indexer back then failing again, a provider throttled, the missing
+  // subtitles over the threshold.
+  prowlarr.statuses = [];
+  await world.hub.pollAll();
+  prowlarr.statuses = fixture('prowlarr-indexerstatus');
+  bazarr.providers = {
+    data: [{ name: 'opensubtitlescom', status: 'TooManyRequests', retry: '-' }],
+  };
+  bazarr.badges = { ...bazarr.badges, episodes: 30 };
   world.sonarr.addImport(world.clock.now());
   world.radarr.addFailure(world.clock.now());
   world.sonarr.healthChecks.push({
@@ -126,11 +162,21 @@ test('the scene triggers are the ones the hub fires, with their filters and vari
         `${trigger.key}: "${key}" is declared`,
       );
     }
+    // The application filter: the ones that fire the event.
     const app = trigger.fields.find((field) => field.key === 'app');
-    assert.deepEqual(
-      app.options.map((option) => option.value),
-      Object.values(KINDS),
-    );
+    if (trigger.key === TRIGGERS.HEALTH) {
+      assert.deepEqual(
+        app.options.map((option) => option.value),
+        Object.values(KINDS),
+      );
+    } else if ([TRIGGERS.IMPORTED, TRIGGERS.FAILED].includes(trigger.key)) {
+      assert.deepEqual(
+        app.options.map((option) => option.value),
+        MEDIA_KINDS,
+      );
+    } else {
+      assert.equal(app, undefined);
+    }
   }
 });
 

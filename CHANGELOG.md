@@ -10,6 +10,24 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Added
+
+- Prowlarr (indexers, API v1), in a new configuration section: a device with
+  the enabled and failing indexers, the queries and grabs of the last 24 hours,
+  health and version; "Prowlarr indexer failing" and "Prowlarr indexer back"
+  scene triggers.
+- Bazarr (subtitles), in a new configuration section: a device with the
+  episodes and movies missing subtitles, the failing providers, health and
+  version; "missing subtitles over the threshold" (20 by default, set in the
+  configuration) and "subtitle provider failing" scene triggers. The search
+  missing and refresh actions run the matching Bazarr tasks.
+- Prowlarr and Bazarr in the "Upcoming releases" widget (one line each), the
+  summary sentence, "Test the connection" and the "health issue" trigger.
+
+### Changed
+
+- The integration is now named "Sonarr, Radarr, Lidarr & co".
+
 ## [1.1.0] - 2026-10-16
 
 ### Added

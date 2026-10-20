@@ -1,12 +1,12 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Sonarr, Radarr & Lidarr",
+  "name": "Sonarr, Radarr, Lidarr & co",
   "description": {
-    "en": "Sonarr, Radarr and Lidarr: releases of the week, queue, missing items, health alerts, searches.",
-    "fr": "Sonarr, Radarr et Lidarr : sorties de la semaine, file, manquants, alertes de santé, recherches.",
-    "de": "Sonarr, Radarr, Lidarr: Neuerscheinungen, Warteschlange, Fehlende, Zustandsmeldungen, Suche.",
-    "es": "Sonarr, Radarr y Lidarr: estrenos de la semana, cola, pendientes, avisos de estado, búsquedas."
+    "en": "Sonarr, Radarr, Lidarr, Prowlarr, Bazarr: releases, queue, missing items, indexers, subtitles.",
+    "fr": "Sonarr, Radarr, Lidarr, Prowlarr, Bazarr : sorties, file, manquants, indexeurs, sous-titres.",
+    "de": "Sonarr, Radarr, Lidarr, Prowlarr, Bazarr: Neuerscheinungen, Warteschlange, Indexer, Untertitel.",
+    "es": "Sonarr, Radarr, Lidarr, Prowlarr, Bazarr: estrenos, cola, pendientes, indexadores, subtítulos."
   },
   "version": "1.1.0",
   "docker_image": "ghcr.io/guim31/gladys-arr:1.1.0",
@@ -535,6 +535,187 @@
       "default": ""
     },
     {
+      "key": "prowlarr_1",
+      "type": "section",
+      "label": {
+        "en": "Prowlarr (indexers)",
+        "fr": "Prowlarr (indexeurs)",
+        "de": "Prowlarr (Indexer)",
+        "es": "Prowlarr (indexadores)"
+      },
+      "description": {
+        "en": "Optional: the indexer manager of Sonarr, Radarr and Lidarr.",
+        "fr": "Facultatif : le gestionnaire d'indexeurs de Sonarr, Radarr et Lidarr.",
+        "de": "Optional: der Indexer-Manager von Sonarr, Radarr und Lidarr.",
+        "es": "Opcional: el gestor de indexadores de Sonarr, Radarr y Lidarr."
+      }
+    },
+    {
+      "key": "prowlarr_1_url",
+      "type": "string",
+      "label": {
+        "en": "Address",
+        "fr": "Adresse",
+        "de": "Adresse",
+        "es": "Dirección"
+      },
+      "description": {
+        "en": "IP address or name with the port, and the URL base if any (e.g. http://192.168.1.2:9696/prowlarr).",
+        "fr": "Adresse IP ou nom avec le port, et la base d'URL s'il y en a une (ex. http://192.168.1.2:9696/prowlarr).",
+        "de": "IP-Adresse oder Name mit Port und gegebenenfalls URL-Basis (z. B. http://192.168.1.2:9696/prowlarr).",
+        "es": "Dirección IP o nombre con el puerto, y la base de URL si la hay (p. ej. http://192.168.1.2:9696/prowlarr)."
+      },
+      "placeholder": {
+        "en": "e.g. 192.168.1.2:9696",
+        "fr": "ex. 192.168.1.2:9696",
+        "de": "z. B. 192.168.1.2:9696",
+        "es": "p. ej. 192.168.1.2:9696"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "prowlarr_1_api_key",
+      "type": "secret",
+      "label": {
+        "en": "API key",
+        "fr": "Clé d'API",
+        "de": "API-Schlüssel",
+        "es": "Clave de API"
+      },
+      "description": {
+        "en": "Prowlarr: Settings → General → Security → API Key.",
+        "fr": "Prowlarr : Settings → General → Security → API Key.",
+        "de": "Prowlarr: Settings → General → Security → API Key.",
+        "es": "Prowlarr: Settings → General → Security → API Key."
+      },
+      "required": false
+    },
+    {
+      "key": "prowlarr_1_name",
+      "type": "string",
+      "label": {
+        "en": "Name",
+        "fr": "Nom",
+        "de": "Name",
+        "es": "Nombre"
+      },
+      "description": {
+        "en": "Name of the device in Gladys. Empty: \"Prowlarr\" followed by the address.",
+        "fr": "Nom de l'appareil dans Gladys. Vide : « Prowlarr » suivi de l'adresse.",
+        "de": "Name des Geräts in Gladys. Leer: „Prowlarr“ gefolgt von der Adresse.",
+        "es": "Nombre del dispositivo en Gladys. Vacío: «Prowlarr» seguido de la dirección."
+      },
+      "placeholder": {
+        "en": "e.g. Prowlarr",
+        "fr": "ex. Prowlarr",
+        "de": "z. B. Prowlarr",
+        "es": "p. ej. Prowlarr"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "bazarr_1",
+      "type": "section",
+      "label": {
+        "en": "Bazarr (subtitles)",
+        "fr": "Bazarr (sous-titres)",
+        "de": "Bazarr (Untertitel)",
+        "es": "Bazarr (subtítulos)"
+      },
+      "description": {
+        "en": "Optional: the subtitles of your Sonarr series and Radarr movies.",
+        "fr": "Facultatif : les sous-titres de vos séries Sonarr et films Radarr.",
+        "de": "Optional: die Untertitel deiner Sonarr-Serien und Radarr-Filme.",
+        "es": "Opcional: los subtítulos de sus series de Sonarr y películas de Radarr."
+      }
+    },
+    {
+      "key": "bazarr_1_url",
+      "type": "string",
+      "label": {
+        "en": "Address",
+        "fr": "Adresse",
+        "de": "Adresse",
+        "es": "Dirección"
+      },
+      "description": {
+        "en": "IP address or name with the port, and the URL base if any (e.g. http://192.168.1.2:6767/bazarr).",
+        "fr": "Adresse IP ou nom avec le port, et la base d'URL s'il y en a une (ex. http://192.168.1.2:6767/bazarr).",
+        "de": "IP-Adresse oder Name mit Port und gegebenenfalls URL-Basis (z. B. http://192.168.1.2:6767/bazarr).",
+        "es": "Dirección IP o nombre con el puerto, y la base de URL si la hay (p. ej. http://192.168.1.2:6767/bazarr)."
+      },
+      "placeholder": {
+        "en": "e.g. 192.168.1.2:6767",
+        "fr": "ex. 192.168.1.2:6767",
+        "de": "z. B. 192.168.1.2:6767",
+        "es": "p. ej. 192.168.1.2:6767"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "bazarr_1_api_key",
+      "type": "secret",
+      "label": {
+        "en": "API key",
+        "fr": "Clé d'API",
+        "de": "API-Schlüssel",
+        "es": "Clave de API"
+      },
+      "description": {
+        "en": "Bazarr: Settings → General → Security → API Key.",
+        "fr": "Bazarr : Settings → General → Security → API Key.",
+        "de": "Bazarr: Settings → General → Security → API Key.",
+        "es": "Bazarr: Settings → General → Security → API Key."
+      },
+      "required": false
+    },
+    {
+      "key": "bazarr_1_name",
+      "type": "string",
+      "label": {
+        "en": "Name",
+        "fr": "Nom",
+        "de": "Name",
+        "es": "Nombre"
+      },
+      "description": {
+        "en": "Name of the device in Gladys. Empty: \"Bazarr\" followed by the address.",
+        "fr": "Nom de l'appareil dans Gladys. Vide : « Bazarr » suivi de l'adresse.",
+        "de": "Name des Geräts in Gladys. Leer: „Bazarr“ gefolgt von der Adresse.",
+        "es": "Nombre del dispositivo en Gladys. Vacío: «Bazarr» seguido de la dirección."
+      },
+      "placeholder": {
+        "en": "e.g. Bazarr",
+        "fr": "ex. Bazarr",
+        "de": "z. B. Bazarr",
+        "es": "p. ej. Bazarr"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "bazarr_1_missing_threshold",
+      "type": "number",
+      "label": {
+        "en": "Missing subtitles threshold",
+        "fr": "Seuil de sous-titres manquants",
+        "de": "Schwelle fehlender Untertitel",
+        "es": "Umbral de subtítulos pendientes"
+      },
+      "description": {
+        "en": "The \"Missing subtitles\" scene trigger fires when the episodes and movies missing subtitles reach this number.",
+        "fr": "Le déclencheur « Sous-titres manquants » part quand les épisodes et films sans sous-titres atteignent ce nombre.",
+        "de": "Der Auslöser „Fehlende Untertitel“ startet, wenn Episoden und Filme ohne Untertitel diese Zahl erreichen.",
+        "es": "El desencadenante «Subtítulos pendientes» se activa cuando los episodios y películas sin subtítulos alcanzan este número."
+      },
+      "required": false,
+      "default": 20,
+      "min": 1
+    },
+    {
       "key": "options",
       "type": "section",
       "label": {
@@ -996,6 +1177,24 @@
                 "de": "Lidarr (Musik)",
                 "es": "Lidarr (música)"
               }
+            },
+            {
+              "value": "prowlarr",
+              "label": {
+                "en": "Prowlarr (indexers)",
+                "fr": "Prowlarr (indexeurs)",
+                "de": "Prowlarr (Indexer)",
+                "es": "Prowlarr (indexadores)"
+              }
+            },
+            {
+              "value": "bazarr",
+              "label": {
+                "en": "Bazarr (subtitles)",
+                "fr": "Bazarr (sous-titres)",
+                "de": "Bazarr (Untertitel)",
+                "es": "Bazarr (subtítulos)"
+              }
             }
           ]
         },
@@ -1055,10 +1254,10 @@
           "key": "app",
           "type": "string",
           "label": {
-            "en": "Application (sonarr, radarr, lidarr)",
-            "fr": "Application (sonarr, radarr, lidarr)",
-            "de": "Anwendung (sonarr, radarr, lidarr)",
-            "es": "Aplicación (sonarr, radarr, lidarr)"
+            "en": "Application (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "fr": "Application (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "de": "Anwendung (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "es": "Aplicación (sonarr, radarr, lidarr, prowlarr, bazarr)"
           }
         },
         {
@@ -1085,10 +1284,350 @@
           "key": "message",
           "type": "string",
           "label": {
-            "en": "Message of Sonarr, Radarr or Lidarr",
-            "fr": "Message de Sonarr, Radarr ou Lidarr",
-            "de": "Meldung von Sonarr, Radarr oder Lidarr",
-            "es": "Mensaje de Sonarr, Radarr o Lidarr"
+            "en": "Message of the application",
+            "fr": "Message de l'application",
+            "de": "Meldung der Anwendung",
+            "es": "Mensaje de la aplicación"
+          }
+        }
+      ]
+    },
+    {
+      "key": "indexer_failed",
+      "label": {
+        "en": "Prowlarr indexer failing",
+        "fr": "Indexeur Prowlarr en échec",
+        "de": "Prowlarr-Indexer fehlerhaft",
+        "es": "Indexador de Prowlarr con error"
+      },
+      "description": {
+        "en": "Prowlarr paused an indexer after failures (down site, refused login, too many requests).",
+        "fr": "Prowlarr a mis un indexeur en pause après des échecs (site en panne, connexion refusée, trop de requêtes).",
+        "de": "Prowlarr hat einen Indexer nach Fehlern pausiert (Seite down, Anmeldung abgelehnt, zu viele Anfragen).",
+        "es": "Prowlarr ha pausado un indexador tras errores (sitio caído, acceso rechazado, demasiadas peticiones)."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Instance (empty: any)",
+            "fr": "Instance (vide : n'importe laquelle)",
+            "de": "Instanz (leer: beliebig)",
+            "es": "Instancia (vacío: cualquiera)"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "instance",
+          "type": "string",
+          "label": {
+            "en": "Instance name",
+            "fr": "Nom de l'instance",
+            "de": "Name der Instanz",
+            "es": "Nombre de la instancia"
+          }
+        },
+        {
+          "key": "device",
+          "type": "string",
+          "label": {
+            "en": "Instance device",
+            "fr": "Appareil de l'instance",
+            "de": "Gerät der Instanz",
+            "es": "Dispositivo de la instancia"
+          }
+        },
+        {
+          "key": "app",
+          "type": "string",
+          "label": {
+            "en": "Application (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "fr": "Application (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "de": "Anwendung (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "es": "Aplicación (sonarr, radarr, lidarr, prowlarr, bazarr)"
+          }
+        },
+        {
+          "key": "indexer",
+          "type": "string",
+          "label": {
+            "en": "Indexer name",
+            "fr": "Nom de l'indexeur",
+            "de": "Name des Indexers",
+            "es": "Nombre del indexador"
+          }
+        },
+        {
+          "key": "until",
+          "type": "string",
+          "label": {
+            "en": "Paused until (ISO date)",
+            "fr": "En pause jusqu'à (date ISO)",
+            "de": "Pausiert bis (ISO-Datum)",
+            "es": "En pausa hasta (fecha ISO)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "indexer_restored",
+      "label": {
+        "en": "Prowlarr indexer back",
+        "fr": "Indexeur Prowlarr rétabli",
+        "de": "Prowlarr-Indexer wieder da",
+        "es": "Indexador de Prowlarr restablecido"
+      },
+      "description": {
+        "en": "Prowlarr lifted the pause of an indexer paused after failures: it will try it again.",
+        "fr": "Prowlarr a levé la pause d'un indexeur mis en pause après des échecs : il va le réessayer.",
+        "de": "Prowlarr hat die Pause eines nach Fehlern pausierten Indexers aufgehoben: Er wird erneut versucht.",
+        "es": "Prowlarr ha levantado la pausa de un indexador pausado tras errores: lo volverá a intentar."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Instance (empty: any)",
+            "fr": "Instance (vide : n'importe laquelle)",
+            "de": "Instanz (leer: beliebig)",
+            "es": "Instancia (vacío: cualquiera)"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "instance",
+          "type": "string",
+          "label": {
+            "en": "Instance name",
+            "fr": "Nom de l'instance",
+            "de": "Name der Instanz",
+            "es": "Nombre de la instancia"
+          }
+        },
+        {
+          "key": "device",
+          "type": "string",
+          "label": {
+            "en": "Instance device",
+            "fr": "Appareil de l'instance",
+            "de": "Gerät der Instanz",
+            "es": "Dispositivo de la instancia"
+          }
+        },
+        {
+          "key": "app",
+          "type": "string",
+          "label": {
+            "en": "Application (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "fr": "Application (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "de": "Anwendung (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "es": "Aplicación (sonarr, radarr, lidarr, prowlarr, bazarr)"
+          }
+        },
+        {
+          "key": "indexer",
+          "type": "string",
+          "label": {
+            "en": "Indexer name",
+            "fr": "Nom de l'indexeur",
+            "de": "Name des Indexers",
+            "es": "Nombre del indexador"
+          }
+        }
+      ]
+    },
+    {
+      "key": "subtitles_missing",
+      "label": {
+        "en": "Bazarr: missing subtitles over the threshold",
+        "fr": "Bazarr : sous-titres manquants au-delà du seuil",
+        "de": "Bazarr: fehlende Untertitel über der Schwelle",
+        "es": "Bazarr: subtítulos pendientes sobre el umbral"
+      },
+      "description": {
+        "en": "The episodes and movies missing subtitles reached the threshold of the configuration (20 by default).",
+        "fr": "Les épisodes et films sans sous-titres ont atteint le seuil de la configuration (20 par défaut).",
+        "de": "Episoden und Filme ohne Untertitel haben die Schwelle der Konfiguration erreicht (standardmäßig 20).",
+        "es": "Los episodios y películas sin subtítulos han alcanzado el umbral de la configuración (20 por defecto)."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Instance (empty: any)",
+            "fr": "Instance (vide : n'importe laquelle)",
+            "de": "Instanz (leer: beliebig)",
+            "es": "Instancia (vacío: cualquiera)"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "instance",
+          "type": "string",
+          "label": {
+            "en": "Instance name",
+            "fr": "Nom de l'instance",
+            "de": "Name der Instanz",
+            "es": "Nombre de la instancia"
+          }
+        },
+        {
+          "key": "device",
+          "type": "string",
+          "label": {
+            "en": "Instance device",
+            "fr": "Appareil de l'instance",
+            "de": "Gerät der Instanz",
+            "es": "Dispositivo de la instancia"
+          }
+        },
+        {
+          "key": "app",
+          "type": "string",
+          "label": {
+            "en": "Application (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "fr": "Application (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "de": "Anwendung (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "es": "Aplicación (sonarr, radarr, lidarr, prowlarr, bazarr)"
+          }
+        },
+        {
+          "key": "episodes",
+          "type": "number",
+          "label": {
+            "en": "Episodes missing subtitles",
+            "fr": "Épisodes sans sous-titres",
+            "de": "Episoden ohne Untertitel",
+            "es": "Episodios sin subtítulos"
+          }
+        },
+        {
+          "key": "movies",
+          "type": "number",
+          "label": {
+            "en": "Movies missing subtitles",
+            "fr": "Films sans sous-titres",
+            "de": "Filme ohne Untertitel",
+            "es": "Películas sin subtítulos"
+          }
+        },
+        {
+          "key": "total",
+          "type": "number",
+          "label": {
+            "en": "Total missing",
+            "fr": "Total manquant",
+            "de": "Fehlend insgesamt",
+            "es": "Total pendiente"
+          }
+        },
+        {
+          "key": "threshold",
+          "type": "number",
+          "label": {
+            "en": "Threshold",
+            "fr": "Seuil",
+            "de": "Schwelle",
+            "es": "Umbral"
+          }
+        }
+      ]
+    },
+    {
+      "key": "provider_failed",
+      "label": {
+        "en": "Bazarr subtitle provider failing",
+        "fr": "Fournisseur de sous-titres Bazarr en échec",
+        "de": "Bazarr-Untertitelanbieter fehlerhaft",
+        "es": "Proveedor de subtítulos de Bazarr con error"
+      },
+      "description": {
+        "en": "Bazarr paused a subtitle provider after an error (too many downloads, refused login…).",
+        "fr": "Bazarr a mis un fournisseur de sous-titres en pause après une erreur (trop de téléchargements, connexion refusée…).",
+        "de": "Bazarr hat einen Untertitelanbieter nach einem Fehler pausiert (zu viele Downloads, Anmeldung abgelehnt…).",
+        "es": "Bazarr ha pausado un proveedor de subtítulos tras un error (demasiadas descargas, acceso rechazado…)."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Instance (empty: any)",
+            "fr": "Instance (vide : n'importe laquelle)",
+            "de": "Instanz (leer: beliebig)",
+            "es": "Instancia (vacío: cualquiera)"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "instance",
+          "type": "string",
+          "label": {
+            "en": "Instance name",
+            "fr": "Nom de l'instance",
+            "de": "Name der Instanz",
+            "es": "Nombre de la instancia"
+          }
+        },
+        {
+          "key": "device",
+          "type": "string",
+          "label": {
+            "en": "Instance device",
+            "fr": "Appareil de l'instance",
+            "de": "Gerät der Instanz",
+            "es": "Dispositivo de la instancia"
+          }
+        },
+        {
+          "key": "app",
+          "type": "string",
+          "label": {
+            "en": "Application (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "fr": "Application (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "de": "Anwendung (sonarr, radarr, lidarr, prowlarr, bazarr)",
+            "es": "Aplicación (sonarr, radarr, lidarr, prowlarr, bazarr)"
+          }
+        },
+        {
+          "key": "provider",
+          "type": "string",
+          "label": {
+            "en": "Provider name",
+            "fr": "Nom du fournisseur",
+            "de": "Name des Anbieters",
+            "es": "Nombre del proveedor"
+          }
+        },
+        {
+          "key": "reason",
+          "type": "string",
+          "label": {
+            "en": "Reason given by Bazarr",
+            "fr": "Raison donnée par Bazarr",
+            "de": "Grund von Bazarr",
+            "es": "Motivo indicado por Bazarr"
+          }
+        },
+        {
+          "key": "until",
+          "type": "string",
+          "label": {
+            "en": "Paused until (as Bazarr writes it)",
+            "fr": "En pause jusqu'à (tel qu'écrit par Bazarr)",
+            "de": "Pausiert bis (wie Bazarr es schreibt)",
+            "es": "En pausa hasta (como lo escribe Bazarr)"
           }
         }
       ]
@@ -1098,16 +1637,16 @@
     {
       "key": "search_missing",
       "label": {
-        "en": "Search missing episodes, movies or albums",
-        "fr": "Chercher les épisodes, films ou albums manquants",
-        "de": "Fehlende Episoden, Filme oder Alben suchen",
-        "es": "Buscar episodios, películas o álbumes pendientes"
+        "en": "Search missing episodes, movies, albums or subtitles",
+        "fr": "Chercher épisodes, films, albums ou sous-titres manquants",
+        "de": "Fehlende Episoden, Filme, Alben oder Untertitel suchen",
+        "es": "Buscar episodios, películas, álbumes o subtítulos pendientes"
       },
       "description": {
-        "en": "Starts the search of every monitored missing episode, movie or album (Wanted → Missing).",
-        "fr": "Lance la recherche de tous les épisodes, films ou albums surveillés manquants (Wanted → Missing).",
-        "de": "Startet die Suche aller überwachten fehlenden Episoden, Filme oder Alben (Wanted → Missing).",
-        "es": "Inicia la búsqueda de todos los episodios, películas o álbumes vigilados pendientes (Wanted → Missing)."
+        "en": "Starts the search of every monitored missing episode, movie or album (Wanted → Missing), and of the missing subtitles in Bazarr.",
+        "fr": "Lance la recherche de tous les épisodes, films ou albums surveillés manquants (Wanted → Missing), et des sous-titres manquants dans Bazarr.",
+        "de": "Startet die Suche aller überwachten fehlenden Episoden, Filme oder Alben (Wanted → Missing) und der fehlenden Untertitel in Bazarr.",
+        "es": "Inicia la búsqueda de todos los episodios, películas o álbumes vigilados pendientes (Wanted → Missing) y de los subtítulos pendientes en Bazarr."
       },
       "timeout_seconds": 20,
       "fields": [
@@ -1139,16 +1678,16 @@
     {
       "key": "refresh_library",
       "label": {
-        "en": "Refresh the Sonarr, Radarr or Lidarr library",
-        "fr": "Rafraîchir la bibliothèque Sonarr, Radarr ou Lidarr",
-        "de": "Sonarr-, Radarr- oder Lidarr-Bibliothek aktualisieren",
-        "es": "Actualizar la biblioteca de Sonarr, Radarr o Lidarr"
+        "en": "Refresh the Sonarr, Radarr, Lidarr or Bazarr library",
+        "fr": "Rafraîchir la bibliothèque Sonarr, Radarr, Lidarr ou Bazarr",
+        "de": "Sonarr-/Radarr-/Lidarr-/Bazarr-Bibliothek aktualisieren",
+        "es": "Actualizar la biblioteca de Sonarr, Radarr, Lidarr o Bazarr"
       },
       "description": {
-        "en": "Asks Sonarr, Radarr or Lidarr to refresh the information and files of every series, movie or artist.",
-        "fr": "Demande à Sonarr, Radarr ou Lidarr de rafraîchir les informations et fichiers de chaque série, film ou artiste.",
-        "de": "Bittet Sonarr, Radarr oder Lidarr, Infos und Dateien aller Serien, Filme oder Künstler zu aktualisieren.",
-        "es": "Pide a Sonarr, Radarr o Lidarr que actualice la información y los archivos de cada serie, película o artista."
+        "en": "Asks Sonarr, Radarr or Lidarr to refresh every series, movie or artist, and Bazarr to sync its series and movies.",
+        "fr": "Demande à Sonarr, Radarr ou Lidarr de rafraîchir chaque série, film ou artiste, et à Bazarr de synchroniser ses séries et films.",
+        "de": "Bittet Sonarr, Radarr oder Lidarr, alle Serien, Filme oder Künstler zu aktualisieren, und Bazarr, Serien und Filme abzugleichen.",
+        "es": "Pide a Sonarr, Radarr o Lidarr que actualice cada serie, película o artista, y a Bazarr que sincronice sus series y películas."
       },
       "timeout_seconds": 30,
       "fields": [
@@ -1180,16 +1719,16 @@
     {
       "key": "read_summary",
       "label": {
-        "en": "Read the Sonarr/Radarr/Lidarr summary",
-        "fr": "Lire le résumé Sonarr/Radarr/Lidarr",
-        "de": "Sonarr/Radarr/Lidarr-Zusammenfassung lesen",
-        "es": "Leer el resumen de Sonarr/Radarr/Lidarr"
+        "en": "Read the *arr summary",
+        "fr": "Lire le résumé *arr",
+        "de": "*arr-Zusammenfassung lesen",
+        "es": "Leer el resumen *arr"
       },
       "description": {
-        "en": "A sentence for a message: releases this week, queue, missing items, health issues.",
-        "fr": "Une phrase pour un message : sorties de la semaine, file, manquants, alertes de santé.",
-        "de": "Ein Satz für eine Nachricht: Neuerscheinungen der Woche, Warteschlange, Fehlende, Meldungen.",
-        "es": "Una frase para un mensaje: estrenos de la semana, cola, pendientes, avisos de estado."
+        "en": "A sentence for a message: releases this week, queue, missing items, indexers, subtitles, health issues.",
+        "fr": "Une phrase pour un message : sorties de la semaine, file, manquants, indexeurs, sous-titres, alertes de santé.",
+        "de": "Ein Satz für eine Nachricht: Neuerscheinungen der Woche, Warteschlange, Fehlende, Indexer, Untertitel, Meldungen.",
+        "es": "Una frase para un mensaje: estrenos de la semana, cola, pendientes, indexadores, subtítulos, avisos de estado."
       },
       "timeout_seconds": 30,
       "fields": [
